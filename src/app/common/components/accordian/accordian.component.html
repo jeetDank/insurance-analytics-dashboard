@@ -1,0 +1,24 @@
+<div class="mt-2">
+  <div class="mb-2 mt-2 fs-4">
+    {{ title }}
+  </div>
+
+  <p-accordion class="mt-2" [value]="0">
+    @for (tab of tabs; track tab.title) {
+    <p-accordion-panel [value]="tab.value">
+      <p-accordion-header  class="fw-medium fs-5 mb-3 " style="background-color: rgb(241, 241, 241);">{{ tab.title }}</p-accordion-header>
+      <p-accordion-content>
+        <div class=" fs-6">
+          {{ tab.subTitle }}
+        </div>
+        <div>
+           <app-insights></app-insights> 
+        </div>
+
+
+
+      </p-accordion-content>
+    </p-accordion-panel>
+    }
+  </p-accordion>
+</div>

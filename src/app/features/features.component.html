@@ -1,0 +1,52 @@
+<mat-drawer-container style="width: 100vw; height: 100vh" autosize>
+  <mat-drawer
+    class="sidebar-container border"
+    #drawer
+    [opened]="true"
+    mode="side"
+  >
+    <app-sidebar></app-sidebar>
+  </mat-drawer>
+
+  <div class="content">
+    <nav class="navbar bg-body-secondary">
+      <div class="container-fluid">
+        <span (click)="drawer.toggle()">
+          <app-icon name="Menu"></app-icon>
+        </span>
+      </div>
+    </nav>
+    <div class="m-5">
+      <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
+        <mat-tab label="Dashboard">
+          <app-common-container
+            ><app-dashboard></app-dashboard
+          ></app-common-container>
+        </mat-tab>
+        <mat-tab label="Single Analysis">
+          <app-common-container
+            ><app-single-analysis></app-single-analysis
+          ></app-common-container>
+        </mat-tab>
+        <mat-tab label="Comparative Analysis">
+          <app-common-container>
+            <app-comparative-analysis></app-comparative-analysis>
+          </app-common-container>
+        </mat-tab>
+        <mat-tab label="Formula Results">
+ <app-common-container> <app-formula-results></app-formula-results></app-common-container>
+         
+        </mat-tab>
+        <mat-tab label="Interactive AI Chats">
+          <app-common-container>  <app-interactive-ai-chats></app-interactive-ai-chats></app-common-container>
+         
+        </mat-tab>
+        <mat-tab label="Semantic Testing"></mat-tab>
+        <mat-tab label="Ask AI Anything"></mat-tab>
+        <mat-tab label="Data Processing"></mat-tab>
+      </mat-tab-group>
+
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</mat-drawer-container>

@@ -1,0 +1,29 @@
+<div class="card border-0 shadow-sm h-100">
+  <div class="card-body">
+    <!-- Title -->
+    <h6 class="mb-2 text-secondary fw-medium">
+      {{ title }}
+    </h6>
+
+    <!-- Value -->
+    <h2 class="fw-medium fs-2 mb-3">
+      {{ value }}
+    </h2>
+
+    <!-- Trend Badge -->
+    <span 
+      class="badge d-inline-flex align-items-center px-2 py-1" 
+      [ngClass]="trend >= 0 ? 'bg-green' : 'bg-red'">
+
+      <span *ngIf="trend > 0" >  
+        &#9650;
+      </span>
+
+      <span *ngIf="trend < 0">
+        &#9660;
+      </span>
+      
+      {{ trend }}%
+    </span>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header mb-4">
+      <app-icon name="User"  color="#374151"></app-icon>
+      <h2>Agentic AI Analytics</h2>
+      <p class="subtitle">Sign in to continue</p>
+    </div>
+
+    <ngb-alert *ngIf="errorMessage" type="danger" (close)="errorMessage=null">
+      {{ errorMessage }}
+    </ngb-alert>
+
+    <form (ngSubmit)="onLogin()" class="login-form">
+      <!-- Email -->
+      <div class="input-group mb-3">
+        <span class="input-group-text bg-light border-0">
+          <app-icon name="User" [size]="18" color="#6b7280"></app-icon>
+        </span>
+        <input
+          type="email"
+          class="form-control border-0 shadow-sm"
+          placeholder="Email"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="input-group mb-3">
+        <span class="input-group-text bg-light border-0">
+          <app-icon name="Settings" [size]="18" color="#6b7280"></app-icon>
+        </span>
+        <input
+          type="password"
+          class="form-control border-0 shadow-sm"
+          placeholder="Password"
+          [(ngModel)]="password"
+          name="password"
+          required
+        />
+      </div>
+
+      <button type="submit" (click)="redirectToFeatures()" class="btn btn-dark w-100 shadow-sm mb-3">
+        Login
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Forgot your password? <a href="#">Reset here</a></p>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card flex justify-center">
+    <p-button label="Check" />
+</div>
