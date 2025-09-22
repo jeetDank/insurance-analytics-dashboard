@@ -1,8 +1,8 @@
 <!-- <div class="fs-2 text-dark">Dashboard</div> -->
 <div class="fs-4 text-dark mt-3 mb-3">Ask About Insurance Analytics</div>
 
-<form class="">
-  <div class="row pb-3">
+<div class="">
+  <form class="row pb-3">
     <div class="col-sm-12 col-lg-12 d-flex flex-column">
       <label class="mb-2" for="">Enter Your Query</label>
 
@@ -33,9 +33,7 @@
         Comparison completed for 3 companies</p-message
       >
     </div>
-
-
-  </div>
+  </form>
 
   <ng-container *ngIf="skeletonVisible == false">
     <div>
@@ -105,6 +103,6 @@
       />
     </div>
   </ng-container>
-</form>
+</div>
 
 <app-card-skeleton *ngIf="skeletonVisible == true"></app-card-skeleton>

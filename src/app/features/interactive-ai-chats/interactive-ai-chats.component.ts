@@ -11,8 +11,7 @@ import { AccordianComponent } from '../../common/components/accordian/accordian.
 import { MultiSelectModule } from 'primeng/multiselect';
 import { EChartsOption } from 'echarts';
 import { EchartsComponent } from '../../common/components/echart/echart.component';
-import {TextareaModule} from 'primeng/textarea';
-
+import { TextareaModule } from 'primeng/textarea';
 
 @Component({
   selector: 'app-interactive-ai-chats',
@@ -29,11 +28,10 @@ import {TextareaModule} from 'primeng/textarea';
     TableComponent,
     CardSkeletonComponent,
     CommonModule,
-    TextareaModule
-    
+    TextareaModule,
   ],
   templateUrl: './interactive-ai-chats.component.html',
-  styleUrl: './interactive-ai-chats.component.scss'
+  styleUrl: './interactive-ai-chats.component.scss',
 })
 export class InteractiveAiChatsComponent {
   skeletonVisible: boolean = true;
@@ -125,38 +123,38 @@ export class InteractiveAiChatsComponent {
 
   chartOptions: EChartsOption = {
     title: {
-    text: 'Basic Radar Chart'
-  },
-  legend: {
-    data: ['Allocated Budget', 'Actual Spending']
-  },
-  radar: {
-    // shape: 'circle',
-    indicator: [
-      { name: 'Sales', max: 6500 },
-      { name: 'Administration', max: 16000 },
-      { name: 'Information Technology', max: 30000 },
-      { name: 'Customer Support', max: 38000 },
-      { name: 'Development', max: 52000 },
-      { name: 'Marketing', max: 25000 }
-    ]
-  },
-  series: [
-    {
-      name: 'Budget vs spending',
-      type: 'radar',
-      data: [
-        {
-          value: [4200, 3000, 20000, 35000, 50000, 18000],
-          name: 'Allocated Budget'
-        },
-        {
-          value: [5000, 14000, 28000, 26000, 42000, 21000],
-          name: 'Actual Spending'
-        }
-      ]
-    }
-  ]
+      text: 'Basic Radar Chart',
+    },
+    legend: {
+      data: ['Allocated Budget', 'Actual Spending'],
+    },
+    radar: {
+      // shape: 'circle',
+      indicator: [
+        { name: 'Sales', max: 6500 },
+        { name: 'Administration', max: 16000 },
+        { name: 'Information Technology', max: 30000 },
+        { name: 'Customer Support', max: 38000 },
+        { name: 'Development', max: 52000 },
+        { name: 'Marketing', max: 25000 },
+      ],
+    },
+    series: [
+      {
+        name: 'Budget vs spending',
+        type: 'radar',
+        data: [
+          {
+            value: [4200, 3000, 20000, 35000, 50000, 18000],
+            name: 'Allocated Budget',
+          },
+          {
+            value: [5000, 14000, 28000, 26000, 42000, 21000],
+            name: 'Actual Spending',
+          },
+        ],
+      },
+    ],
   };
 
   onChartInit(chart: any) {
@@ -174,5 +172,4 @@ export class InteractiveAiChatsComponent {
       ],
     };
   }
-
 }

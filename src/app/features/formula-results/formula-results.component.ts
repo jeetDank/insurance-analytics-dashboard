@@ -9,7 +9,7 @@ import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-formula-results',
-  imports:  [InputTextModule,SelectModule, ButtonModule, MessageModule, IconsModule, CardSkeletonComponent, CommonModule],
+  imports:  [InputTextModule,SelectModule, ButtonModule, MessageModule, IconsModule, CommonModule],
   templateUrl: './formula-results.component.html',
   styleUrl: './formula-results.component.scss'
 })

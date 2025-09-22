@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { FeatherModule } from 'angular-feather';
-import { Home, Settings, Search, User, Bell,Upload,Clock,Menu, Hexagon, Box, PieChart, CheckCircle } from 'angular-feather/icons';
+import { Home, Settings, Search, User, Bell,Upload,Clock,Menu, Hexagon, Box, PieChart, CheckCircle, Info } from 'angular-feather/icons';
 import { IconComponent } from './icon.component';
 
 const icons = {
@@ -15,7 +15,8 @@ const icons = {
   Hexagon,
   Box,
   PieChart,
-  CheckCircle
+  CheckCircle,
+  Info
   
 };
 

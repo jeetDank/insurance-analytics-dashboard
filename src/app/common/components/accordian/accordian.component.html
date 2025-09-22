@@ -1,9 +1,9 @@
 <div class="mt-2">
-  <div class="mb-2 mt-2 fs-4">
-    {{ title }}
+  <div class="mb-2 mt-2 fs-4 d-flex flex-row gap-2 align-items-center">
+    {{ title }} <i class="pi pi-link" style="font-size: large;" ></i>
   </div>
 
-  <p-accordion class="mt-2" [value]="0">
+  <p-accordion class="mt-4" [value]="0">
     @for (tab of tabs; track tab.title) {
     <p-accordion-panel [value]="tab.value">
       <p-accordion-header  class="fw-medium fs-5 mb-3 " style="background-color: rgb(241, 241, 241);">{{ tab.title }}</p-accordion-header>

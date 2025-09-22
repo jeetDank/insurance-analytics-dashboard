@@ -1,29 +1,20 @@
 <div class="mt-2">
+  @for(insights of data;track insights.id){
 
-
-
-    @for(insights of data;track insights.id){
-
-        <ng-container>
-    <div class="fs-4 mb-2">{{insights.title}}</div>
-    <div class="fs-5 mb-2">{{insights.subTitle}}</div>
+  <ng-container>
+    <div class="fs-4 mb-2">{{ insights.title }}</div>
+    <div class="fs-5 mb-2">{{ insights.subTitle }}</div>
 
     <ul>
-       
-        @for(point of insights.bulletPoints;track point){
+      @for(point of insights.bulletPoints;track point){
 
-             <li class="mb-1">
-        
-                {{point}}
+      <li class="mb-1">
+        {{ point }}
       </li>
-   
-        }
-        
-     
+
+      }
     </ul>
   </ng-container>
 
-    }
-
-  
+  }
 </div>

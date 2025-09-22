@@ -12,6 +12,9 @@ import { SingleAnalysisComponent } from './single-analysis/single-analysis.compo
 import { ComparativeAnalysisComponent } from './comparative-analysis/comparative-analysis.component';
 import { FormulaResultsComponent } from './formula-results/formula-results.component';
 import { InteractiveAiChatsComponent } from './interactive-ai-chats/interactive-ai-chats.component';
+import { SemanticTestingComponent } from './semantic-testing/semantic-testing.component';
+import { AskAiAnythingComponent } from './ask-ai-anything/ask-ai-anything.component';
+import { DataProcessingComponent } from "./data-processing/data-processing.component";
 
 @Component({
   selector: 'app-features',
@@ -28,7 +31,11 @@ import { InteractiveAiChatsComponent } from './interactive-ai-chats/interactive-
     MatTabsModule,
     DashboardComponent,
     CommonContainerComponent,
-  ],
+    SemanticTestingComponent,
+    AskAiAnythingComponent,
+    DataProcessingComponent,
+    DataProcessingComponent
+],
   templateUrl: './features.component.html',
   styleUrl: './features.component.scss',
 })

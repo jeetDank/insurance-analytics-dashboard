@@ -4,7 +4,6 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { IconsModule } from '../../common/components/icon/icons.module';
 import { TableComponent } from '../../common/components/table/table.component';
-import { SimpleMetricCardComponent } from '../../common/components/simple-metric-card/simple-metric-card.component';
 import { CardSkeletonComponent } from '../../common/components/card-skeleton/card-skeleton.component';
 import { CommonModule } from '@angular/common';
 import { InsightsComponent } from '../../common/components/insights/insights.component';
