@@ -1,0 +1,20 @@
+::ng-deep .custom-message-wrapper.p-message {
+  border-left: 5px solid;
+  border-radius: 0 !important;
+}
+
+::ng-deep .custom-message-wrapper.p-message-success {
+  border-left-color: var(--green-500);
+}
+
+::ng-deep .custom-message-wrapper.p-message-info {
+  border-left-color: var(--blue-500);
+}
+
+::ng-deep .custom-message-wrapper.p-message-warn {
+  border-left-color: var(--yellow-500);
+}
+
+::ng-deep .custom-message-wrapper.p-message-error {
+  border-left-color: var(--red-500);
+}

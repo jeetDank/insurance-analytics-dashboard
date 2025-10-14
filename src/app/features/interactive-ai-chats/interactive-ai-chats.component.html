@@ -2,11 +2,12 @@
 <div class="fs-4 text-dark mt-3 mb-3">Ask About Insurance Analytics</div>
 
 <div class="">
-  <form class="row pb-3">
+  <form [formGroup]="interactiveAIChatForm" class="row pb-3">
     <div class="col-sm-12 col-lg-12 d-flex flex-column">
       <label class="mb-2" for="">Enter Your Query</label>
 
       <textarea
+        formControlName="query"
         placeholder="eg.,Compare Hartford and Travelers revenue for Q1 2024"
         pTextarea
         rows="5"
@@ -18,6 +19,8 @@
 
     <div class="col-sm-12 mt-3">
       <p-button
+        (click)="fetchQueryResults()"
+        [disabled]="interactiveAIChatForm.invalid"
         [loading]="skeletonVisible"
         [raised]="true"
         label="Submit Query"

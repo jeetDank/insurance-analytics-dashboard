@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {SelectModule} from 'primeng/select'
 import {ButtonModule} from 'primeng/button'
 import {MessageModule} from 'primeng/message'
@@ -9,7 +9,6 @@ import { AccordianComponent } from '../../common/components/accordian/accordian.
 import {MatTabsModule} from '@angular/material/tabs';
 import { CommonContainerComponent } from '../../common/components/common-container/common-container.component';
 import { FileUploadModule } from 'primeng/fileupload';
-import { HttpClient } from '@angular/common/http';
 import { TableComponent } from '../../common/components/table/table.component';
 import { EChartsOption } from 'echarts';
 import { EchartsComponent } from '../../common/components/echart/echart.component';
@@ -20,7 +19,7 @@ import { EchartsComponent } from '../../common/components/echart/echart.componen
   templateUrl: './data-processing.component.html',
   styleUrl: './data-processing.component.scss'
 })
-export class DataProcessingComponent {
+export class DataProcessingComponent implements OnInit {
 
   skeletonVisible:boolean = false;
 
@@ -29,9 +28,9 @@ export class DataProcessingComponent {
   }
 
   chartOptions: EChartsOption = {
-    title: {
-    text: 'Insurance Claims Trend',
-    left: 'center'
+   title: {
+    text: '',
+   
   },
   tooltip: {
     trigger: 'axis'
@@ -43,28 +42,60 @@ export class DataProcessingComponent {
   xAxis: {
     type: 'category',
     boundaryGap: false,
+    name: 'Months',
+    nameLocation: 'middle',
+    nameGap: 30, // distance from axis line
+    axisLine: { lineStyle: { color: '#666' } },
     data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']
   },
   yAxis: {
     type: 'value',
-    name: 'Number of Claims'
+    name: 'Number of Claims',
+    nameLocation: 'middle',
+    nameGap: 50,
+    axisLine: { lineStyle: { color: '#666' } },
+    nameRotate: 90 // vertical orientation
   },
   series: [
     {
       name: 'Filed Claims',
       type: 'line',
       smooth: true,
-      data: [120, 200, 150, 80, 70, 110, 130]
+      showSymbol: false, // remove point symbols
+      lineStyle: {
+        width: 3
+      },
+      areaStyle: {
+        opacity: 0.2
+      },
+      emphasis: {
+        focus: 'series'
+      },
+      data: [120, 250, 180, 90, 70, 160, 210]
     },
     {
       name: 'Approved Claims',
       type: 'line',
       smooth: true,
-      data: [100, 180, 130, 60, 50, 90, 110]
+      showSymbol: false,
+      lineStyle: {
+        width: 3
+      },
+      areaStyle: {
+        opacity: 0.2
+      },
+      emphasis: {
+        focus: 'series'
+      },
+      data: [100, 220, 150, 70, 50, 140, 180]
     }
   ]
   };
 
+
+  ngOnInit(): void {
+      
+  }
 
 
 }

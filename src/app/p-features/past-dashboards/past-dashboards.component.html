@@ -1,0 +1,40 @@
+<div class="side-panel w-100 overflow-hidden" >
+      
+  <div class="p-3 border-bottom">
+    <p-iconfield iconPosition="left">
+      <p-inputicon styleClass="pi pi-search" />
+      <input 
+        type="text" 
+        pInputText 
+        [(ngModel)]="searchQuery"
+        placeholder="Search dashboards..."
+        class="w-100"
+      />
+    </p-iconfield>
+  </div>
+
+  <!-- Dashboard List -->
+  <div class="dashboard-list overflow-y-auto">
+    @if (filteredDashboards.length > 0) {
+      @for (dashboard of filteredDashboards; track dashboard.id) {
+        <div 
+          class="dashboard-item p-3 border-bottom cursor-pointer"
+          (click)="selectDashboard(dashboard)"
+          [class.selected]="selectedDashboard?.id === dashboard.id"
+        >
+          <div class="d-flex align-items-start gap-2">
+            <i class="pi pi-chart-line text-primary mt-1"></i>
+            <div class="flex-grow-1">
+              <p class="mb-0 small text-wrap">{{ dashboard.name }}</p>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="p-4 text-center text-muted">
+        <i class="pi pi-inbox mb-2" style="font-size: 2rem"></i>
+        <p class="mb-0">No dashboards found</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<p-message 
+      [severity]="severity" 
+      styleClass="custom-message-wrapper mb-3"
+    >
+      
+        <div class="d-flex align-items-start gap-3 w-100">
+          @if (icon) {
+            <i [class]="icon" class="message-icon" style="font-size: 1.5rem"></i>
+          }
+          
+          <div class="flex-grow-1">
+            @if (title) {
+              <h6 class="mb-2 fw-semibold">{{ title }}</h6>
+            }
+            
+           @if (body) {
+              @if (isArray(body)) {
+                <ul class="mb-0 ps-3">
+                  @for (item of body; track $index) {
+                    <li class="mb-1 small">{{ item }}</li>
+                  }
+                </ul>
+              } @else {
+                <p class="mb-0 small">{{ body }}</p>
+              }
+            }
+          </div>
+        </div>
+      
+    </p-message>

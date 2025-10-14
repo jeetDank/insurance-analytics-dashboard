@@ -1,79 +1,11 @@
-<div class="container w-100 h-100 pt-2 px-4">
-  <div class="d-flex flex-row gap-2 align-items-center">
-    <app-page-title title="Agentic AI Analytics Platform"></app-page-title>
+<div class="">
+  <div class="project-title d-flex flex-row gap-2 align-items-center border-bottom">
+    <app-page-title class="text-center w-100 " title="Agentic AI Analytics"></app-page-title>
   </div>
 
+  <div class="container w-100 h-100 pt-2 px-4">
+    
 
-
-  <div>
-    <form class="pt-5 p-2 d-flex flex-column gap-4">
-      <div class="fs-5 d-flex flex-row align-items-center gap-1">
-        <app-icon name="Box"></app-icon> LLM Configuration
-      </div>
-      <div class="d-flex flex-column">
-        <label class="mb-2" for="">Select LLM Tier</label>
-        <p-select
-          formControlName="selectedCity"
-          [options]=""
-          optionLabel="name"
-          placeholder="Select"
-          class="w-full md:w-56"
-        />
-      </div>
-      <div class="d-flex flex-column">
-        <label class="mb-2" for="">Select Cloud Trial Provider</label>
-        <p-select
-          formControlName="selectedCity"
-          [options]=""
-          optionLabel="name"
-          placeholder="Select"
-          class="w-full md:w-56"
-        />
-      </div>
-      <div class="d-flex flex-column">
-        <label class="mb-2" for="">Select Model</label>
-        <p-select
-          formControlName="selectedCity"
-          [options]=""
-          optionLabel="name"
-          placeholder="Select"
-          class="w-full md:w-56"
-        />
-      </div>
-    </form>
-  </div>
-  <p-divider type="solid"></p-divider>
-  <div class="pt-4 p-2 d-flex flex-column gap-4">
-    <div class="d-flex flex-column">
-      <label class="mb-2" for="">Select Query to Resume</label>
-      <p-select
-        formControlName="selectedCity"
-        [options]=""
-        optionLabel="name"
-        placeholder="Select"
-        class="w-full md:w-56"
-      />
-    </div>
-
-    <div class="d-flex flex-row flex-wrap justify-content-between">
-      <p-button
-      [raised]="true"
-        label="Resume Query"
-        styleClass="text-dark"
-        severity="secondary"
-        variant="outlined"
-      />
-      <div>
-        <p-button  [link]="true" label="History" styleClass="text-dark" />
-      </div>
-    </div>
-    <p-divider styleClass="m-0 p-0" type="solid"></p-divider>
-
-    <div class="d-flex flex-row align-items-center gap-3">
-      <p-avatar label="JD" styleClass="mr-2" size="xlarge" />
-      <div>Jeet Dank</div>
-    </div>
+    
   </div>
 </div>
-
-

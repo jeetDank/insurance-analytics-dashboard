@@ -5,11 +5,11 @@
     [opened]="true"
     mode="side"
   >
-    <app-sidebar></app-sidebar>
+    <app-sidebar (sidebarData)="catchSidebarDataChange($event)" ></app-sidebar>
   </mat-drawer>
 
   <div class="content">
-    <nav class="navbar bg-body-secondary">
+    <nav class="navbar bg-body-secondary border border-end">
       <div class="container-fluid">
         <span (click)="drawer.toggle()">
           <app-icon name="Menu"></app-icon>
@@ -17,44 +17,50 @@
       </div>
     </nav>
     <div class="m-5">
-      <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="left">
-        <mat-tab label="Dashboard">
-          <app-common-container
-            ><app-dashboard></app-dashboard
-          ></app-common-container>
+      <mat-tab-group
+        (selectedTabChange)="catchActiveTabIndex($event)"
+        mat-stretch-tabs="false"
+        mat-align-tabs="left"
+      >
+        <mat-tab  label="Dashboard">
+          <ng-container *ngIf="activeTabIndex ==0" >
+            <app-common-container
+              ><app-dashboard></app-dashboard
+            ></app-common-container>
+          </ng-container>
         </mat-tab>
         <mat-tab label="Single Analysis">
-          <app-common-container
+          <app-common-container  *ngIf="activeTabIndex ==1"
             ><app-single-analysis></app-single-analysis
           ></app-common-container>
         </mat-tab>
         <mat-tab label="Comparative Analysis">
-          <app-common-container>
+          <app-common-container  *ngIf="activeTabIndex ==2" >
             <app-comparative-analysis></app-comparative-analysis>
           </app-common-container>
         </mat-tab>
         <mat-tab label="Formula Results">
-          <app-common-container>
+          <app-common-container  *ngIf="activeTabIndex ==3">
             <app-formula-results></app-formula-results
           ></app-common-container>
         </mat-tab>
         <mat-tab label="Interactive AI Chats">
-          <app-common-container>
-            <app-interactive-ai-chats></app-interactive-ai-chats
+          <app-common-container  *ngIf="activeTabIndex ==4">
+            <app-interactive-ai-chats [sidebarValues]="sidebarData" ></app-interactive-ai-chats
           ></app-common-container>
         </mat-tab>
         <mat-tab label="Semantic Testing">
-          <app-common-container>
+          <app-common-container  *ngIf="activeTabIndex ==5">
             <app-semantic-testing></app-semantic-testing>
           </app-common-container>
         </mat-tab>
         <mat-tab label="Ask AI Anything">
-          <app-common-container>
+          <app-common-container  *ngIf="activeTabIndex ==6">
             <app-ask-ai-anything></app-ask-ai-anything>
           </app-common-container>
         </mat-tab>
         <mat-tab label="Data Processing">
-          <app-common-container>
+          <app-common-container  *ngIf="activeTabIndex ==7">
             <app-data-processing></app-data-processing>
           </app-common-container>
         </mat-tab>

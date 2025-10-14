@@ -1,0 +1,91 @@
+<mat-drawer-container style="width: 100vw; height: 100vh" autosize>
+  <mat-drawer
+    class="sidebar-container border-end"
+    #drawer
+    [opened]="false"
+    mode="side"
+  >
+    <app-sidebar (sidebarData)="catchSidebarDataChange($event)"></app-sidebar>
+  </mat-drawer>
+
+  <div class="content">
+    <nav class="navbar nav-cust-props border-bottom">
+      <div class="d-flex align-items-center w-100">
+        <!-- uncomment to display the toggle sidebar button -->
+
+        <!-- <span (click)="drawer.toggle()">
+          <app-icon name="Menu"></app-icon>  
+
+        </span> -->
+
+        <span class="">
+          <h5>Financial Analysis Dashboard</h5>
+        </span>
+
+        <p-button
+          (click)="previousDashboards = true" 
+          class="ms-auto text-dark me-3"
+          variant="outlined"
+          icon="pi pi-history"
+          severity="secondary"
+          label="Previous Dashboards"
+        />
+        <p-button
+          (click)="formulas = true"
+          class="text-dark"
+          variant="outlined"
+          icon="pi pi-calculator"
+          severity="secondary"
+          label="Saved Formulas"
+        />
+      </div>
+    </nav>
+    <div class="canvas">
+      <div class="banner">
+        <div class="banner-icon-container me-3">
+          <span class="pi pi-chart-bar"></span>
+        </div>
+
+        <div class="banner-icon-container">
+          <span class="pi pi-chart-line"></span>
+        </div>
+
+        <div class="ms-4">
+          <div>
+            <h4 class="text-light">Financial Analysis Dashboard</h4>
+          </div>
+          <div class="text-light">
+            AI generated insights through comparative analysis of SEC filings
+          </div>
+        </div>
+      </div>
+
+      <div class="query-container shadow-sm border " >
+        <textarea placeholder="Enter your analysis prompt here..." class="query-text-area w-100"  name="" id=""></textarea>
+        <p-button class="mb-3 me-3" severity="contrast" icon="pi pi-send" />
+      </div>
+
+      <div class="sample-prompt-container mt-3" >
+        <div class="mb-3 w-100" >Sample Prompts:</div>
+        @for (item of samplePrompts; track $index) {
+            <p-button class="mt-2 mb-2 me-2" variant="outlined"  [label]="item.prompt" severity="secondary"  />
+        }
+      </div>
+
+      <div>
+          <app-accordian></app-accordian>
+      </div>
+
+
+    </div>
+  </div>
+</mat-drawer-container>
+
+
+<p-drawer [(visible)]="previousDashboards" [style]="{'width':'350px'}" position="right" header="Past Dashboads">
+    <app-past-dashboards></app-past-dashboards>
+</p-drawer>
+
+<p-drawer [(visible)]="formulas" [style]="{'width':'350px'}" position="right" header="Saved Formulae">
+   <app-saved-formulas></app-saved-formulas>
+</p-drawer>

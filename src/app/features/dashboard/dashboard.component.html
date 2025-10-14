@@ -7,7 +7,7 @@
       <label class="mb-2" for="">Select Company</label>
       <p-select
         appendTo="body"
-        formControlName="selectedCity"
+        
         [options]=""
         optionLabel="name"
         placeholder="Select"
@@ -19,7 +19,7 @@
       <label class="mb-2" for="">Select Period</label>
       <p-select
         appendTo="body"
-        formControlName="selectedCity"
+        
         [options]=""
         optionLabel="name"
         placeholder="Select"
@@ -30,7 +30,7 @@
       <label class="mb-2" for="">Select Year</label>
       <p-select
         appendTo="body"
-        formControlName="selectedCity"
+       
         [options]=""
         optionLabel="name"
         placeholder="Select"
@@ -39,6 +39,7 @@
     </div>
     <div class="col-sm-12 mt-3">
       <p-button
+        (click)="testAPI()"
         [loading]="skeletonVisible"
         [raised]="true"
         label="Analyse Dashboard"

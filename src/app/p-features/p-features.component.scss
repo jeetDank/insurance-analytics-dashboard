@@ -1,0 +1,143 @@
+.sidebar-container {
+  height: 100vh;
+  width: 400px;
+
+  border-radius: 0;
+  background-color: #ffffff; /* Your navbar color */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.content {
+  // border: 1px solid black;
+  height: 100%;
+  background-color: #f9fafb;
+}
+.nav-cust-props {
+  height: 60px;
+  background-color: #ffffff;
+  transition: box-shadow 0.3s ease-in-out;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  padding: 0 30px;
+}
+
+.canvas {
+    padding: 0 10rem;
+    padding-top: 1.875rem;
+}
+
+/* Large desktop */
+@media (max-width: 1400px) {
+    .canvas {
+        padding: 0 6rem;
+        padding-top: 1.875rem;
+    }
+}
+
+/* Desktop */
+@media (max-width: 1200px) {
+    .canvas {
+        padding: 0 4rem;
+        padding-top: 1.875rem;
+    }
+}
+
+/* Laptop */
+@media (max-width: 992px) {
+    .canvas {
+        padding: 0 3rem;
+        padding-top: 1.875rem;
+    }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .canvas {
+        padding: 0 2rem;
+        padding-top: 1.5rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .canvas {
+        padding: 0 1rem;
+        padding-top: 1.25rem;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 375px) {
+    .canvas {
+        padding: 0 0.75rem;
+        padding-top: 1rem;
+    }
+}
+
+
+
+.banner-icon-container{
+    height: 60px;
+    width: 60px;
+    text-align: center;
+    background-color: #0080ff29;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+
+}
+
+.banner-icon-container span{
+    font-size: 2rem;
+    color: white;
+}
+
+.banner{
+    background-color: #1447e6;
+    border-radius: 5px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    
+}
+.query-text-area{
+    border: none;
+    outline: none;
+    min-height: 150px;
+    max-height: 200px;
+    padding: 10px;
+    resize: none;
+    font-weight: 500;
+
+}
+.query-container{
+    margin-top:30px;
+    border-radius: 5px;
+    // outline: 2px solid rgb(98, 98, 98);
+    overflow: hidden;
+    background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+  
+  
+}
+
+
+.sample-prompt-container{
+    display: flex ;
+    flex-wrap: wrap;
+    
+}
+
+
+
+
+
+
+.prev_dashboard_width{
+    min-width: 350px;
+}

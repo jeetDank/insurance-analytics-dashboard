@@ -15,6 +15,7 @@ import { InteractiveAiChatsComponent } from './interactive-ai-chats/interactive-
 import { SemanticTestingComponent } from './semantic-testing/semantic-testing.component';
 import { AskAiAnythingComponent } from './ask-ai-anything/ask-ai-anything.component';
 import { DataProcessingComponent } from "./data-processing/data-processing.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-features',
@@ -34,7 +35,8 @@ import { DataProcessingComponent } from "./data-processing/data-processing.compo
     SemanticTestingComponent,
     AskAiAnythingComponent,
     DataProcessingComponent,
-    DataProcessingComponent
+    DataProcessingComponent,
+    CommonModule
 ],
   templateUrl: './features.component.html',
   styleUrl: './features.component.scss',
@@ -42,8 +44,24 @@ import { DataProcessingComponent } from "./data-processing/data-processing.compo
 export class FeaturesComponent {
   visible: boolean = true;
   showFiller: any;
+  activeTabIndex:number= 0;
+
+  sidebarData:any; 
+
+  catchSidebarDataChange(data:any){
+    this.sidebarData = data;
+    console.log("Logging from features component ",data);
+    
+  }
 
   isSidebarVisible() {
     this.visible = !this.visible;
+  }
+  catchActiveTabIndex(updatedTabIndex:any){
+    
+    console.log(updatedTabIndex);
+  
+    this.activeTabIndex = updatedTabIndex.index;
+    
   }
 }

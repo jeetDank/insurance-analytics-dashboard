@@ -169,7 +169,9 @@
           sectionHeader="Historical Guidance for Aflac Inc"
         ></app-table>
       </div>
-
+      <div class="my-3 fs-4" >
+        Insurance Claims Trend
+      </div>
       <div class="mt-3 border border-1" style="height: 400px;">
         <app-echarts [options]="chartOptions"></app-echarts>
       </div>
@@ -177,4 +179,4 @@
   </mat-tab>
 </mat-tab-group>
 
-<app-card-skeleton *ngIf="skeletonVisible == true"></app-card-skeleton>
+<app-card-skeleton></app-card-skeleton>

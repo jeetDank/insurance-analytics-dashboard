@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -12,6 +12,13 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { EChartsOption } from 'echarts';
 import { EchartsComponent } from '../../common/components/echart/echart.component';
 import { TextareaModule } from 'primeng/textarea';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MainService } from '../../common/services/main.service';
 
 @Component({
   selector: 'app-interactive-ai-chats',
@@ -29,12 +36,17 @@ import { TextareaModule } from 'primeng/textarea';
     CardSkeletonComponent,
     CommonModule,
     TextareaModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './interactive-ai-chats.component.html',
   styleUrl: './interactive-ai-chats.component.scss',
 })
-export class InteractiveAiChatsComponent {
+export class InteractiveAiChatsComponent implements OnChanges {
+
+  @Input() sidebarValues:any = {};
   skeletonVisible: boolean = true;
+
+  interactiveAIChatForm: FormGroup;
 
   companies = ['company a', 'company b', 'company c'];
   selectedCompanies = 'company a';
@@ -115,10 +127,38 @@ export class InteractiveAiChatsComponent {
     ],
   };
 
-  constructor() {
+  constructor(private fb: FormBuilder, private main: MainService) {
+    this.interactiveAIChatForm = this.fb.group({
+      query: ['', [Validators.required]],
+    });
+
     setTimeout(() => {
       this.skeletonVisible = false;
     }, 5000);
+  }
+
+  fetchQueryResults() {
+    const data = this.interactiveAIChatForm.getRawValue();
+    let payload = {
+      query: data.query,
+      user: 'demo_user',
+      llm_provider: this.sidebarValues.cloud_trial_provider.value,
+      llm_model: this.sidebarValues.model.value,
+      tab_origin: 'ai_chat',
+    };
+
+    console.log(payload);
+    
+
+    this.main.interactiveAIChats(payload).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+      
   }
 
   chartOptions: EChartsOption = {

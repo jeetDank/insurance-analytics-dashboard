@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {SelectModule} from 'primeng/select'
 import {ButtonModule} from 'primeng/button'
 import {MessageModule} from 'primeng/message'
@@ -9,6 +9,8 @@ import { CardSkeletonComponent } from '../../common/components/card-skeleton/car
 import { CommonModule } from '@angular/common';
 import { InsightsComponent } from '../../common/components/insights/insights.component';
 import { AccordianComponent } from '../../common/components/accordian/accordian.component';
+import { MainService } from '../../common/services/main.service';
+import { LoaderService } from '../../common/services/loader.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +18,7 @@ import { AccordianComponent } from '../../common/components/accordian/accordian.
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
 
 
   metricData = [
@@ -53,10 +55,36 @@ export class DashboardComponent {
   ]
   skeletonVisible:boolean = true;
 
-  constructor(){
-      setTimeout(() => {
-        this.skeletonVisible = false;
-      }, 5000);
+  
+
+  constructor(private mainAPIService:MainService){
+      
+
+      
+
+  }
+  ngOnInit(): void {
+
+
+    this.mainAPIService.loaderSubject.subscribe((res)=>{
+      this.skeletonVisible = res;
+      console.log(res);
+      
+    })
+
+     
+  }
+
+  testAPI(){
+     this.mainAPIService.getSlowData().subscribe({
+        next:(res)=>{
+          console.log(res);
+        },
+        error:(err)=>{
+          console.log(err);
+          
+        }
+      })
   }
 
 }

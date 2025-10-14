@@ -1,0 +1,54 @@
+<p-toast position="top-right" />
+    
+    <div class="side-panel w-100 overflow-hidden">
+      <!-- Header -->
+      <div class="panel-header p-3 border-bottom">
+        <h5 class="mb-0 fw-semibold">Insurance Formulas</h5>
+      </div>
+      
+      <!-- Search Box -->
+      <div class="p-3 border-bottom">
+        <p-iconfield iconPosition="left">
+          <p-inputicon styleClass="pi pi-search" />
+          <input 
+            type="text" 
+            pInputText 
+            [(ngModel)]="searchQuery"
+            placeholder="Search formulas..."
+            class="w-100"
+          />
+        </p-iconfield>
+      </div>
+
+      <!-- Formula List -->
+      <div class="formula-list overflow-y-auto">
+        @if (filteredFormulas.length > 0) {
+          @for (formula of filteredFormulas; track formula.id) {
+            <div class="formula-item p-3 border-bottom">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="mb-0 fw-semibold">{{ formula.name }}</h6>
+                <button 
+                  class="btn btn-link p-0 text-primary"
+                  (click)="copyFormula(formula)"
+                  pTooltip="Copy formula"
+                  tooltipPosition="left"
+                >
+                  <i class="pi pi-copy" style="font-size: 1rem"></i>
+                </button>
+              </div>
+              
+              <div class="formula-code p-2 mb-2 bg-light border rounded">
+                <code class="small">{{ formula.formula }}</code>
+              </div>
+              
+              <p class="mb-0 small text-muted">{{ formula.description }}</p>
+            </div>
+          }
+        } @else {
+          <div class="p-4 text-center text-muted">
+            <i class="pi pi-inbox mb-2" style="font-size: 2rem"></i>
+            <p class="mb-0">No formulas found</p>
+          </div>
+        }
+      </div>
+    </div>
