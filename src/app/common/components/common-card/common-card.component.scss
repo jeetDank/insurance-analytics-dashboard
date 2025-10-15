@@ -1,0 +1,59 @@
+.metric-card {
+  --p-card-background: #fff;
+  --p-card-border-color: #e5e7eb;
+  --p-card-border-radius: 1rem;
+  --p-card-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  padding: 1.25rem;
+
+  h3 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+  }
+
+  .text-primary {
+    color: var(--text-primary);
+  }
+
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+
+  .text-muted {
+    color: var(--text-muted);
+  }
+
+  .metric-value {
+    font-size: var(--text-3xl);
+    line-height: var(--leading-tight);
+  }
+
+  .metric-name {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .metric-period {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+
+  .metric-trend {
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    i {
+      font-size: 0.875rem;
+    }
+
+    &.up {
+      color: #16a34a; // green
+    }
+
+    &.down {
+      color: #dc2626; // red
+    }
+  }
+}

@@ -1,0 +1,107 @@
+<p-card   class="metric-card shadow-sm border-0 rounded-4">
+  <!-- Header -->
+  <div class="card-header bg-transparent border-0 pb-1 d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="card-title mb-0 fw-semibold ">
+        {{ cardData.metricName }}
+        <i
+          class="pi pi-info-circle text-muted ms-2 cursor-pointer"
+          (click)="op.toggle($event)"
+        ></i>
+      </h5>
+      @if (cardData.subTitle) {
+        <small class="text-muted">{{ cardData.subTitle }}</small>
+      }
+    </div>
+    <p-tag
+      class="fw-medium"
+      [style]="{ border: '1px solid #adb5bd', background: 'transparent', color: '#6c757d' }"
+      severity="secondary"
+      value="Calculated"
+    ></p-tag>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body pt-2">
+    <!-- Company -->
+    <div class="d-flex align-items-center mb-1">
+      <span class="fw-semibold text-secondary me-2">
+        {{ cardData.companyName }}
+      </span>
+    </div>
+
+    <!-- Metric Value -->
+    @if (cardData.metric) {
+      <div class="metric-value display-6 fw-medium  lh-1 mt-2">
+        {{ cardData.metric }}
+      </div>
+    }
+
+    <!-- Period -->
+    <div class="metric-period text-muted small mt-1">
+      {{ cardData.metricPeriod }}
+    </div>
+
+    <!-- Trend -->
+    <div
+      class="metric-trend d-flex align-items-center gap-1 mt-2"
+      [ngClass]="{ 'text-success': cardData.trendPositive, 'text-danger': !cardData.trendPositive }"
+    >
+      <i [class]="cardData.trendIcon"></i>
+      <span class="fw-medium">{{ cardData.trend }}</span>
+    </div>
+  </div>
+
+ 
+</p-card>
+
+<p-popover #op>
+  <!-- popover.component.html -->
+  <div class="popover-body p-3">
+    <!-- Metric -->
+    <h6 class="mb-1 fw-semibold">Revenue Growth</h6>
+
+    <!-- Definition -->
+    <p class="text-secondary mb-3">
+      Measures the percentage increase or decrease in revenue over a given
+      period.
+    </p>
+
+    <!-- Formula label + Edit button -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <label class="fw-medium mb-0">Formula</label>
+      <button
+        (click)="toggleEditView()"
+        type="button"
+        class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+      >
+        <i class="pi pi-pencil"></i>
+        Edit
+      </button>
+    </div>
+
+    <!-- Input box -->
+    <input
+      type="text"
+      class="form-control mb-3"
+      placeholder="Enter formula here..."
+    />
+
+    <!-- Action buttons -->
+    @if (isEditViewOn) {
+    <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-dark btn-sm">
+        <i class="pi pi-refresh me-1"></i>
+        Edit & Recalculate
+      </button>
+      <button
+        (click)="toggleEditView()"
+        type="button"
+        class="btn btn-outline-secondary btn-sm"
+      >
+        Cancel
+      </button>
+    </div>
+    }
+  </div>
+</p-popover>
