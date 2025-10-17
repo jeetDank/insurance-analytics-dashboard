@@ -32,6 +32,6 @@ email: string = '';
   }
 
   redirectToFeatures(){
-    this.router.navigate(["/features"])
+    this.router.navigate(["/p-features"])
   }
 }

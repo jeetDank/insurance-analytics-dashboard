@@ -1,13 +1,13 @@
-
 // Custom Theming for Angular Material
-// For more information: https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@use 'bootstrap/scss/bootstrap';
 @import "primeicons/primeicons.css";
 
+/* 🌙 Dark Theme Variables */
 :root {
   @include mat.tabs-overrides((
-    active-focus-indicator-color: rgb(174, 174, 174),
-    active-indicator-color:rgb(174, 174, 174)
+    active-focus-indicator-color: rgb(100, 100, 100),
+    active-indicator-color: rgb(150, 150, 150)
   ));
 
   /* Font families */
@@ -36,43 +36,63 @@
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  /* Text colors */
-  --text-primary: #1a1a1a;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
+  /* 🌙 Dark Mode Colors */
+  --color-bg-primary: #0f1115;
+  --color-bg-secondary: #1a1c22;
+  --color-bg-card: #1e2129;
+  --color-border: #2e323b;
+
+  /* Text colors for dark theme */
+  --text-primary: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+
+  /* Accent Colors */
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-info: #0ea5e9;
 }
 
+/* Use a palette that exists in @angular/material */
 html {
   @include mat.theme((
     color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
+      theme-type: dark,
+      primary: mat.$blue-palette,    // <- safe exported palette
+      tertiary: mat.$blue-palette,   // <- replaced undefined palette
     ),
     typography: Roboto,
     density: 0,
   ));
-}/* You can add global styles to this file, and also import other style files */
-
-/* Importing Bootstrap SCSS file. */
-@import 'bootstrap/scss/bootstrap';
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-*{
-  font-size: 14px;
 }
 
-body {
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
+/* ---------- rest of your dark theme CSS (unchanged) ---------- */
+/* Global Resets */
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--color-bg-primary);
   color: var(--text-primary);
-  line-height: var(--leading-normal);
-  background-color: #f9fafb;
+  font-family: var(--font-primary);
   -webkit-font-smoothing: antialiased;
 }
 
+* {
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  background-color: var(--color-bg-primary);
+}
+
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: var(--weight-medium);
@@ -81,17 +101,60 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5rem;
 }
 
+/* Paragraphs */
 p {
   margin-bottom: 1rem;
   color: var(--text-secondary);
 }
 
+/* Muted Text */
 small, .text-muted {
   font-size: var(--text-sm);
   color: var(--text-muted);
 }
 
+/* Responsive Typography */
 h1 { font-size: clamp(2rem, 4vw, 2.75rem); }
 h2 { font-size: clamp(1.75rem, 3vw, 2.25rem); }
 h3 { font-size: clamp(1.5rem, 2.5vw, 1.875rem); }
 body { font-size: clamp(0.95rem, 1.5vw, 1rem); }
+
+/* Cards & Containers */
+.card, .draggable-card, .mat-mdc-card {
+  background-color: var(--color-bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover, .draggable-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+}
+
+/* Links and Interactive Elements */
+a, button, .btn-link {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover, button:hover, .btn-link:hover {
+  color: var(--color-accent-hover);
+}
+
+/* Scrollbar Styling (Optional, Modern Dark) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #3a3f4b;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5263;
+}

@@ -3,12 +3,12 @@ import { RouterOutlet } from '@angular/router';
 import { IconsModule } from './common/components/icon/icons.module';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { SidebarComponent } from './common/components/sidebar/sidebar.component';
+import { ScrollTopModule } from 'primeng/scrolltop';
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,IconsModule,CommonModule,ButtonModule],
+  imports: [ScrollTopModule,RouterOutlet,IconsModule,CommonModule,ButtonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

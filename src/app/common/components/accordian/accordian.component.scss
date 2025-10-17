@@ -1,19 +1,107 @@
-.accordion-header-style{
-    background-color:#eef3ff; 
-}
-.p-accordionheader{
-     background-color:#eef3ff; 
-     font-size:1.25rem ;
-     font-weight: 500;
-    //  border: 1px solid rgb(215, 215, 215);
-
+/* Accordion Header */
+.accordion-header-style {
+  background-color: var(--color-bg-card);
+  color: var(--text-primary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.accordion-header-style:hover {
+  background-color: rgba(59, 130, 246, 0.1); /* subtle blue tint on hover */
+  border-color: var(--color-accent);
+}
 
-.info-and-selector{
-    background-color:#eef3ff ;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #d4d8e2;
-    margin-bottom: 20px;
+/* PrimeNG Accordion Header */
+.p-accordionheader {
+  background-color: var(--color-bg-card);
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.p-accordionheader:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Active Header State */
+.p-accordionheader.p-highlight {
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border-color: var(--color-accent-hover);
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
+}
+
+/* Accordion Panel Body */
+.p-accordion-content {
+  background-color: var(--color-bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 1rem;
+}
+
+/* Info Section */
+.info-and-selector {
+  background-color: var(--color-bg-card);
+  color: var(--text-primary);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.info-and-selector:hover {
+  border-color: var(--color-accent);
+}
+
+/* Optional: text in info section */
+.info-and-selector p,
+.info-and-selector span {
+  color: var(--text-secondary);
+}
+
+
+/* Dark Accordion Base */
+.dark-accordion {
+  background-color: var(--color-bg-primary);
+  color: var(--text-primary);
+}
+
+.dark-panel {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark-panel:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.dark-header {
+  background-color: var(--color-bg-card);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.dark-content {
+  background-color: var(--color-bg-secondary);
+  color: var(--text-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.dark-tag {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--text-primary);
+  border: 1px solid var(--color-border);
 }

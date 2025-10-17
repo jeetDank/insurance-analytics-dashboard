@@ -9,6 +9,9 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { MessageService } from 'primeng/api';
 
+
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),

@@ -1,9 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { AccordionModule } from 'primeng/accordion';
 import { TagModule } from 'primeng/tag';
-import { InsightsComponent } from '../insights/insights.component';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomMessageComponent } from '../custom-message/custom-message.component';
 
@@ -46,7 +44,7 @@ interface messageDetails{
 
 @Component({
   selector: 'app-accordian',
-  imports: [AccordionModule, TagModule,SelectButtonModule,FormsModule,CustomMessageComponent],
+  imports: [AccordionModule, TagModule, SelectButtonModule, FormsModule, CustomMessageComponent],
   templateUrl: './accordian.component.html',
   styleUrl: './accordian.component.scss',
 })
@@ -57,16 +55,16 @@ export class AccordianComponent {
 
   @Input() tabs: tabData[] = [
     {
-      title: 'Step 1: Data Collection',
+      title: 'Analyzing revenue data for Apple and Microsoft (Q3 2024 - Q4 2024)',
       icon: 'pi pi-check-circle',
       subTitle: 'Processing Steps: 4 unique to this system',
       value: 0,
       steps: [
         {
-          title: 'Parsing user query',
+          title: 'Parsing user query with financial context',
           subTitle:
-            'Identified companies: Apple, Microsoft | Analysis: Geographic revenue breakdown',
-          tag: 'unique',
+            'Identified companies: Apple (CIK: 320193), Microsoft (CIK: 789019) | Metric: Revenue | Timeframe: Last 2 quarters',
+          tag: null,
           tagIcon: 'pi pi-sparkles',
           list: null,
           id: 1,
@@ -74,7 +72,118 @@ export class AccordianComponent {
           message:{
             severity:'warn',
             icon:"pi pi-exclamation-circle",
-            title:"chatgpt discrepancy:",
+            title:"ChatGPT Discrepancy:",
+            message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
+          }
+        },
+        {
+          title: 'Direct SEC EDGAR database access',
+          subTitle:
+            'Authenticated access to SEC EDGAR API, automatic filing retrieval and XBRL parsing',
+          tag: 'unique',
+          tagIcon: 'pi pi-sparkles',
+          list: [
+            {
+              listTitle: 'Direct data sources (no manual input required):',
+              listIcon: 'pi pi-database',
+              list: [
+                {
+                  itemTitle: 'Apple Inc. 10-Q Q4 2024 (Filed: Nov 2024)',
+                  itemIcon: 'pi pi-file',
+                },
+                {
+                  itemTitle: 'Apple Inc. 10-Q Q3 2024 (Filed: Aug 2024)',
+                  itemIcon: 'pi pi-file',
+                },
+                {
+                  itemTitle: 'Microsoft Corp. 10-Q Q4 2024 (Filed: Oct 2024)',
+                  itemIcon: 'pi pi-file',
+                },
+                {
+                  itemTitle: 'Microsoft Corp. 10-Q Q3 2024 (Filed: Jul 2024)',
+                  itemIcon: 'pi pi-file',
+                },
+              ],
+            },
+          ],
+          id: 2,
+          icon: 'pi pi-verified',
+          message:{
+            severity:'warn',
+            icon:"pi pi-exclamation-circle",
+            title:"ChatGPT Discrepancy:",
+            message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
+          }
+        },
+        {
+          title: 'Structured financial data extraction',
+          subTitle:
+            `Parsed XBRL financial statements, validated data integrity, extracted revenue line items from consolidated income statements with automatic reconciliation`,
+          tag: 'unique',
+          tagIcon: 'pi pi-sparkles',
+          list: null,
+          id: 4,
+          icon: 'pi pi-verified',
+          message:{
+            severity:'warn',
+            icon:"pi pi-exclamation-circle",
+            title:"ChatGPT Discrepancy:",
+            message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
+          }
+        },
+        {
+          title: 'Automated comparative analysis',
+          subTitle:
+            `Computed quarter-over-quarter growth percentages, normalized data across different reporting formats, verified calculations against reported figures`,
+          tag: 'unique',
+          tagIcon: 'pi pi-sparkles',
+          list: null,
+          id: 3,
+          icon: 'pi pi-verified',
+          message:{
+            severity:'warn',
+            icon:"pi pi-exclamation-circle",
+            title:"ChatGPT Discrepancy:",
+            message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
+          }
+        },
+        {
+          title: 'Formula verification & audit trail',
+          subTitle:
+            `Applied standard accounting formulas, cross-referenced with filed data, generated audit-ready calculation trails with source document links`,
+          tag: 'unique',
+          tagIcon: 'pi pi-sparkles',
+          list: null,
+          id: 3,
+          icon: 'pi pi-verified',
+          message:{
+            severity:'warn',
+            icon:"pi pi-exclamation-circle",
+            title:"ChatGPT Discrepancy:",
+            message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
+          }
+        },
+      ],
+    },
+    {
+      title: 'Analyzing revenue breakdown by geographic region for Apple and Microsoft',
+      icon: 'pi pi-check-circle',
+      subTitle: 'Processing Steps: (3 unique to this system)',
+      value: 0,
+      steps: [
+        {
+          title: 'Parsing user query',
+          subTitle:
+            'Identified companies: Apple (CIK: 320193), Microsoft (CIK: 789019) | Metric: Revenue | Timeframe: Last 2 quarters',
+          tag: null,
+          tagIcon: 'pi pi-sparkles',
+          list: null,
+          id: 1,
+          icon: 'pi pi-verified',
+          message:{
+            severity:'warn',
+            icon:"pi pi-exclamation-circle",
+            title:"ChatGPT Discrepancy:",
             message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
           }
         },
@@ -97,6 +206,7 @@ export class AccordianComponent {
                   itemTitle: 'Microsoft Corp. 10-Q Q4 2024 - Note 17: Segment Information',
                   itemIcon: 'pi pi-file',
                 },
+      
               ],
             },
           ],
@@ -105,7 +215,7 @@ export class AccordianComponent {
           message:{
             severity:'warn',
             icon:"pi pi-exclamation-circle",
-            title:"chatgpt discrepancy:",
+            title:"ChatGPT Discrepancy:",
             message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
           }
         },
@@ -116,12 +226,12 @@ export class AccordianComponent {
           tag: 'unique',
           tagIcon: 'pi pi-sparkles',
           list: null,
-          id: 1,
+          id: 4,
           icon: 'pi pi-verified',
           message:{
             severity:'warn',
             icon:"pi pi-exclamation-circle",
-            title:"Chatgpt Discrepancy:",
+            title:"ChatGPT Discrepancy:",
             message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
           }
         },
@@ -137,10 +247,11 @@ export class AccordianComponent {
           message:{
             severity:'warn',
             icon:"pi pi-exclamation-circle",
-            title:"chatgpt discrepancy:",
+            title:"ChatGPT Discrepancy:",
             message:"Cannot access real-time SEC filings. Would either: (1) Use training data from months/years ago, leading to outdated/incorrect revenue figures (e.g., might report Q2 2024 data when you asked for Q4 2024), or (2) Require you to manually find, download, copy-paste or upload the SEC filings. Results would lack filing dates and CIK verification."
           }
         },
+        
       ],
     },
   ];
