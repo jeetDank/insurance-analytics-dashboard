@@ -4,6 +4,7 @@ import { TagModule } from 'primeng/tag';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormsModule } from '@angular/forms';
 import { CustomMessageComponent } from '../custom-message/custom-message.component';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 
 interface tabData {
   title: string;
@@ -44,7 +45,7 @@ interface messageDetails{
 
 @Component({
   selector: 'app-accordian',
-  imports: [AccordionModule, TagModule, SelectButtonModule, FormsModule, CustomMessageComponent],
+  imports: [AccordionModule, TagModule, SelectButtonModule, FormsModule,NgbAccordionModule],
   templateUrl: './accordian.component.html',
   styleUrl: './accordian.component.scss',
 })

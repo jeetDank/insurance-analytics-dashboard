@@ -3,11 +3,9 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #f3f4f6; /* gray-100 */
 }
 
 .login-card {
-  background: #ffffff;
   padding: 2.5rem 2rem;
   border-radius: 12px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
@@ -18,12 +16,10 @@
 
 .login-header h2 {
   margin: 0.5rem 0;
-  color: #374151; /* gray-800 */
   font-weight: 600;
 }
 
 .subtitle {
-  color: #6b7280; /* gray-500 */
   font-size: 0.95rem;
 }
 
@@ -36,23 +32,19 @@
 }
 
 .btn-dark {
-  background-color: #374151; /* gray-800 */
   border-radius: 8px;
   font-weight: 600;
 }
 
 .btn-dark:hover {
-  background-color: #1f2937; /* darker gray */
 }
 
 .login-footer {
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: #6b7280;
 }
 
 .login-footer a {
-  color: #374151;
   text-decoration: none;
   font-weight: 500;
 }

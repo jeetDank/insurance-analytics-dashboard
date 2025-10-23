@@ -1,6 +1,6 @@
 .side-panel {
       height: 100vh;
-      background-color: #ffffff;
+      background-color: #000000;
       border-right: 1px solid #e9ecef;
       display: flex;
       flex-direction: column;
@@ -18,17 +18,15 @@
       transition: background-color 0.2s ease;
     }
 
-    .formula-item:hover {
-      background-color: #f8f9fa;
-    }
 
     .formula-code {
       word-wrap: break-word;
       overflow-wrap: break-word;
+      background-color: #383838;
     }
 
     .formula-code code {
-      color: #495057;
+      color: #bfbfbf;
       font-family: 'Courier New', monospace;
     }
 
@@ -44,17 +42,4 @@
     /* Scrollbar styling */
     .formula-list::-webkit-scrollbar {
       width: 6px;
-    }
-
-    .formula-list::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    .formula-list::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 3px;
-    }
-
-    .formula-list::-webkit-scrollbar-thumb:hover {
-      background: #555;
     }

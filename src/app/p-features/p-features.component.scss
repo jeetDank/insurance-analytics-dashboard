@@ -147,3 +147,280 @@
 .prev_dashboard_width {
   min-width: 350px;
 }
+
+
+
+.p-drawer{
+  background-color: black;
+}
+
+.custom-drawer{
+   background-color: black;
+}
+
+
+
+
+
+
+
+
+
+/* View Toggle Buttons */
+.btn-group .btn {
+  border: 1px solid var(--dark-border);
+}
+
+.btn-group .btn.btn-primary {
+  background: var(--dark-primary);
+  border-color: var(--dark-primary);
+  color: #ffffff;
+}
+
+.btn-group .btn.btn-outline-secondary {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-secondary);
+}
+
+/* Main Container */
+.comparison-container {
+  background: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+  // padding: 1.5rem;
+}
+
+/* Company Pills Section */
+.company-pills {
+  background: var(--dark-bg-secondary);
+  padding: 1.5rem;
+  border: 1px solid var(--dark-border);
+  border-radius: 8px;
+}
+
+.badge-company {
+  background: rgba(96, 165, 250, 0.15);
+  color: var(--dark-primary);
+  border: 1px solid var(--dark-border);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* Metric Card Container */
+.comparison-metric-card {
+  background: var(--dark-bg-secondary);
+  // border: 1px solid var(--dark-border);
+  border-radius: 8px;
+  // padding: 1.5rem;
+}
+
+/* Metric Header */
+.metric-header {
+  border-bottom: 1px solid var(--dark-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.metric-title {
+  color: var(--dark-primary);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.metric-subtitle {
+  color: var(--dark-text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Company Card */
+.company-metric-card {
+  background: var(--dark-bg-tertiary);
+  border: 1px solid var(--dark-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  height: 100%;
+}
+
+/* Unavailable Card */
+.company-metric-card.unavailable {
+  background: var(--dark-bg-quaternary);
+  border: 1px dashed var(--dark-border);
+  opacity: 0.7;
+}
+
+/* Company Name Badge */
+.company-name-badge {
+  // background: rgba(96, 165, 250, 0.1);
+  color: var(--dark-primary);
+  // border: 1px solid var(--dark-border);
+  padding: 0.35rem 0rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Metric Value */
+.metric-value {
+  color: var(--dark-text-primary);
+  font-weight: 500;
+  font-size: 2rem;
+}
+
+.metric-period {
+  color: var(--dark-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Trend Badge */
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.trend-badge.trend-positive {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--dark-success);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.trend-badge.trend-negative {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--dark-error);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Unavailable Section */
+.unavailable-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.unavailable-icon {
+  font-size: 2.5rem;
+  color: var(--dark-text-muted);
+  opacity: 0.5;
+}
+
+.unavailable-text {
+  color: var(--dark-text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .comparison-container {
+    // padding: 1rem;
+  }
+
+  .metric-title {
+    font-size: 1.1rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .metric-value {
+    font-size: 1.25rem;
+  }
+}
+
+
+
+
+::ng-deep .dark-popover.p-popover {
+  background: var(--color-bg-card);
+  border: 1px solid var(--dark-border);
+  box-shadow: 0 4px 12px var(--dark-shadow);
+  color: var(--dark-text-primary);
+}
+
+::ng-deep .dark-popover .p-popover-content {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+  padding: 0;
+}
+
+::ng-deep .dark-popover .popover-body {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+}
+
+/* Dark Input */
+.dark-input {
+  background-color: var(--dark-bg-primary);
+  border: 1px solid var(--dark-border);
+  color: var(--dark-text-primary);
+  transition: all 0.25s ease;
+}
+
+.dark-input:focus {
+  background-color: var(--dark-bg-primary);
+  border-color: var(--dark-primary);
+  color: var(--dark-text-primary);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+  outline: none;
+}
+
+.dark-input::placeholder {
+  color: var(--dark-text-muted);
+}
+
+/* Dark Buttons */
+.btn-outline-primary {
+  color: var(--dark-primary);
+  border-color: var(--dark-primary);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: var(--dark-primary);
+  color: var(--dark-primary);
+}
+
+.btn-primary {
+  background-color: var(--dark-primary);
+  border-color: var(--dark-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #5094e8;
+  border-color: #5094e8;
+}
+
+.btn-outline-secondary {
+  color: var(--dark-text-secondary);
+  border-color: var(--dark-border);
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: var(--dark-hover);
+  border-color: var(--dark-border-light);
+  color: var(--dark-text-primary);
+}
+
+/* Popover arrow (if needed) */
+::ng-deep .dark-popover .p-popover-arrow {
+  border-bottom-color: var(--dark-bg-secondary);
+}
+
+::ng-deep .dark-popover .p-popover-arrow::before {
+  border-bottom-color: var(--dark-border);
+}

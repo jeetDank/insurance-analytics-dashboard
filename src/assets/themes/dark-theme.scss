@@ -1,0 +1,416 @@
+// Dark Theme Variables
+$primaryColor: #64B5F6;
+$primaryDarkColor: #42A5F5;
+$primaryDarkerColor: #2196F3;
+$primaryTextColor: #121212;
+
+$colors: (
+    "blue": #64B5F6,
+    "green": #81C784,
+    "yellow": #FFD54F,
+    "cyan": #4DD0E1,
+    "pink": #F06292,
+    "indigo": #7986CB,
+    "teal": #4DB6AC,
+    "orange": #FFB74D,
+    "bluegray": #90A4AE,
+    "purple": #BA68C8,
+    "red": #E57373,
+    "primary": $primaryColor
+);
+
+// Dark Theme Core Colors
+$textColor: #e0e0e0;
+$textSecondaryColor: #b0b0b0;
+$surfaceGround: #121212;
+$surfaceSection: #1e1e1e;
+$surfaceCard: #1e1e1e;
+$surfaceOverlay: #2a2a2a;
+$surfaceBorder: #383838;
+$surfaceHover: #2a2a2a;
+
+// General Variables
+$fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$fontSize: 1rem;
+$fontWeight: normal;
+$highlightBg: $primaryColor;
+$highlightTextColor: $primaryTextColor;
+$highlightFocusBg: rgba($primaryColor, .24);
+$borderRadius: 3px;
+$transitionDuration: .2s;
+$formElementTransition: background-color $transitionDuration, color $transitionDuration, border-color $transitionDuration, box-shadow $transitionDuration;
+$actionIconTransition: background-color $transitionDuration, color $transitionDuration, box-shadow $transitionDuration;
+$listItemTransition: background-color $transitionDuration, border-color $transitionDuration, box-shadow $transitionDuration;
+$primeIconFontSize: 1rem;
+$divider: 1px solid #383838;
+$inlineSpacing: .5rem;
+$disabledOpacity: .6;
+$maskBg: rgba(0, 0, 0, 0.7);
+$loadingIconFontSize: 2rem;
+$errorColor: #EF9A9A;
+$focusOutlineColor: #90CAF9;
+$focusOutline: 0 none;
+$focusOutlineOffset: 0;
+$inputFocusOutlineOffset: $focusOutlineOffset;
+$focusShadow: 0 0 0 0.2rem rgba($primaryColor, 0.5);
+$actionIconWidth: 2rem;
+$actionIconHeight: 2rem;
+$actionIconBg: transparent;
+$actionIconBorder: 0 none;
+$actionIconColor: $textSecondaryColor;
+$actionIconHoverBg: #2a2a2a;
+$actionIconHoverBorderColor: transparent;
+$actionIconHoverColor: $textColor;
+$actionIconBorderRadius: 50%;
+$scaleSM: 0.875;
+$scaleLG: 1.25;
+
+// Form Variables
+$inputPadding: .5rem .5rem;
+$inputBg: #2a2a2a;
+$inputTextFontSize: 1rem;
+$inputTextColor: $textColor;
+$inputIconColor: $textColor;
+$inputBorder: 1px solid #383838;
+$inputHoverBorderColor: $primaryColor;
+$inputFocusBorderColor: $primaryColor;
+$inputErrorBorderColor: #383838 #383838 #383838 $errorColor;
+$inputPlaceholderTextColor: #707070;
+$inputFilledBg: #2a2a2a;
+$inputFilledHoverBg: #2a2a2a;
+$inputFilledFocusBg: #2a2a2a;
+$inputGroupBg: #383838;
+$inputGroupTextColor: $textSecondaryColor;
+$inputGroupAddOnMinWidth: 2.357rem;
+
+// Input List Variables
+$inputListBg: #2a2a2a;
+$inputListTextColor: $textColor;
+$inputListBorder: $inputBorder;
+$inputListPadding: .5rem 0;
+$inputListItemPadding: .5rem 1rem;
+$inputListItemBg: transparent;
+$inputListItemTextColor: $textColor;
+$inputListItemHoverBg: #383838;
+$inputListItemTextHoverColor: $textColor;
+$inputListItemFocusBg: #2a2a2a;
+$inputListItemTextFocusColor: $textColor;
+$inputListItemBorder: 0 none;
+$inputListItemBorderRadius: 0;
+$inputListItemMargin: 0;
+$inputListItemFocusShadow: inset 0 0 0 0.15rem $focusOutlineColor;
+$inputListHeaderPadding: .5rem 1rem;
+$inputListHeaderMargin: 0;
+$inputListHeaderBg: #1e1e1e;
+$inputListHeaderTextColor: $textColor;
+$inputListHeaderBorder: 0 none;
+$inputOverlayBg: $inputListBg;
+$inputOverlayHeaderBg: $inputListHeaderBg;
+$inputOverlayBorder: 0 none;
+$inputOverlayShadow: 0 3px 6px 0 rgba(0, 0, 0, 0.5);
+
+// Checkbox & Radio Variables
+$checkboxWidth: 20px;
+$checkboxHeight: 20px;
+$checkboxBorder: 2px solid #383838;
+$checkboxIconFontSize: 14px;
+$checkboxActiveBorderColor: $primaryColor;
+$checkboxActiveBg: $primaryColor;
+$checkboxIconActiveColor: $primaryTextColor;
+$checkboxActiveHoverBg: $primaryDarkerColor;
+$checkboxIconActiveHoverColor: $primaryTextColor;
+$checkboxActiveHoverBorderColor: $primaryDarkerColor;
+
+$radiobuttonWidth: 20px;
+$radiobuttonHeight: 20px;
+$radiobuttonBorder: 2px solid #383838;
+$radiobuttonIconSize: 12px;
+$radiobuttonActiveBorderColor: $primaryColor;
+$radiobuttonActiveBg: $primaryColor;
+$radiobuttonIconActiveColor: $primaryTextColor;
+$radiobuttonActiveHoverBg: $primaryDarkerColor;
+$radiobuttonIconActiveHoverColor: $primaryTextColor;
+$radiobuttonActiveHoverBorderColor: $primaryDarkerColor;
+
+// Button Variables
+$buttonPadding: .5rem 1rem;
+$buttonIconOnlyWidth: 2.357rem;
+$buttonIconOnlyPadding: .5rem 0;
+$buttonBg: $primaryColor;
+$buttonTextColor: $primaryTextColor;
+$buttonBorder: 1px solid $primaryColor;
+$buttonHoverBg: $primaryDarkColor;
+$buttonTextHoverColor: $primaryTextColor;
+$buttonHoverBorderColor: $primaryDarkColor;
+$buttonActiveBg: $primaryDarkerColor;
+$buttonTextActiveColor: $primaryTextColor;
+$buttonActiveBorderColor: $primaryDarkerColor;
+$raisedButtonShadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.4), 0px 2px 2px 0px rgba(0, 0, 0, 0.28), 0px 1px 5px 0px rgba(0, 0, 0, 0.24);
+$roundedButtonBorderRadius: 2rem;
+$textButtonHoverBgOpacity: .04;
+$textButtonActiveBgOpacity: .16;
+$outlinedButtonBorder: 1px solid;
+$plainButtonTextColor: $textSecondaryColor;
+$plainButtonHoverBgColor: #2a2a2a;
+$plainButtonActiveBgColor: #383838;
+
+// Secondary Button
+$secondaryButtonBg: #546E7A;
+$secondaryButtonTextColor: #ffffff;
+$secondaryButtonBorder: 1px solid #546E7A;
+$secondaryButtonHoverBg: #455A64;
+$secondaryButtonTextHoverColor: #ffffff;
+$secondaryButtonHoverBorderColor: #455A64;
+$secondaryButtonActiveBg: #37474F;
+$secondaryButtonTextActiveColor: #ffffff;
+$secondaryButtonActiveBorderColor: #37474F;
+$secondaryButtonFocusShadow: 0 0 0 0.2rem rgba(#546E7A, 0.5);
+
+// Info Button
+$infoButtonBg: #29B6F6;
+$infoButtonTextColor: #121212;
+$infoButtonBorder: 1px solid #29B6F6;
+$infoButtonHoverBg: #039BE5;
+$infoButtonTextHoverColor: #ffffff;
+$infoButtonHoverBorderColor: #039BE5;
+$infoButtonActiveBg: #0288D1;
+$infoButtonTextActiveColor: #ffffff;
+$infoButtonActiveBorderColor: #0288D1;
+$infoButtonFocusShadow: 0 0 0 0.2rem rgba(#29B6F6, 0.5);
+
+// Success Button
+$successButtonBg: #66BB6A;
+$successButtonTextColor: #121212;
+$successButtonBorder: 1px solid #66BB6A;
+$successButtonHoverBg: #4CAF50;
+$successButtonTextHoverColor: #ffffff;
+$successButtonHoverBorderColor: #4CAF50;
+$successButtonActiveBg: #43A047;
+$successButtonTextActiveColor: #ffffff;
+$successButtonActiveBorderColor: #43A047;
+$successButtonFocusShadow: 0 0 0 0.2rem rgba(#66BB6A, 0.5);
+
+// Warning Button
+$warningButtonBg: #FFCA28;
+$warningButtonTextColor: #121212;
+$warningButtonBorder: 1px solid #FFCA28;
+$warningButtonHoverBg: #FFC107;
+$warningButtonTextHoverColor: #121212;
+$warningButtonHoverBorderColor: #FFC107;
+$warningButtonActiveBg: #FFB300;
+$warningButtonTextActiveColor: #121212;
+$warningButtonActiveBorderColor: #FFB300;
+$warningButtonFocusShadow: 0 0 0 0.2rem rgba(#FFCA28, 0.5);
+
+// Danger Button
+$dangerButtonBg: #EF5350;
+$dangerButtonTextColor: #ffffff;
+$dangerButtonBorder: 1px solid #EF5350;
+$dangerButtonHoverBg: #E53935;
+$dangerButtonTextHoverColor: #ffffff;
+$dangerButtonHoverBorderColor: #E53935;
+$dangerButtonActiveBg: #D32F2F;
+$dangerButtonTextActiveColor: #ffffff;
+$dangerButtonActiveBorderColor: #D32F2F;
+$dangerButtonFocusShadow: 0 0 0 0.2rem rgba(#EF5350, 0.5);
+
+// Help Button
+$helpButtonBg: #AB47BC;
+$helpButtonTextColor: #ffffff;
+$helpButtonBorder: 1px solid #AB47BC;
+$helpButtonHoverBg: #9C27B0;
+$helpButtonTextHoverColor: #ffffff;
+$helpButtonHoverBorderColor: #9C27B0;
+$helpButtonActiveBg: #8E24AA;
+$helpButtonTextActiveColor: #ffffff;
+$helpButtonActiveBorderColor: #8E24AA;
+$helpButtonFocusShadow: 0 0 0 0.2rem rgba(#AB47BC, 0.5);
+
+// Link Button
+$linkButtonColor: $primaryColor;
+$linkButtonHoverColor: $primaryDarkColor;
+$linkButtonTextHoverDecoration: underline;
+$linkButtonFocusShadow: 0 0 0 0.2rem $focusOutlineColor;
+
+// Toggle Button
+$toggleButtonBg: #2a2a2a;
+$toggleButtonBorder: 1px solid #383838;
+$toggleButtonTextColor: $textColor;
+$toggleButtonIconColor: $textSecondaryColor;
+$toggleButtonHoverBg: #383838;
+$toggleButtonHoverBorderColor: #383838;
+$toggleButtonTextHoverColor: $textColor;
+$toggleButtonIconHoverColor: $textSecondaryColor;
+$toggleButtonActiveBg: $primaryColor;
+$toggleButtonActiveBorderColor: $primaryColor;
+$toggleButtonTextActiveColor: $primaryTextColor;
+$toggleButtonIconActiveColor: $primaryTextColor;
+$toggleButtonActiveHoverBg: $primaryDarkColor;
+$toggleButtonActiveHoverBorderColor: $primaryDarkColor;
+$toggleButtonTextActiveHoverColor: $primaryTextColor;
+$toggleButtonIconActiveHoverColor: $primaryTextColor;
+
+// Panel Variables
+$panelHeaderBorderColor: #383838;
+$panelHeaderBorder: 1px solid #383838;
+$panelHeaderBg: #1e1e1e;
+$panelHeaderTextColor: $textColor;
+$panelHeaderFontWeight: 600;
+$panelHeaderPadding: 1rem;
+$panelToggleableHeaderPadding: .5rem 1rem;
+$panelHeaderHoverBg: #2a2a2a;
+$panelHeaderHoverBorderColor: #383838;
+$panelHeaderTextHoverColor: $textColor;
+$panelContentBorderColor: #383838;
+$panelContentBorder: 1px solid #383838;
+$panelContentBg: #2a2a2a;
+$panelContentEvenRowBg: #323232;
+$panelContentTextColor: $textColor;
+$panelContentPadding: 1rem;
+$panelFooterBorder: 1px solid #383838;
+$panelFooterBg: #2a2a2a;
+$panelFooterTextColor: $textColor;
+$panelFooterPadding: 0.5rem 1rem;
+
+// Menu Variables
+$menuWidth: 12.5rem;
+$menuBg: #2a2a2a;
+$menuBorder: 1px solid #383838;
+$menuTextColor: $textColor;
+$menuitemPadding: .75rem 1rem;
+$menuitemBorderRadius: 0;
+$menuitemTextColor: $textColor;
+$menuitemIconColor: $textSecondaryColor;
+$menuitemTextHoverColor: $textColor;
+$menuitemIconHoverColor: $textSecondaryColor;
+$menuitemHoverBg: #383838;
+$menuitemTextFocusColor: $textColor;
+$menuitemIconFocusColor: $textColor;
+$menuitemFocusBg: #323232;
+$menuitemTextActiveColor: $textColor;
+$menuitemIconActiveColor: $textSecondaryColor;
+$menuitemActiveBg: #383838;
+$menuitemActiveFocusBg: #383838;
+$overlayMenuBg: $menuBg;
+$overlayMenuBorder: 0 none;
+$overlayMenuShadow: 0 1px 6px 0 rgba(0, 0, 0, 0.5);
+$verticalMenuPadding: .25rem 0;
+
+// Data Table Variables
+$tableHeaderBorder: 1px solid #383838;
+$tableHeaderBorderWidth: 0 0 1px 0;
+$tableHeaderBg: #1e1e1e;
+$tableHeaderTextColor: $textColor;
+$tableHeaderFontWeight: 600;
+$tableHeaderPadding: 1rem 1rem;
+$tableHeaderCellPadding: 1rem 1rem;
+$tableHeaderCellBg: #1e1e1e;
+$tableHeaderCellTextColor: $textColor;
+$tableHeaderCellFontWeight: 600;
+$tableHeaderCellBorder: 1px solid #383838;
+$tableHeaderCellBorderWidth: 0 0 1px 0;
+$tableHeaderCellHoverBg: #2a2a2a;
+$tableHeaderCellTextHoverColor: $textColor;
+$tableHeaderCellIconColor: $textSecondaryColor;
+$tableHeaderCellIconHoverColor: $textSecondaryColor;
+$tableHeaderCellHighlightBg: #1e1e1e;
+$tableHeaderCellHighlightTextColor: $primaryColor;
+$tableHeaderCellHighlightHoverBg: #2a2a2a;
+$tableHeaderCellHighlightTextHoverColor: $primaryColor;
+$tableBodyRowBg: #2a2a2a;
+$tableBodyRowTextColor: $textColor;
+$tableBodyRowEvenBg: #2a2a2a;
+$tableBodyRowHoverBg: #383838;
+$tableBodyRowTextHoverColor: $textColor;
+$tableBodyCellBorder: 1px solid #383838;
+$tableBodyCellBorderWidth: 0 0 1px 0;
+$tableBodyCellPadding: 1rem 1rem;
+
+// Message Variables
+$messageMargin: 1rem 0;
+$messagePadding: 1rem 1.5rem;
+$messageBorderWidth: 0 0 0 4px;
+$messageIconFontSize: 1.5rem;
+$messageTextFontSize: 1rem;
+$messageTextFontWeight: 500;
+$infoMessageBg: #1976D2;
+$infoMessageBorder: solid #0D47A1;
+$infoMessageTextColor: #E3F2FD;
+$infoMessageIconColor: #E3F2FD;
+$successMessageBg: #388E3C;
+$successMessageBorder: 0 none;
+$successMessageTextColor: #E8F5E9;
+$successMessageIconColor: #E8F5E9;
+$warningMessageBg: #F57C00;
+$warningMessageBorder: 0 none;
+$warningMessageTextColor: #FFF3E0;
+$warningMessageIconColor: #FFF3E0;
+$errorMessageBg: #D32F2F;
+$errorMessageBorder: 0 none;
+$errorMessageTextColor: #FFEBEE;
+$errorMessageIconColor: #FFEBEE;
+
+// Overlay Variables
+$overlayContentBorder: 0 none;
+$overlayContentBg: $panelContentBg;
+$overlayContainerShadow: 0 0 14px 0 rgba(0, 0, 0, 0.5);
+$dialogHeaderBg: #2a2a2a;
+$dialogHeaderBorder: 1px solid #383838;
+$dialogHeaderTextColor: $textColor;
+$dialogHeaderFontWeight: 600;
+$dialogHeaderFontSize: 1.25rem;
+$dialogHeaderPadding: 1.5rem;
+$dialogContentPadding: 0 1.5rem;
+$dialogFooterBorder: 1px solid #383838;
+$dialogFooterPadding: 1.5rem;
+$tooltipBg: #424242;
+$tooltipTextColor: #ffffff;
+$tooltipPadding: $inputPadding;
+
+:root {
+    font-family: $fontFamily;
+    --font-family: #{$fontFamily};
+    --surface-a: #2a2a2a;
+    --surface-b: #1e1e1e;
+    --surface-c: #383838;
+    --surface-d: #4a4a4a;
+    --surface-e: #2a2a2a;
+    --surface-f: #2a2a2a;
+    --text-color: #{$textColor};
+    --text-color-secondary: #{$textSecondaryColor};
+    --primary-color: #{$primaryColor};
+    --primary-color-text: #{$primaryTextColor};
+    --surface-0: #121212;
+    --surface-50: #1e1e1e;
+    --surface-100: #2a2a2a;
+    --surface-200: #383838;
+    --surface-300: #4a4a4a;
+    --surface-400: #5c5c5c;
+    --surface-500: #6e6e6e;
+    --surface-600: #909090;
+    --surface-700: #b0b0b0;
+    --surface-800: #d0d0d0;
+    --surface-900: #e0e0e0;
+    --content-padding: #{$panelContentPadding};
+    --inline-spacing: #{$inlineSpacing};
+    --border-radius: #{$borderRadius};
+    --surface-ground: #121212;
+    --surface-section: #1e1e1e;
+    --surface-card: #1e1e1e;
+    --surface-overlay: #2a2a2a;
+    --surface-border: #383838;
+    --surface-hover: #2a2a2a;
+    --maskbg: #{$maskBg};
+    --highlight-bg: #{$highlightBg};
+    --highlight-text-color: #{$highlightTextColor};
+    --focus-ring: #{$focusShadow};
+    color-scheme: dark;
+}
+
+
+// Custom extensions
+/* Dark theme customizations */
+body {
+    background-color: var(--surface-ground);
+    color: var(--text-color);
+}

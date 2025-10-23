@@ -75,16 +75,6 @@ export class DashboardComponent implements OnInit {
      
   }
 
-  testAPI(){
-     this.mainAPIService.getSlowData().subscribe({
-        next:(res)=>{
-          console.log(res);
-        },
-        error:(err)=>{
-          console.log(err);
-          
-        }
-      })
-  }
+  
 
 }

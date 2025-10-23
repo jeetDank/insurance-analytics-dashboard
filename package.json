@@ -22,7 +22,7 @@
     "@angular/router": "^19.1.0",
     "@ng-bootstrap/ng-bootstrap": "^18.0.0",
     "@popperjs/core": "^2.11.8",
-    "@primeng/themes": "^20.1.2",
+    "@primeng/themes": "^20.2.0",
     "angular-feather": "^6.5.1",
     "bootstrap": "^5.3.3",
     "echarts": "^6.0.0",

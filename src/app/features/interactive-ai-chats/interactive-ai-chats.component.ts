@@ -150,11 +150,7 @@ export class InteractiveAiChatsComponent implements OnChanges {
     console.log(payload);
     
 
-    this.main.interactiveAIChats(payload).subscribe({
-      next: (res) => {
-        console.log(res);
-      },
-    });
+    
   }
 
   ngOnChanges(changes: SimpleChanges): void {

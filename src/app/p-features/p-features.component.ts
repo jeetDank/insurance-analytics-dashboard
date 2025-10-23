@@ -7,7 +7,6 @@ import { AccordianComponent } from '../common/components/accordian/accordian.com
 import { DrawerModule } from 'primeng/drawer';
 import { PastDashboardsComponent } from './past-dashboards/past-dashboards.component';
 import { SavedFormulasComponent } from './saved-formulas/saved-formulas.component';
-import { CommonCardComponent } from '../common/components/common-card/common-card.component';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -20,6 +19,13 @@ import { AccordionModule } from 'primeng/accordion';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { NgbAccordionModule, NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { MainService } from '../common/services/main.service';
+import { FormsModule } from '@angular/forms';
+import { PopoverModule } from 'primeng/popover';
+
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { LoaderService } from '../common/services/loader.service';
 
 interface referenceData {
   totalRefCount: number;
@@ -33,6 +39,35 @@ interface references {
   logo: string | null;
   link: string;
   label: string;
+}
+interface CardData {
+  companyName: string;
+  metricName: string;
+  subTitle: string | null;
+  metric: string;
+  metricPeriod: string;
+  trend: string;
+  trendIcon: string;
+  trendPositive: boolean;
+}
+
+interface ComparisonMetric {
+  metricName: string;
+  subTitle: string | null;
+  formula:{
+    formula:string,
+    use:string
+  } | null
+  companies: {
+    [companyName: string]: {
+      metric: string;
+      metricPeriod: string;
+      trend: string;
+      trendIcon: string;
+      trendPositive: boolean;
+      available: boolean;
+    };
+  };
 }
 
   
@@ -48,7 +83,6 @@ interface references {
     EchartsComponent,
     ContainerCardComponent,
     DragDropModule,
-    CommonCardComponent,
     SidebarComponent,
     IconsModule,
     MatSidenavModule,
@@ -58,6 +92,11 @@ interface references {
     PastDashboardsComponent,
     SavedFormulasComponent,
     EchartsComponent,
+    NgbAccordionModule,
+    FormsModule,
+    PopoverModule,
+    ProgressSpinnerModule
+    
   ],
   templateUrl: './p-features.component.html',
   styleUrl: './p-features.component.scss',
@@ -84,181 +123,20 @@ export class PFeaturesComponent {
     trend: '+6.1% YoY',
     trendIcon: 'pi pi-arrow-up-right',
     trendPositive: true,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'Net Income',
-    subTitle: null,
-    metric: '$22.9B',
-    metricPeriod: 'Q4 2024',
-    trend: '+8.2% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'Gross Margin',
-    subTitle: null,
-    metric: '46.2%',
-    metricPeriod: 'Q4 2024',
-    trend: '+0.5% vs Q3 2024',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'Operating Income',
-    subTitle: null,
-    metric: '$29.3B',
-    metricPeriod: 'Q4 2024',
-    trend: '+7.8% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'EPS (Diluted)',
-    subTitle: 'Earnings Per Share',
-    metric: '$1.46',
-    metricPeriod: 'Q4 2024',
-    trend: '+10.6% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'Cash & Cash Equivalents',
-    subTitle: null,
-    metric: '$61.8B',
-    metricPeriod: 'Q4 2024',
-    trend: '-2.3% vs Q3 2024',
-    trendIcon: 'pi pi-arrow-down-right',
-    trendPositive: false,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'R&D Expenses',
-    subTitle: 'Research & Development',
-    metric: '$8.0B',
-    metricPeriod: 'Q4 2024',
-    trend: '+9.1% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Apple Inc.',
-    metricName: 'Total Assets',
-    subTitle: null,
-    metric: '$365.7B',
-    metricPeriod: 'Q4 2024',
-    trend: '+3.4% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-
-  // Microsoft Corporation Metrics
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Revenue',
-    subTitle: null,
-    metric: '$65.6B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+16.0% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Net Income',
-    subTitle: null,
-    metric: '$24.7B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+11.0% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Gross Margin',
-    subTitle: null,
-    metric: '69.9%',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+1.2% vs Q4 FY2024',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Operating Income',
-    subTitle: null,
-    metric: '$30.6B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+14.5% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'EPS (Diluted)',
-    subTitle: 'Earnings Per Share',
-    metric: '$3.30',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+10.0% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Cash & Cash Equivalents',
-    subTitle: null,
-    metric: '$78.4B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+5.2% vs Q4 FY2024',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Cloud Revenue',
-    subTitle: 'Azure & Cloud Services',
-    metric: '$38.9B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+22.0% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'R&D Expenses',
-    subTitle: 'Research & Development',
-    metric: '$7.5B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+18.7% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Total Assets',
-    subTitle: null,
-    metric: '$512.1B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '+8.9% YoY',
-    trendIcon: 'pi pi-arrow-up-right',
-    trendPositive: true,
-  },
-  {
-    companyName: 'Microsoft Corporation',
-    metricName: 'Free Cash Flow',
-    subTitle: null,
-    metric: '$19.3B',
-    metricPeriod: 'Q1 FY2025',
-    trend: '-2.1% vs Q4 FY2024',
-    trendIcon: 'pi pi-arrow-down-right',
-    trendPositive: false,
+    formula: {
+      name:"Revenue",
+      formula:"",
+      use:""
+    }
   }
+  
   ];
 
+ companies: string[] = [];
+  comparisonMetrics: ComparisonMetric[] = [];
+  
+  // View mode toggle
+  viewMode: 'cards' | 'comparison' = 'comparison';
 
   samplePrompts: any = [
     {
@@ -278,90 +156,138 @@ export class PFeaturesComponent {
     { id: 3, prompt: 'Compare operating margins for Apple and Microsoft' },
   ];
 
-  appleOption: EChartsOption = {
-    title: {
-      text: '',
-      left: 'center',
-      textStyle: {
-        fontSize: 16,
-        fontWeight: 600,
-      },
+   baseDarkChartTheme = {
+  backgroundColor: 'transparent', // dark container already applied in UI
+  textStyle: {
+    color: '#e5e5e5', // matches var(--dark-text-primary)
+  },
+  title: {
+    textStyle: {
+      color: '#e5e5e5',
+      fontSize: 16,
+      fontWeight: 600,
     },
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: ${c}B ({d}%)',
+  },
+  legend: {
+    textStyle: {
+      color: '#a0a0a0', // var(--dark-text-secondary)
     },
-    legend: {
-      bottom: 0,
+    itemWidth: 14,
+    itemHeight: 10,
+    icon: 'circle',
+  },
+  tooltip: {
+    backgroundColor: 'rgba(50,50,50,0.9)',
+    borderColor: '#333',
+    textStyle: {
+      color: '#fff',
     },
-    series: [
-      {
-        name: 'Apple Revenue',
-        type: 'pie',
-        radius: '65%',
-        center: ['50%', '50%'],
-        data: [
-          { value: 201.18, name: 'iPhone' },
-          { value: 96.17, name: 'Services' },
-          { value: 37.01, name: 'Wearables/Home & Accessories' },
-          { value: 29.98, name: 'Mac' },
-          { value: 26.69, name: 'iPad' },
-        ],
-        label: {
-          formatter: '{b}\n{d}%',
-        },
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.3)',
-          },
-        },
-      },
-    ],
-  };
+  },
+};
 
-  // Microsoft FY2024 Revenue (in $M)
-  microsoftOption: EChartsOption = {
-    title: {
-      text: '',
-      left: 'center',
-      textStyle: {
-        fontSize: 16,
-        fontWeight: 600,
+appleOption: EChartsOption = {
+  ...this.baseDarkChartTheme,
+  title: {
+    ...this.baseDarkChartTheme.title,
+    text: '',
+  },
+  legend: {
+    ...this.baseDarkChartTheme.legend,
+    bottom: 0,
+  },
+  tooltip: {
+    ...this.baseDarkChartTheme.tooltip,
+    formatter: '{b}: ${c}B ({d}%)',
+  },
+  series: [
+    {
+      name: 'Apple Revenue',
+      type: 'pie',
+      radius: '65%',
+      center: ['50%', '50%'],
+      data: [
+        { value: 201.18, name: 'iPhone' },
+        { value: 96.17, name: 'Services' },
+        { value: 37.01, name: 'Wearables/Home & Accessories' },
+        { value: 29.98, name: 'Mac' },
+        { value: 26.69, name: 'iPad' },
+      ],
+      label: {
+        formatter: '{b}\n{d}%',
+        color: '#ccc', // lighter for visibility
+        fontSize: 12,
       },
-    },
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: ${c}M ({d}%)',
-    },
-    legend: {
-      bottom: 0,
-    },
-    series: [
-      {
-        name: 'Microsoft Revenue',
-        type: 'pie',
-        radius: '65%',
-        center: ['50%', '50%'],
-        data: [
-          { value: 77728, name: 'Productivity & Business Processes' },
-          { value: 105362, name: 'Intelligent Cloud' },
-          { value: 62032, name: 'More Personal Computing' },
-        ],
-        label: {
-          formatter: '{b}\n{d}%',
-        },
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.3)',
-          },
+      labelLine: {
+        lineStyle: {
+          color: '#555',
         },
       },
-    ],
-  };
+      itemStyle: {
+        borderColor: '#1e2129',
+        borderWidth: 2,
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 15,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+  ],
+};
+
+microsoftOption: EChartsOption = {
+  ...this.baseDarkChartTheme,
+  title: {
+    ...this.baseDarkChartTheme.title,
+    text: '',
+  },
+  legend: {
+    ...this.baseDarkChartTheme.legend,
+    bottom: 0,
+  },
+  tooltip: {
+    ...this.baseDarkChartTheme.tooltip,
+    formatter: '{b}: ${c}M ({d}%)',
+  },
+  series: [
+    {
+      name: 'Microsoft Revenue',
+      type: 'pie',
+      radius: '65%',
+      center: ['50%', '50%'],
+      data: [
+        { value: 77728, name: 'Productivity & Business Processes' },
+        { value: 105362, name: 'Intelligent Cloud' },
+        { value: 62032, name: 'More Personal Computing' },
+      ],
+      label: {
+        formatter: '{b}\n{d}%',
+        color: '#ccc',
+        fontSize: 12,
+      },
+      labelLine: {
+        lineStyle: {
+          color: '#555',
+        },
+      },
+      itemStyle: {
+        borderColor: '#1e2129',
+        borderWidth: 2,
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 15,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+  ],
+};
+
+
 
   referencesData: referenceData[] = [
     {
@@ -401,9 +327,31 @@ export class PFeaturesComponent {
     },
   ];
 
+  isLoaderShowing:boolean| null=null;
+  userQuery:string ="" 
+  constructor(private main:MainService,private loader:LoaderService){
+     loader.isLoading.subscribe((res)=>{
+      this.isLoaderShowing = res
+      console.log(res);
+      
+    });
+  }
+
+
 
   ngOnInit() {
   this.cardData = this.groupByMetricName(this.cardData);
+   this.processDataForComparison();
+
+   setTimeout(() => { 
+    this.loader.show();
+    
+   }, 5000);
+}
+
+
+pushPromptToQueryBox(query:any){
+  this.userQuery = query.prompt;
 }
 
 groupByMetricName(data: any[]) {
@@ -439,4 +387,133 @@ groupByMetricName(data: any[]) {
   drop(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.cardData, event.previousIndex, event.currentIndex);
   }
+
+
+
+
+
+
+  // API Interactions
+
+  sendQuery(){
+      let payload = {
+        query:this.userQuery
+      }
+      this.main.parseQuery(payload).subscribe({
+
+      })
+  }
+
+
+  processDataForComparison() {
+    // Extract unique companies
+    this.companies = [...new Set(this.cardData.map(item => item.companyName))];
+    
+    // Limit to 4 companies
+    if (this.companies.length > 4) {
+      console.warn('More than 4 companies detected. Only showing first 4.');
+      this.companies = this.companies.slice(0, 4);
+    }
+
+    // Extract unique metrics
+    const uniqueMetrics = [...new Set(this.cardData.map(item => item.metricName))];
+
+    // Build comparison structure
+    this.comparisonMetrics = uniqueMetrics.map(metricName => {
+      const companiesData: ComparisonMetric['companies'] = {};
+      
+      // Get subtitle from first occurrence of this metric
+      const firstMetric = this.cardData.find(item => item.metricName === metricName);
+      const subTitle = firstMetric?.subTitle || null;
+      const formula = firstMetric?.formula || null
+
+      // For each company, find if they have this metric
+      this.companies.forEach(companyName => {
+        const metricData = this.cardData.find(
+          item => item.companyName === companyName && item.metricName === metricName
+        );
+
+        if (metricData) {
+          companiesData[companyName] = {
+            metric: metricData.metric,
+            metricPeriod: metricData.metricPeriod,
+            trend: metricData.trend,
+            trendIcon: metricData.trendIcon,
+            trendPositive: metricData.trendPositive,
+            available: true
+          };
+        } else {
+          companiesData[companyName] = {
+            metric: 'N/A',
+            metricPeriod: '',
+            trend: '',
+            trendIcon: '',
+            trendPositive: false,
+            available: false
+          };
+        }
+      });
+
+      return {
+        metricName,
+        subTitle,
+        formula,
+        companies: companiesData
+      };
+    });
+  }
+
+  toggleView() {
+    this.viewMode = this.viewMode === 'cards' ? 'comparison' : 'cards';
+  }
+
+
+  getColumnClass(): string {
+    switch (this.companies.length) {
+      case 1:
+        return 'col-12';
+      case 2:
+        return 'col-md-6';
+      case 3:
+        return 'col-md-4';
+      case 4:
+        return 'col-md-3 col-sm-6';
+      default:
+        return 'col-md-3';
+    }
+  }
+
+  /**
+   * Get company keys for iteration
+   */
+  getCompanyKeys(companies: ComparisonMetric['companies']): string[] {
+    return Object.keys(companies);
+  }
+
+
+
+  popoverData:any = null;
+
+  updateFormulaToggleData(metric:any){
+
+    this.popoverData = metric;
+
+    
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

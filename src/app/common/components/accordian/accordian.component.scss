@@ -1,107 +1,233 @@
-/* Accordion Header */
-.accordion-header-style {
-  background-color: var(--color-bg-card);
-  color: var(--text-primary);
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+
+
+/* Main accordion wrapper */
+.dark-accordion-wrapper {
+  background: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
 }
 
-.accordion-header-style:hover {
-  background-color: rgba(59, 130, 246, 0.1); /* subtle blue tint on hover */
-  border-color: var(--color-accent);
-}
-
-/* PrimeNG Accordion Header */
-.p-accordionheader {
-  background-color: var(--color-bg-card);
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 500;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.p-accordionheader:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-/* Active Header State */
-.p-accordionheader.p-highlight {
-  background-color: var(--color-accent);
-  color: #ffffff;
-  border-color: var(--color-accent-hover);
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
-}
-
-/* Accordion Panel Body */
-.p-accordion-content {
-  background-color: var(--color-bg-secondary);
-  color: var(--text-secondary);
-  border: 1px solid var(--color-border);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  padding: 1rem;
-}
-
-/* Info Section */
-.info-and-selector {
-  background-color: var(--color-bg-card);
-  color: var(--text-primary);
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.info-and-selector:hover {
-  border-color: var(--color-accent);
-}
-
-/* Optional: text in info section */
-.info-and-selector p,
-.info-and-selector span {
-  color: var(--text-secondary);
-}
-
-
-/* Dark Accordion Base */
+/* Main accordion container */
 .dark-accordion {
-  background-color: var(--color-bg-primary);
-  color: var(--text-primary);
+  background: var(--dark-bg-primary);
+
+  .dark-accordion-item {
+    background: var(--dark-bg-secondary);
+    border: 1px solid var(--dark-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px var(--dark-shadow);
+    transition: all 0.25s ease-in-out;
+
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+
+    &:hover {
+      border-color: var(--dark-border-light);
+      box-shadow: 0 0 8px rgba(96, 165, 250, 0.2);
+    }
+  }
+
+  .dark-accordion-header {
+    background: var(--dark-bg-primary);
+    margin: 0;
+
+    .dark-accordion-button {
+      background: var(--dark-bg-secondary);
+      border: none;
+      color: var(--dark-text-primary);
+      padding: 1rem 1.25rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      text-align: left;
+      font-weight: 400;
+      transition: all 0.25s ease;
+
+      &:hover {
+        background: var(--dark-hover);
+        color: var(--dark-primary);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35);
+        outline: none;
+      }
+
+      &:not(.collapsed) {
+        background: var(--dark-bg-tertiary);
+        color: var(--dark-primary);
+        border-bottom: 1px solid var(--dark-border-light);
+      }
+
+      &::after {
+        filter: invert(0.8);
+        opacity: 0.7;
+      }
+    }
+  }
+
+  ::ng-deep .accordion-body {
+    background: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
+    padding: 1.25rem;
+    border: none;
+  }
 }
 
-.dark-panel {
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+/* Nested accordion styles */
+.steps-container {
+  background: transparent;
+
+  .nested-accordion {
+    background: transparent;
+
+    .nested-accordion-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--dark-border-light);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.2s ease-in-out;
+
+      &:not(:last-child) {
+        margin-bottom: 0.75rem;
+      }
+
+      &:hover {
+        border-color: var(--dark-primary);
+        box-shadow: 0 0 6px rgba(96, 165, 250, 0.3);
+      }
+    }
+
+    .nested-accordion-header {
+      .nested-accordion-button {
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--dark-text-primary);
+        padding: 0.875rem 1rem;
+        width: 100%;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        transition: all 0.25s ease;
+
+        &:hover {
+          background: rgba(96, 165, 250, 0.08);
+          color: var(--dark-primary);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+          outline: none;
+        }
+
+        &:not(.collapsed) {
+          background: rgba(96, 165, 250, 0.1);
+          border-bottom: 1px solid var(--dark-border-light);
+          color: var(--dark-primary);
+        }
+
+        &::after {
+          filter: invert(0.8);
+          opacity: 0.7;
+        }
+      }
+    }
+
+    ::ng-deep .accordion-body {
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--dark-text-primary);
+      padding: 1rem;
+    }
+  }
 }
 
-.dark-panel:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+/* Text colors */
+.text-primary {
+  color: var(--dark-primary) !important;
+}
+.text-success {
+  color: var(--dark-success) !important;
+}
+.text-secondary {
+  color: var(--dark-text-secondary) !important;
+}
+.text-muted {
+  color: var(--dark-text-muted) !important;
 }
 
-.dark-header {
-  background-color: var(--color-bg-card);
-  color: var(--text-primary);
+/* Badge/Tag styles */
+.badge-custom {
+  background: rgba(96, 165, 250, 0.1);
+  color: var(--dark-primary);
+  border: 1px solid var(--dark-border-light);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+
+  i {
+    color: var(--dark-primary);
+  }
 }
 
-.dark-content {
-  background-color: var(--color-bg-secondary);
-  color: var(--text-secondary);
-  border-top: 1px solid var(--color-border);
+.badge-unique {
+  background: rgba(96, 165, 250, 0.15);
+  color: var(--dark-primary);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+
+  i {
+    color: var(--dark-primary);
+  }
 }
 
-.dark-tag {
-  background: rgba(59, 130, 246, 0.1);
-  color: var(--text-primary);
-  border: 1px solid var(--color-border);
+/* Icon coloring */
+i.text-primary {
+  color: var(--dark-primary) !important;
+}
+i.text-success {
+  color: var(--dark-success) !important;
+}
+i.text-secondary {
+  color: var(--dark-text-secondary) !important;
+}
+
+/* List styling */
+.list-unstyled li {
+  color: var(--dark-text-primary);
+  span {
+    color: var(--dark-text-primary);
+  }
+
+  &:hover span {
+    color: var(--dark-primary);
+  }
+}
+
+/* Headings & strong */
+h6 {
+  color: var(--dark-primary);
+  font-weight: 600;
+}
+strong {
+  color: var(--dark-text-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dark-accordion-button {
+    padding: 0.875rem 1rem !important;
+  }
+
+  ::ng-deep .accordion-body {
+    padding: 1rem !important;
+  }
 }

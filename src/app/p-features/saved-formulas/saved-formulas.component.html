@@ -3,7 +3,7 @@
     <div class="side-panel w-100 overflow-hidden">
       <!-- Header -->
       <div class="panel-header p-3 border-bottom">
-        <h5 class="mb-0 fw-semibold">Insurance Formulas</h5>
+        <h5 class="mb-0 text-light fw-semibold">Insurance Formulas</h5>
       </div>
       
       <!-- Search Box -->
@@ -15,7 +15,8 @@
             pInputText 
             [(ngModel)]="searchQuery"
             placeholder="Search formulas..."
-            class="w-100"
+            class="w-100 bg-dark"
+            
           />
         </p-iconfield>
       </div>
@@ -37,7 +38,7 @@
                 </button>
               </div>
               
-              <div class="formula-code p-2 mb-2 bg-light border rounded">
+              <div class="formula-code p-2 mb-2 rounded">
                 <code class="small">{{ formula.formula }}</code>
               </div>
               
