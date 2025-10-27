@@ -6,7 +6,8 @@ export const API_ENDPOINTS = {
  
    
     QUERY:"/api/v1/query/parse",
-    COMAPANIES:"/api/v1/companies/resolve"
+    COMAPANIES:"/api/v1/companies/resolve",
+    ANALYSE_BATCH:"/api/v1/analysis/batch"
 
 } as const;
 
