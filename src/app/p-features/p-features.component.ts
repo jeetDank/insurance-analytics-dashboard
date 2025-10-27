@@ -33,6 +33,8 @@ import { LoaderService } from '../common/services/loader.service';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from '../common/services/message.service';
 import { catchError, EMPTY, finalize, forkJoin, of, tap } from 'rxjs';
+import { NgIf } from "../../../node_modules/@angular/common/common_module.d-NEF7UaHr";
+import { CardSkeletonComponent } from '../common/components/card-skeleton/card-skeleton.component';
 
 interface message {
   text: string;
@@ -106,7 +108,8 @@ interface ComparisonMetric {
     FormsModule,
     PopoverModule,
     ProgressSpinnerModule,
-  ],
+    CardSkeletonComponent
+],
   templateUrl: './p-features.component.html',
   styleUrl: './p-features.component.scss',
 })
@@ -120,222 +123,10 @@ export class PFeaturesComponent {
 
   sidebarData: any;
 
-  cardData = [
-    // Apple Inc. Metrics
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'Revenue',
-      subTitle: null,
-      metric: '$94.9B',
-      metricPeriod: 'Q4 2024',
-      trend: '+6.1% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-      formula: {
-        name: 'Revenue',
-        formula: '',
-        use: '',
-      },
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'Net Income',
-      subTitle: null,
-      metric: '$22.9B',
-      metricPeriod: 'Q4 2024',
-      trend: '+8.2% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-      formula: {
-        name: 'Net Income',
-        formula: '',
-        use: '',
-      },
-    },
-    {
-      companyName: 'Amazon',
-      metricName: 'Net Income',
-      subTitle: null,
-      metric: '$22.9B',
-      metricPeriod: 'Q4 2024',
-      trend: '+8.2% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-      formula: {
-        name: 'Net Income',
-        formula: '',
-        use: '',
-      },
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'Gross Margin',
-      subTitle: null,
-      metric: '46.2%',
-      metricPeriod: 'Q4 2024',
-      trend: '+0.5% vs Q3 2024',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'Operating Income',
-      subTitle: null,
-      metric: '$29.3B',
-      metricPeriod: 'Q4 2024',
-      trend: '+7.8% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'EPS (Diluted)',
-      subTitle: 'Earnings Per Share',
-      metric: '$1.46',
-      metricPeriod: 'Q4 2024',
-      trend: '+10.6% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'Cash & Cash Equivalents',
-      subTitle: null,
-      metric: '$61.8B',
-      metricPeriod: 'Q4 2024',
-      trend: '-2.3% vs Q3 2024',
-      trendIcon: 'pi pi-arrow-down-right',
-      trendPositive: false,
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'R&D Expenses',
-      subTitle: 'Research & Development',
-      metric: '$8.0B',
-      metricPeriod: 'Q4 2024',
-      trend: '+9.1% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Apple Inc.',
-      metricName: 'Total Assets',
-      subTitle: null,
-      metric: '$365.7B',
-      metricPeriod: 'Q4 2024',
-      trend: '+3.4% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-
-    // Microsoft Corporation Metrics
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Revenue',
-      subTitle: null,
-      metric: '$65.6B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+16.0% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Net Income',
-      subTitle: null,
-      metric: '$24.7B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+11.0% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Gross Margin',
-      subTitle: null,
-      metric: '69.9%',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+1.2% vs Q4 FY2024',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Operating Income',
-      subTitle: null,
-      metric: '$30.6B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+14.5% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'EPS (Diluted)',
-      subTitle: 'Earnings Per Share',
-      metric: '$3.30',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+10.0% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Cash & Cash Equivalents',
-      subTitle: null,
-      metric: '$78.4B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+5.2% vs Q4 FY2024',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Cloud Revenue',
-      subTitle: 'Azure & Cloud Services',
-      metric: '$38.9B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+22.0% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'R&D Expenses',
-      subTitle: 'Research & Development',
-      metric: '$7.5B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+18.7% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Total Assets',
-      subTitle: null,
-      metric: '$512.1B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '+8.9% YoY',
-      trendIcon: 'pi pi-arrow-up-right',
-      trendPositive: true,
-    },
-    {
-      companyName: 'Microsoft Corporation',
-      metricName: 'Free Cash Flow',
-      subTitle: null,
-      metric: '$19.3B',
-      metricPeriod: 'Q1 FY2025',
-      trend: '-2.1% vs Q4 FY2024',
-      trendIcon: 'pi pi-arrow-down-right',
-      trendPositive: false,
-    },
-  ];
+  cardData:any[] = [];
 
   companies: string[] = [];
   comparisonMetrics: ComparisonMetric[] = [];
-
-  // View mode toggle
-  viewMode: 'cards' | 'comparison' = 'comparison';
 
   samplePrompts: any = [
     {
@@ -343,7 +134,7 @@ export class PFeaturesComponent {
       prompt:
         'Show me the revenue data for Apple and Microsoft for the last two quarters',
     },
-    
+
     {
       id: 2,
       prompt:
@@ -544,8 +335,7 @@ export class PFeaturesComponent {
   }
 
   ngOnInit() {
-    this.cardData = this.groupByMetricName(this.cardData);
-    this.processDataForComparison();
+  
   }
 
   pushPromptToQueryBox(query: any) {
@@ -585,9 +375,15 @@ export class PFeaturesComponent {
     moveItemInArray(this.cardData, event.previousIndex, event.currentIndex);
   }
 
+
+
+
   // API Interactions
 
   sendQuery(): void {
+
+    this.clearData()
+
     const payload = { query: this.userQuery };
 
     // Start loading state
@@ -630,91 +426,109 @@ export class PFeaturesComponent {
         },
       });
   }
-
+  clearData(){
+    this.cardData =[];
+    this.analysisData = [];
+    this.userQueryResponseData = null;
+    this.foundCompaniesData = null;
+  
+  }
   userQueryResponseData: any;
 
   handleResponse(res: any): void {
-  this.foundCompaniesData = [];
-  this.userQueryResponseData = res?.parsed;
+    this.foundCompaniesData = [];
+    this.userQueryResponseData = res?.parsed;
 
-  // Validate companies array safely
-  const companies: string[] = Array.isArray(this.userQueryResponseData?.companies)
-    ? this.userQueryResponseData.companies
-    : [];
+    // Validate companies array safely
+    const companies: string[] = Array.isArray(
+      this.userQueryResponseData?.companies
+    )
+      ? this.userQueryResponseData.companies
+      : [];
 
-  if (companies.length === 0) {
-    console.warn('No valid companies found in response.');
-    this.msg.setMessage('No companies found for this query.', 'warning');
-    return;
+    if (companies.length === 0) {
+      console.warn('No valid companies found in response.');
+      this.msg.setMessage('No companies found for this query.', 'warning');
+      return;
+    }
+
+    this.msg.company.fetching();
+    this.loader.show();
+
+    // Map each company to an API observable with error handling
+    const requests = companies.map((company) =>
+      this.main.postCompanies({ company_input: company }).pipe(
+        tap(() => console.log(`Fetching data for ${company}...`)),
+        catchError((error) => {
+          console.error(`Error fetching info for ${company}:`, error);
+          this.msg.setMessage(
+            `Error fetching company info: ${company}`,
+            'error'
+          );
+          // Return a fallback object to keep the stream alive
+          return of({
+            company_input: company,
+            error: true,
+            message: 'Failed to fetch company info.',
+          });
+        })
+      )
+    );
+
+    // Run all requests simultaneously and handle all results together
+    forkJoin(requests)
+      .pipe(
+        finalize(() => {
+          this.loader.hide();
+        })
+      )
+      .subscribe({
+        next: (results: any[]) => {
+          console.log('All company info results:', results);
+
+          // Separate successful and failed results
+          const successfulResults = results.filter((r) => !r.error);
+          const failedResults = results.filter((r) => r.error);
+
+          // Save successful results
+          this.foundCompaniesData = successfulResults;
+
+          // Notify user
+          if (successfulResults.length > 0) {
+            this.msg.setMessage(
+              `Fetched info for ${successfulResults.length} compan${
+                successfulResults.length > 1 ? 'ies' : 'y'
+              }.`,
+              'success'
+            );
+          }
+
+          if (failedResults.length > 0) {
+            this.msg.setMessage(
+              `${failedResults.length} compan${
+                failedResults.length > 1 ? 'ies' : 'y'
+              } failed to load.`,
+              'warning'
+            );
+          }
+
+          // Handle successful company responses (e.g. analysis trigger)
+          successfulResults.forEach((res) => this.handleCompanyResponse(res));
+
+          this.AnalyseCompanies();
+        },
+        error: (err) => {
+          console.error('Unexpected error while fetching companies:', err);
+          this.msg.setMessage(
+            'An unexpected error occurred while fetching companies.',
+            'error'
+          );
+        },
+        complete: () => {
+          console.log('All company info fetch requests complete.');
+        },
+      });
   }
-
-  this.msg.company.fetching();
-  this.loader.show();
-
-  // Map each company to an API observable with error handling
-  const requests = companies.map((company) =>
-    this.main.postCompanies({ company_input: company }).pipe(
-      tap(() => console.log(`Fetching data for ${company}...`)),
-      catchError((error) => {
-        console.error(`Error fetching info for ${company}:`, error);
-        this.msg.setMessage(`Error fetching company info: ${company}`, 'error');
-        // Return a fallback object to keep the stream alive
-        return of({ company_input: company, error: true, message: 'Failed to fetch company info.' });
-      })
-    )
-  );
-
-  // Run all requests simultaneously and handle all results together
-  forkJoin(requests)
-    .pipe(
-      finalize(() => {
-        this.loader.hide();
-        
-      })
-    )
-    .subscribe({
-      next: (results: any[]) => {
-        console.log('All company info results:', results);
-
-        // Separate successful and failed results
-        const successfulResults = results.filter((r) => !r.error);
-        const failedResults = results.filter((r) => r.error);
-
-        // Save successful results
-        this.foundCompaniesData = successfulResults;
-
-        // Notify user
-        if (successfulResults.length > 0) {
-          this.msg.setMessage(
-            `Fetched info for ${successfulResults.length} compan${successfulResults.length > 1 ? 'ies' : 'y'}.`,
-            'success'
-          );
-        }
-
-        if (failedResults.length > 0) {
-          this.msg.setMessage(
-            `${failedResults.length} compan${failedResults.length > 1 ? 'ies' : 'y'} failed to load.`,
-            'warning'
-          );
-        }
-
-        // Handle successful company responses (e.g. analysis trigger)
-        successfulResults.forEach((res) => this.handleCompanyResponse(res));
-
-        this.AnalyseCompanies();
-
-        
-      },
-      error: (err) => {
-        console.error('Unexpected error while fetching companies:', err);
-        this.msg.setMessage('An unexpected error occurred while fetching companies.', 'error');
-      },
-      complete: () => {
-        console.log('All company info fetch requests complete.');
-      },
-    });
-}
-
 
   foundCompaniesData: any = [];
 
@@ -723,8 +537,6 @@ export class PFeaturesComponent {
       payload: { cik: res.company.identifiers.cik, name: res.company.name },
       data: res,
     });
-
-    
   }
 
   AnalyseCompanies(): void {
@@ -799,6 +611,11 @@ export class PFeaturesComponent {
   handleAnalysisResponse(res: any) {
     console.log(res);
     this.analysisData = res;
+
+    this.cardData = this.groupByMetricName(this.populateCardData(res,this.userQueryResponseData.metrics));
+    this.processDataForComparison();
+    
+    
   }
 
   processDataForComparison() {
@@ -866,10 +683,6 @@ export class PFeaturesComponent {
     });
   }
 
-  toggleView() {
-    this.viewMode = this.viewMode === 'cards' ? 'comparison' : 'cards';
-  }
-
   getColumnClass(): string {
     switch (this.companies.length) {
       case 1:
@@ -924,5 +737,159 @@ export class PFeaturesComponent {
       start_date: quarterRanges[quarter].start,
       end_date: quarterRanges[quarter].end,
     };
+  }
+
+  populateCardData(apiResponse: any, requestedMetrics: string[]): any[] {
+    const cardData: any[] = [];
+
+    if (!apiResponse?.success || !apiResponse?.results?.length) {
+      return cardData;
+    }
+
+    // Process each company
+    apiResponse.results.forEach((company: any) => {
+      const latestStatement = company.statements[0];
+      const previousStatement = company.statements[1];
+
+      if (!latestStatement) return;
+
+      // Helper to format currency
+      const formatCurrency = (value: number): string => {
+        const absValue = Math.abs(value);
+        if (absValue >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
+        if (absValue >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+        return `$${value.toFixed(2)}`;
+      };
+
+      // Helper to format percentage
+      const formatPercentage = (value: number): string =>
+        `${value.toFixed(1)}%`;
+
+      // Helper to get growth
+      const getGrowth = (metricKey: string): number | null => {
+        const current = latestStatement.metrics[metricKey];
+        if (current?.yoy_growth != null) return current.yoy_growth;
+        if (current?.qoq_growth != null) return current.qoq_growth;
+
+        // Calculate from previous statement
+        if (previousStatement?.metrics[metricKey]) {
+          const prev = previousStatement.metrics[metricKey].value;
+          if (prev !== 0) {
+            return ((current.value - prev) / Math.abs(prev)) * 100;
+          }
+        }
+        return null;
+      };
+
+      // Metric name mappings
+      const metricNames: Record<
+        string,
+        { name: string; subTitle: string | null }
+      > = {
+        revenue: { name: 'Revenue', subTitle: null },
+        net_income: { name: 'Net Income', subTitle: null },
+        gross_profit: { name: 'Gross Profit', subTitle: null },
+        operating_income: { name: 'Operating Income', subTitle: null },
+        eps_diluted: { name: 'EPS (Diluted)', subTitle: 'Earnings Per Share' },
+        cash_equivalents: { name: 'Cash & Cash Equivalents', subTitle: null },
+        research_and_development: {
+          name: 'R&D Expenses',
+          subTitle: 'Research & Development',
+        },
+        total_assets: { name: 'Total Assets', subTitle: null },
+        free_cash_flow: { name: 'Free Cash Flow', subTitle: null },
+      };
+
+      // Process each metric
+      Object.keys(latestStatement.metrics).forEach((metricKey) => {
+        const metric = latestStatement.metrics[metricKey];
+        const config = metricNames[metricKey];
+
+        if (!config) return; // Skip unknown metrics
+
+        // Filter by requested metrics if provided
+        if (requestedMetrics?.length > 0) {
+          const isRequested = requestedMetrics.some(
+            (rm) =>
+              rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+              config.name.toLowerCase().replace(/[^a-z0-9]/g, '')
+          );
+          if (!isRequested) return;
+        }
+
+        const growth = getGrowth(metricKey);
+        const isPositive = growth !== null ? growth >= 0 : true;
+
+        cardData.push({
+          companyName: company.company_name,
+          metricName: config.name,
+          subTitle: config.subTitle,
+          metric: formatCurrency(metric.value),
+          metricPeriod: latestStatement.period,
+          trend:
+            growth !== null
+              ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% YoY`
+              : 'No change',
+          trendIcon: isPositive
+            ? 'pi pi-arrow-up-right'
+            : 'pi pi-arrow-down-right',
+          trendPositive: isPositive,
+          formula: {
+            name: config.name,
+            formula: '',
+            use: '',
+          },
+        });
+      });
+
+      // Add calculated Gross Margin if revenue and gross_profit exist
+      if (
+        latestStatement.metrics.revenue &&
+        latestStatement.metrics.gross_profit
+      ) {
+        const margin =
+          (latestStatement.metrics.gross_profit.value /
+            latestStatement.metrics.revenue.value) *
+          100;
+
+        let marginGrowth: number | null = null;
+        if (
+          previousStatement?.metrics.revenue &&
+          previousStatement?.metrics.gross_profit
+        ) {
+          const prevMargin =
+            (previousStatement.metrics.gross_profit.value /
+              previousStatement.metrics.revenue.value) *
+            100;
+          marginGrowth = margin - prevMargin;
+        }
+
+        if (
+          !requestedMetrics?.length ||
+          requestedMetrics.some((m) => m.toLowerCase().includes('margin'))
+        ) {
+          cardData.push({
+            companyName: company.company_name,
+            metricName: 'Gross Margin',
+            subTitle: null,
+            metric: formatPercentage(margin),
+            metricPeriod: latestStatement.period,
+            trend:
+              marginGrowth !== null
+                ? `${marginGrowth >= 0 ? '+' : ''}${marginGrowth.toFixed(
+                    1
+                  )}% vs prior period`
+                : 'No change',
+            trendIcon:
+              marginGrowth !== null && marginGrowth >= 0
+                ? 'pi pi-arrow-up-right'
+                : 'pi pi-arrow-down-right',
+            trendPositive: marginGrowth !== null ? marginGrowth >= 0 : true,
+          });
+        }
+      }
+    });
+
+    return cardData;
   }
 }

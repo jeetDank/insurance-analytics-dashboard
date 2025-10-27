@@ -66,7 +66,7 @@
         <!-- Spinner: top-right -->
         <div class="position-absolute top-0 end-0 mt-2 me-3">
           @if(isLoaderShowing){
-            <p-progress-spinner
+          <p-progress-spinner
             strokeWidth="5"
             ariaLabel="loading"
             [style]="{ width: '30px', height: '30px' }"
@@ -97,13 +97,20 @@
       </div>
 
       @if (this.currentMsg != null) {
-        <div class="mt-3 mb-3">
-        <p-message icon="pi pi-info-circle" styleClass="rounded-1" variant="outlined" [severity]="this.currentMsg.type">{{this.currentMsg.text}}</p-message>
+      <div class="mt-3 mb-3">
+        <p-message
+          icon="pi pi-info-circle"
+          styleClass="rounded-1"
+          variant="outlined"
+          [severity]="this.currentMsg.type"
+          >{{ this.currentMsg.text }}</p-message
+        >
       </div>
       }
 
       <!-- loader and msg  -->
 
+      @if(userQuery == "" ){
       <div class="sample-prompt-container mt-3">
         <div class="mb-2 w-100">Sample Prompts:</div>
         @for (item of samplePrompts; track $index) {
@@ -117,12 +124,13 @@
         }
       </div>
 
+      }
       <!-- <div class="mb-2 mt-2">
         <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" />
       </div> -->
 
       <div>
-        <app-accordian [apiResponse]="analysisData" ></app-accordian>
+        <app-accordian [apiResponse]="analysisData"></app-accordian>
       </div>
 
       <!-- <div class="row" cdkDropList (cdkDropListDropped)="drop($event)">
@@ -135,15 +143,19 @@
         }
       </div> -->
 
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      @if (comparisonMetrics.length > 0) {
+        <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">Financial Metrics</h2>
       </div>
+      }
 
       <!-- Comparison View -->
 
       <div class="comparison-container">
         <!-- Company Header Pills -->
-        <div class="company-pills mb-4">
+
+        @if (companies.length> 0) {
+          <div class="company-pills mb-4">
           <div class="d-flex flex-wrap gap-2">
             @for (company of companies; track company) {
             <span class="badge badge-company">
@@ -153,6 +165,8 @@
           </div>
         </div>
 
+        }
+        
         <!-- Comparison Metrics Grid -->
         <div class="metrics-comparison">
           @for (metric of comparisonMetrics; track metric.metricName) {
@@ -228,7 +242,8 @@
         </div>
       </div>
 
-      <div class="row mb-3">
+      @if (false) {
+        <div class="row mb-3">
         <div class="col-sm-12 col-lg-6">
           <app-container-card>
             <div>
@@ -252,8 +267,10 @@
           </app-container-card>
         </div>
       </div>
+      }
 
-      @for (refData of referencesData; track $index) {
+     @if (false) {
+       @for (refData of referencesData; track $index) {
       <div ngbAccordion class="dark-accordion">
         <div ngbAccordionItem class="dark-accordion-item">
           <h2 ngbAccordionHeader class="dark-accordion-header">
@@ -295,6 +312,9 @@
         </div>
       </div>
       }
+     }
+
+     <app-card-skeleton></app-card-skeleton>
     </div>
   </div>
 </mat-drawer-container>
@@ -347,3 +367,5 @@
     />
   </div>
 </p-popover>
+
+

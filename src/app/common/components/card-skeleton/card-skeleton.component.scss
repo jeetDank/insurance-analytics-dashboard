@@ -1,0 +1,85 @@
+/* Base skeleton styles with shimmer animation */
+.skeleton-title,
+.skeleton-text,
+.skeleton-block,
+.skeleton-card {
+  background: linear-gradient(
+    90deg,
+    rgb(50, 50, 50) 0%,
+    rgb(88, 88, 88) 50%,
+    rgb(50, 50, 50) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--bs-border-radius);
+}
+
+/* Skeleton title - 50px height */
+.skeleton-title {
+  width: 100%;
+  height: 50px;
+}
+
+/* Skeleton text - 10px height (single line) */
+.skeleton-text {
+  width: 100%;
+  height: 10px;
+}
+
+/* Skeleton block - 100px height */
+.skeleton-block {
+  width: 100%;
+  height: 50px;
+}
+
+/* Skeleton card - 250px height */
+.skeleton-card {
+  width: 100%;
+  height: 100px;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Optional: Pulse animation alternative */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Use pulse animation instead (uncomment to enable) */
+/*
+.skeleton-title,
+.skeleton-text,
+.skeleton-block,
+.skeleton-card {
+  animation: pulse 1.5s ease-in-out infinite;
+  background: var(--bs-secondary-bg);
+}
+*/
+
+/* Dark theme specific enhancements (optional) */
+[data-bs-theme="dark"] .skeleton-title,
+[data-bs-theme="dark"] .skeleton-text,
+[data-bs-theme="dark"] .skeleton-block,
+[data-bs-theme="dark"] .skeleton-card {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+}
