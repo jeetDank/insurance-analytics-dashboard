@@ -431,6 +431,9 @@ export class PFeaturesComponent {
     this.analysisData = [];
     this.userQueryResponseData = null;
     this.foundCompaniesData = null;
+    this.comparisonMetrics = [];
+    this.companies = [];
+
   
   }
   userQueryResponseData: any;
