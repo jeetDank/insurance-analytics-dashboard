@@ -42,6 +42,7 @@ interface message {
   timestamp: string;
 }
 interface referenceData {
+  companyName: string;
   totalRefCount: number;
   sections: refSections[];
 }
@@ -362,42 +363,42 @@ export class PFeaturesComponent {
     ],
   };
 
-  referencesData: referenceData[] = [
-    {
-      totalRefCount: 5,
-      sections: [
-        {
-          sectionName: 'SEC Filings:',
-          references: [
-            {
-              logo: 'pi pi-book',
-              link: 'https://www.sec.gov/edgar/browse/?CIK=320193',
-              label: 'Apple Inc. - Form 10-Q Q4 2024',
-            },
-            {
-              logo: 'pi pi-book',
-              link: 'Microsoft Corp. - Form 10-Q Q4 2024',
-              label: 'Apple Inc. - Form 10-Q Q3 2024',
-            },
-            {
-              logo: 'pi pi-book',
-              link: 'Microsoft Corp. - Form 10-Q Q4 2024',
-              label: 'Apple Inc. - Form 10-Q Q3 2024',
-            },
-          ],
-        },
-        {
-          sectionName: 'Reference Websites:',
-          references: [
-            {
-              logo: 'pi pi-book',
-              link: 'https://www.sec.gov/edgar',
-              label: 'SEC EDGAR Database',
-            },
-          ],
-        },
-      ],
-    },
+  referencesData: referenceData[] | null = [
+    // {
+    //   totalRefCount: 5,
+    //   sections: [
+    //     {
+    //       sectionName: 'SEC Filings:',
+    //       references: [
+    //         {
+    //           logo: 'pi pi-book',
+    //           link: 'https://www.sec.gov/edgar/browse/?CIK=320193',
+    //           label: 'Apple Inc. - Form 10-Q Q4 2024',
+    //         },
+    //         {
+    //           logo: 'pi pi-book',
+    //           link: 'Microsoft Corp. - Form 10-Q Q4 2024',
+    //           label: 'Apple Inc. - Form 10-Q Q3 2024',
+    //         },
+    //         {
+    //           logo: 'pi pi-book',
+    //           link: 'Microsoft Corp. - Form 10-Q Q4 2024',
+    //           label: 'Apple Inc. - Form 10-Q Q3 2024',
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       sectionName: 'Reference Websites:',
+    //       references: [
+    //         {
+    //           logo: 'pi pi-book',
+    //           link: 'https://www.sec.gov/edgar',
+    //           label: 'SEC EDGAR Database',
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
   ];
 
   isLoaderShowing: boolean | null = null;
@@ -517,6 +518,7 @@ export class PFeaturesComponent {
     this.companies = [];
     this.parsedChartData=null;
    this.chartOptions=null;
+   this.referencesData = null;
   }
   userQueryResponseData: any;
 
@@ -719,6 +721,10 @@ export class PFeaturesComponent {
     );
     this.chartOptions = this.createPieChartOptions(this.parsedChartData);
     console.log(this.parsedChartData);
+
+    // generate references and links 
+
+    this.referencesData = this.parseReferencesFromApiResponse(this.allResponses.analysisData)
   }
 
   formatCurrency(value: number): string {
@@ -1282,4 +1288,92 @@ export class PFeaturesComponent {
 
     return filtered;
   }
+
+
+  parseReferencesFromApiResponse(apiResponse: any): referenceData[] {
+  // Handle null/undefined response
+  if (!apiResponse || !apiResponse.success || !apiResponse.results) {
+    return [];
+  }
+
+  const referencesData: referenceData[] = [];
+  
+  // Iterate through each result in the API response
+  apiResponse.results.forEach((result: any) => {
+    if (!result.statements || result.statements.length === 0) {
+      return;
+    }
+
+    const secFilingReferences: references[] = [];
+    const websiteReferences: references[] = [];
+    const companyName = result.company_name || 'Unknown Company';
+    
+    // Extract SEC filing information from statements
+    result.statements.forEach((statement: any) => {
+      if (statement.metadata) {
+        const metadata = statement.metadata;
+        
+        // Create SEC filing reference
+        if (metadata.filing_url && metadata.company_name && metadata.filing_type) {
+          const period = statement.period || 
+                        (metadata.period_end_date ? this.formatPeriod(metadata.period_end_date) : 'N/A');
+          
+          secFilingReferences.push({
+            logo: 'pi pi-book',
+            link: metadata.filing_url,
+            label: `${metadata.company_name} - Form ${metadata.filing_type} ${period}`
+          });
+        }
+      }
+    });
+
+    // Add SEC EDGAR database reference (always included if we have SEC filings)
+    if (secFilingReferences.length > 0) {
+      websiteReferences.push({
+        logo: 'pi pi-book',
+        link: 'https://www.sec.gov/edgar',
+        label: 'SEC EDGAR Database'
+      });
+    }
+
+    // Build sections array
+    const sections: refSections[] = [];
+    
+    if (secFilingReferences.length > 0) {
+      sections.push({
+        sectionName: 'SEC Filings:',
+        references: secFilingReferences
+      });
+    }
+    
+    if (websiteReferences.length > 0) {
+      sections.push({
+        sectionName: 'Reference Websites:',
+        references: websiteReferences
+      });
+    }
+
+    // Only add to referencesData if we have sections
+    if (sections.length > 0) {
+      referencesData.push({
+        companyName: companyName,  // Add company name
+        totalRefCount: secFilingReferences.length + websiteReferences.length,
+        sections: sections
+      });
+    }
+  });
+
+  return referencesData;
+}
+
+formatPeriod(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    const quarter = Math.ceil((date.getMonth() + 1) / 3);
+    return `Q${quarter} ${date.getFullYear()}`;
+  } catch (e) {
+    return 'N/A';
+  }
+}
+
 }

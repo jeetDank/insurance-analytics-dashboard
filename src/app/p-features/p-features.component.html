@@ -133,6 +133,8 @@
 
       @if (allResponses.parsedData) {
       <div class="mt-3">
+        <div class="border-top border-dark mt-5 mb-5"></div>
+
         <app-accordian
           [parsedQuery]="this.allResponses.parsedData"
         ></app-accordian>
@@ -162,8 +164,8 @@
       </div> -->
 
       @if (comparisonMetrics.length > 0) {
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Financial Metrics</h2>
+      <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Financial Metrics</h3>
       </div>
       }
 
@@ -288,6 +290,10 @@
       } -->
 
       @if (chartOptions && chartOptions.length > 0) {
+      <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Charts</h3>
+      </div>
+
       <div class="row mb-3">
         @for (chart of chartOptions; track chart.cik + chart.metricName) {
         <div class="col-sm-12 col-lg-6">
@@ -307,12 +313,19 @@
         </div>
         }
       </div>
-      } @if (false) { @for (refData of referencesData; track $index) {
-      <div ngbAccordion class="dark-accordion">
+      } @if (referencesData!=null && referencesData.length > 0) { 
+        <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">References & Sources</h3>
+      </div>
+        
+        @for (refData
+      of referencesData; track $index) {
+      
+      <div ngbAccordion class="dark-accordion mt-2">
         <div ngbAccordionItem class="dark-accordion-item">
           <h2 ngbAccordionHeader class="dark-accordion-header">
             <button ngbAccordionButton class="dark-accordion-button">
-              References & Sources
+              {{ refData.companyName }}
             </button>
           </h2>
           <div ngbAccordionCollapse>
@@ -330,6 +343,7 @@
                         <i [class]="reference.logo"></i>
                         }
                       </span>
+
                       <a
                         [href]="reference.link"
                         target="_blank"
@@ -351,6 +365,7 @@
       } }
 
       <app-card-skeleton></app-card-skeleton>
+      <div style="height: 50px"></div>
     </div>
   </div>
 </mat-drawer-container>
