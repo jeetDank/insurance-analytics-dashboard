@@ -33,7 +33,7 @@ import { LoaderService } from '../common/services/loader.service';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from '../common/services/message.service';
 import { catchError, EMPTY, finalize, forkJoin, of, tap } from 'rxjs';
-import { NgIf } from "../../../node_modules/@angular/common/common_module.d-NEF7UaHr";
+import { NgIf } from '../../../node_modules/@angular/common/common_module.d-NEF7UaHr';
 import { CardSkeletonComponent } from '../common/components/card-skeleton/card-skeleton.component';
 
 interface message {
@@ -84,6 +84,94 @@ interface ComparisonMetric {
   };
 }
 
+interface MetricChild {
+  name: string;
+  value: number;
+  description: string;
+  percentage_of_parent: number;
+  unit: string;
+}
+
+interface Metric {
+  name: string;
+  value: number;
+  unit: string;
+  children?: Record<string, MetricChild>;
+}
+
+interface Statement {
+  metadata: {
+    company_name: string;
+    filing_date: string;
+    period_end_date: string;
+  };
+  period: string;
+  metrics: Record<string, Metric>;
+}
+
+interface CompanyResult {
+  cik: string;
+  company_name: string;
+  statements: Statement[];
+}
+
+interface APIResponse {
+  success: boolean;
+  results: CompanyResult[];
+}
+
+// Output structure for pie chart data
+interface PieChartDataPoint {
+  name: string;
+  value: number;
+  percentage: number;
+  formattedValue: string;
+}
+
+interface MetricPieChartData {
+  metricName: string;
+  totalValue: number;
+  data: PieChartDataPoint[];
+}
+
+interface CompanyPieChartData {
+  companyName: string;
+  cik: string;
+  period: string;
+  filingDate: string;
+  metrics: MetricPieChartData[];
+}
+
+interface PieChartDataPoint {
+  name: string;
+  value: number;
+  percentage: number;
+  formattedValue: string;
+}
+
+interface MetricPieChartData {
+  metricName: string;
+  totalValue: number;
+  data: PieChartDataPoint[];
+}
+
+interface CompanyPieChartData {
+  companyName: string;
+  cik: string;
+  period: string;
+  filingDate: string;
+  metrics: MetricPieChartData[];
+}
+
+// Output structure for each chart
+interface CompanyChartOption {
+  companyName: string;
+  cik: string;
+  period: string;
+  metricName: string;
+  chartOption: EChartsOption;
+}
+
 @Component({
   selector: 'app-p-features',
   imports: [
@@ -108,8 +196,8 @@ interface ComparisonMetric {
     FormsModule,
     PopoverModule,
     ProgressSpinnerModule,
-    CardSkeletonComponent
-],
+    CardSkeletonComponent,
+  ],
   templateUrl: './p-features.component.html',
   styleUrl: './p-features.component.scss',
 })
@@ -123,7 +211,7 @@ export class PFeaturesComponent {
 
   sidebarData: any;
 
-  cardData:any[] = [];
+  cardData: any[] = [];
 
   companies: string[] = [];
   comparisonMetrics: ComparisonMetric[] = [];
@@ -334,9 +422,7 @@ export class PFeaturesComponent {
     });
   }
 
-  ngOnInit() {
-  
-  }
+  ngOnInit() {}
 
   pushPromptToQueryBox(query: any) {
     this.userQuery = query.prompt;
@@ -375,14 +461,10 @@ export class PFeaturesComponent {
     moveItemInArray(this.cardData, event.previousIndex, event.currentIndex);
   }
 
-
-
-
   // API Interactions
 
   sendQuery(): void {
-
-    this.clearData()
+    this.clearData();
 
     const payload = { query: this.userQuery };
 
@@ -426,21 +508,22 @@ export class PFeaturesComponent {
         },
       });
   }
-  clearData(){
-    this.cardData =[];
-    this.analysisData = [];
+  clearData() {
+    this.cardData = [];
+    this.allResponses = {};
     this.userQueryResponseData = null;
     this.foundCompaniesData = null;
     this.comparisonMetrics = [];
     this.companies = [];
-
-  
+    this.parsedChartData=null;
+   this.chartOptions=null;
   }
   userQueryResponseData: any;
 
   handleResponse(res: any): void {
     this.foundCompaniesData = [];
     this.userQueryResponseData = res?.parsed;
+    this.allResponses.parsedData = res
 
     // Validate companies array safely
     const companies: string[] = Array.isArray(
@@ -517,7 +600,7 @@ export class PFeaturesComponent {
 
           // Handle successful company responses (e.g. analysis trigger)
           successfulResults.forEach((res) => this.handleCompanyResponse(res));
-
+          this.allResponses.companyData = this.foundCompaniesData;
           this.AnalyseCompanies();
         },
         error: (err) => {
@@ -609,16 +692,161 @@ export class PFeaturesComponent {
       });
   }
 
-  analysisData: any;
+  allResponses: any = {
+    parsedData: null,
+    companyData: null,
+    analysisData: null,
+  };
+
+  parsedChartData: any;
+  chartOptions: any;
 
   handleAnalysisResponse(res: any) {
     console.log(res);
-    this.analysisData = res;
-
-    this.cardData = this.groupByMetricName(this.populateCardData(res,this.userQueryResponseData.metrics));
+    this.allResponses.analysisData = res;
+    this.cardData = this.groupByMetricName(
+      this.populateCardData(
+        this.allResponses.analysisData,
+        this.userQueryResponseData.metrics
+      )
+    );
     this.processDataForComparison();
-    
-    
+
+    // plot charts
+
+    this.parsedChartData = this.parseFinancialDataForPieCharts(
+      this.allResponses.analysisData
+    );
+    this.chartOptions = this.createPieChartOptions(this.parsedChartData);
+    console.log(this.parsedChartData);
+  }
+
+  formatCurrency(value: number): string {
+    if (Math.abs(value) >= 1_000_000_000) {
+      return `$${(value / 1_000_000_000).toFixed(2)}B`;
+    } else if (Math.abs(value) >= 1_000_000) {
+      return `$${(value / 1_000_000).toFixed(2)}M`;
+    } else if (Math.abs(value) >= 1_000) {
+      return `$${(value / 1_000).toFixed(2)}K`;
+    }
+    return `$${value.toFixed(2)}`;
+  }
+
+  cleanMetricName(name: string): string {
+    return name
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  parseFinancialDataForPieCharts(
+    apiResponse: APIResponse
+  ): CompanyPieChartData[] | string {
+    // Validate API response
+    if (!apiResponse || !apiResponse.success) {
+      return 'No data available - API request was not successful';
+    }
+
+    if (!apiResponse.results || apiResponse.results.length === 0) {
+      return 'No data available - No company results found';
+    }
+
+    const companiesData: CompanyPieChartData[] = [];
+
+    // Process each company in the results
+    for (const company of apiResponse.results) {
+      if (!company.statements || company.statements.length === 0) {
+        continue; // Skip companies with no statements
+      }
+
+      // Process each statement (filing period)
+      for (const statement of company.statements) {
+        const metricsData: MetricPieChartData[] = [];
+
+        // Iterate through all metrics in the statement
+        for (const [metricKey, metricValue] of Object.entries(
+          statement.metrics
+        )) {
+          // Only process metrics that have children (breakdown data)
+          if (
+            metricValue.children &&
+            Object.keys(metricValue.children).length > 0
+          ) {
+            const pieChartPoints: PieChartDataPoint[] = [];
+
+            // Extract each child segment for the pie chart
+            for (const [childKey, childValue] of Object.entries(
+              metricValue.children
+            )) {
+              pieChartPoints.push({
+                name:
+                  childValue.description?.replace(
+                    `${metricValue.name} - `,
+                    ''
+                  ) || childKey,
+                value: childValue.value,
+                percentage: childValue.percentage_of_parent,
+                formattedValue: this.formatCurrency(childValue.value),
+              });
+            }
+
+            // Only add if we have valid data points
+            if (pieChartPoints.length > 0) {
+              metricsData.push({
+                metricName: this.cleanMetricName(metricValue.name),
+                totalValue: metricValue.value,
+                data: pieChartPoints.sort(
+                  (a, b) => b.percentage - a.percentage
+                ), // Sort by percentage descending
+              });
+            }
+          }
+        }
+
+        // Only add company data if we found metrics with breakdown
+        if (metricsData.length > 0) {
+          companiesData.push({
+            companyName: statement.metadata.company_name,
+            cik: company.cik,
+            period: statement.period,
+            filingDate: statement.metadata.filing_date,
+            metrics: metricsData,
+          });
+        }
+      }
+    }
+
+    // Return appropriate message if no pie chart data was found
+    if (companiesData.length === 0) {
+      return 'No data available - No metrics with breakdown data found';
+    }
+
+    return companiesData;
+  }
+
+  getMetricDataByName(
+    parsedData: CompanyPieChartData[] | string,
+    metricName: string
+  ): CompanyPieChartData[] | string {
+    if (typeof parsedData === 'string') {
+      return parsedData; // Return error message as-is
+    }
+
+    const filteredData = parsedData
+      .map((company) => ({
+        ...company,
+        metrics: company.metrics.filter((metric) =>
+          metric.metricName.toLowerCase().includes(metricName.toLowerCase())
+        ),
+      }))
+      .filter((company) => company.metrics.length > 0);
+
+    if (filteredData.length === 0) {
+      return `No data available for metric: ${metricName}`;
+    }
+
+    return filteredData;
   }
 
   processDataForComparison() {
@@ -894,5 +1122,164 @@ export class PFeaturesComponent {
     });
 
     return cardData;
+  }
+
+  // dynamic chart function
+
+  getUnitFormatter(data: PieChartDataPoint[]): {
+    unit: string;
+    formatter: string;
+    divisor: number;
+  } {
+    const maxValue = Math.max(...data.map((d) => Math.abs(d.value)));
+
+    if (maxValue >= 1_000_000_000) {
+      return {
+        unit: 'B',
+        formatter: '{b}: ${c}B ({d}%)',
+        divisor: 1_000_000_000,
+      };
+    } else if (maxValue >= 1_000_000) {
+      return { unit: 'M', formatter: '{b}: ${c}M ({d}%)', divisor: 1_000_000 };
+    } else if (maxValue >= 1_000) {
+      return { unit: 'K', formatter: '{b}: ${c}K ({d}%)', divisor: 1_000 };
+    }
+    return { unit: '', formatter: '{b}: ${c} ({d}%)', divisor: 1 };
+  }
+
+  createPieChartOptions(
+    parsedData: CompanyPieChartData[] | string
+  ): CompanyChartOption[] | string {
+    // Handle error message from parser
+    if (typeof parsedData === 'string') {
+      return parsedData;
+    }
+
+    // Validate input
+    if (!parsedData || parsedData.length === 0) {
+      return 'No data available to create charts';
+    }
+
+    const chartOptions: CompanyChartOption[] = [];
+
+    // Process each company
+    for (const company of parsedData) {
+      // Process each metric for the company
+      for (const metric of company.metrics) {
+        // Skip metrics with no data
+        if (!metric.data || metric.data.length === 0) {
+          continue;
+        }
+
+        // Determine the appropriate unit and formatter
+        const { formatter, divisor } = this.getUnitFormatter(metric.data);
+
+        // Convert data points to ECharts format
+        const chartData = metric.data.map((point) => ({
+          value: parseFloat((point.value / divisor).toFixed(2)),
+          name: point.name,
+        }));
+
+        // Create the chart option using the base theme
+        const chartOption: EChartsOption = {
+          ...this.baseDarkChartTheme,
+          title: {
+            ...this.baseDarkChartTheme.title,
+            text: '', // You can set this to metric.metricName if you want titles
+          },
+          legend: {
+            ...this.baseDarkChartTheme.legend,
+            bottom: 0,
+          },
+          tooltip: {
+            ...this.baseDarkChartTheme.tooltip,
+            formatter: formatter,
+          },
+          series: [
+            {
+              name: `${company.companyName} - ${metric.metricName}`,
+              type: 'pie',
+              radius: '65%',
+              center: ['50%', '50%'],
+              data: chartData,
+              label: {
+                formatter: '{b}\n{d}%',
+                color: '#ccc', // lighter for visibility
+                fontSize: 12,
+              },
+              labelLine: {
+                lineStyle: {
+                  color: '#555',
+                },
+              },
+              itemStyle: {
+                borderColor: '#1e2129',
+                borderWidth: 2,
+              },
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 15,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)',
+                },
+              },
+            },
+          ],
+        };
+
+        // Add to results
+        chartOptions.push({
+          companyName: company.companyName,
+          cik: company.cik,
+          period: company.period,
+          metricName: metric.metricName,
+          chartOption: chartOption,
+        });
+      }
+    }
+
+    if (chartOptions.length === 0) {
+      return 'No valid charts could be created from the data';
+    }
+
+    return chartOptions;
+  }
+
+  getChartsByCompany(
+    chartOptions: CompanyChartOption[] | string,
+    companyName: string
+  ): CompanyChartOption[] | string {
+    if (typeof chartOptions === 'string') {
+      return chartOptions;
+    }
+
+    const filtered = chartOptions.filter((chart) =>
+      chart.companyName.toLowerCase().includes(companyName.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+      return `No charts found for company: ${companyName}`;
+    }
+
+    return filtered;
+  }
+
+  getChartsByMetric(
+    chartOptions: CompanyChartOption[] | string,
+    metricName: string
+  ): CompanyChartOption[] | string {
+    if (typeof chartOptions === 'string') {
+      return chartOptions;
+    }
+
+    const filtered = chartOptions.filter((chart) =>
+      chart.metricName.toLowerCase().includes(metricName.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+      return `No charts found for metric: ${metricName}`;
+    }
+
+    return filtered;
   }
 }
