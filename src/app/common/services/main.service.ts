@@ -29,8 +29,7 @@ export class MainService {
 
   startAnalysis(payload: {
     companies: company[];
-    start_date: string;
-    end_date: string;
+    time_periods:string[],
     filing_type: string;
   }) {
     return this.http.post(`${BASE_URL}${API_ENDPOINTS.ANALYSE_BATCH}`, payload);

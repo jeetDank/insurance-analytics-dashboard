@@ -87,11 +87,24 @@
         </div>
 
         <!-- Button: bottom-right -->
-        <div class="position-absolute bottom-0 end-0 mb-3 me-3">
+        
+        <div class="position-absolute end-0 mb-3 me-3" style="bottom:40px">
           <p-button
+            [disabled]="isLoaderShowing"
             severity="contrast"
             icon="pi pi-send"
             (click)="sendQuery()"
+            type="submit"
+            
+          ></p-button>
+        </div>
+        <div class="position-absolute bottom-0 end-0 mb-3 me-3 " >
+          <p-button
+            type="button"
+            [disabled]="isLoaderShowing"
+            severity="contrast"
+            icon="pi pi-refresh"
+            (click)="clearData()"
           ></p-button>
         </div>
       </div>

@@ -462,7 +462,7 @@ export class PFeaturesComponent {
   // API Interactions
 
   sendQuery(): void {
-    this.clearData();
+    
 
     const payload = { query: this.userQuery };
 
@@ -516,6 +516,9 @@ export class PFeaturesComponent {
     this.parsedChartData = null;
     this.chartOptions = null;
     this.referencesData = null;
+    this.currentMsg = null;
+    this.userQuery = '';
+   
   }
   userQueryResponseData: any;
 
@@ -648,23 +651,15 @@ export class PFeaturesComponent {
 
     // Extract time period safely
     const timePeriods = this.userQueryResponseData?.time_periods;
-    const dateRange =
-      Array.isArray(timePeriods) && timePeriods.length > 0
-        ? this.getQuarterDates(timePeriods[0])
-        : null;
-
-    if (!dateRange) {
-      console.warn('Invalid or missing time period. Using default date range.');
-    }
+    
 
     // Build payload safely and cleanly
     const payload = {
       companies: this.foundCompaniesData
         .map((company: any) => company?.payload)
         .filter((p: any) => !!p), // remove invalid ones
-      start_date: dateRange?.start_date || '2024-01-01',
-      end_date: dateRange?.end_date || '2025-10-22',
-      filing_type: '10-Q',
+         time_periods: timePeriods,
+          filing_type: '10-Q',
     };
 
     if (payload.companies.length === 0) {
