@@ -1404,4 +1404,8 @@ export class PFeaturesComponent {
       return 'N/A';
     }
   }
+
+  scrollToElement(element: HTMLElement) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
