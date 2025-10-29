@@ -19,11 +19,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ScrollTopModule } from 'primeng/scrolltop';
-import {
-  NgbAccordionModule,
-  NgbModal,
-  NgbModule,
-} from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainService } from '../common/services/main.service';
 import { FormsModule } from '@angular/forms';
 import { PopoverModule } from 'primeng/popover';
@@ -33,8 +29,8 @@ import { LoaderService } from '../common/services/loader.service';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from '../common/services/message.service';
 import { catchError, EMPTY, finalize, forkJoin, of, tap } from 'rxjs';
-import { NgIf } from '../../../node_modules/@angular/common/common_module.d-NEF7UaHr';
 import { CardSkeletonComponent } from '../common/components/card-skeleton/card-skeleton.component';
+import { SelectModule } from 'primeng/select';
 
 interface message {
   text: string;
@@ -198,6 +194,7 @@ interface CompanyChartOption {
     PopoverModule,
     ProgressSpinnerModule,
     CardSkeletonComponent,
+    SelectModule,
   ],
   templateUrl: './p-features.component.html',
   styleUrl: './p-features.component.scss',
@@ -516,16 +513,25 @@ export class PFeaturesComponent {
     this.foundCompaniesData = null;
     this.comparisonMetrics = [];
     this.companies = [];
-    this.parsedChartData=null;
-   this.chartOptions=null;
-   this.referencesData = null;
+    this.parsedChartData = null;
+    this.chartOptions = null;
+    this.referencesData = null;
   }
   userQueryResponseData: any;
 
   handleResponse(res: any): void {
     this.foundCompaniesData = [];
     this.userQueryResponseData = res?.parsed;
-    this.allResponses.parsedData = res
+    this.allResponses.parsedData = res;
+
+    // check for ambiguities
+
+    if (
+      this.userQueryResponseData?.ambiguities &&
+      this.userQueryResponseData.ambiguities.length == 0
+    ) {
+      // this.handleAmbiguity(this.userQueryResponseData?.ambiguities);
+    }
 
     // Validate companies array safely
     const companies: string[] = Array.isArray(
@@ -618,6 +624,8 @@ export class PFeaturesComponent {
       });
   }
 
+  handleAmbiguity(data: any) {}
+
   foundCompaniesData: any = [];
 
   handleCompanyResponse(res: any) {
@@ -698,6 +706,14 @@ export class PFeaturesComponent {
     parsedData: null,
     companyData: null,
     analysisData: null,
+    ambiguity: [
+      {
+        name: 'string',
+        suggestions: ['string'],
+        context: 'string',
+        selectedOption: '',
+      },
+    ],
   };
 
   parsedChartData: any;
@@ -719,12 +735,17 @@ export class PFeaturesComponent {
     this.parsedChartData = this.parseFinancialDataForPieCharts(
       this.allResponses.analysisData
     );
-    this.chartOptions = this.createPieChartOptions(this.parsedChartData);
-    console.log(this.parsedChartData);
+    this.chartOptions = this.getChartsByMetric(
+      this.createPieChartOptions(this.parsedChartData),
+      this.userQueryResponseData.metrics
+    );
+    console.log(this.chartOptions);
 
-    // generate references and links 
+    // generate references and links
 
-    this.referencesData = this.parseReferencesFromApiResponse(this.allResponses.analysisData)
+    this.referencesData = this.parseReferencesFromApiResponse(
+      this.allResponses.analysisData
+    );
   }
 
   formatCurrency(value: number): string {
@@ -1196,6 +1217,7 @@ export class PFeaturesComponent {
           legend: {
             ...this.baseDarkChartTheme.legend,
             bottom: 0,
+            show: false,
           },
           tooltip: {
             ...this.baseDarkChartTheme.tooltip,
@@ -1272,108 +1294,119 @@ export class PFeaturesComponent {
 
   getChartsByMetric(
     chartOptions: CompanyChartOption[] | string,
-    metricName: string
+    metricNames: string[]
   ): CompanyChartOption[] | string {
     if (typeof chartOptions === 'string') {
       return chartOptions;
     }
 
+    // Normalize all metric names for case-insensitive comparison
+    const lowerCaseMetrics = metricNames.map((name) => name.toLowerCase());
+
+    // Filter charts that match any of the provided metric names
     const filtered = chartOptions.filter((chart) =>
-      chart.metricName.toLowerCase().includes(metricName.toLowerCase())
+      lowerCaseMetrics.some((metric) =>
+        chart.metricName.toLowerCase().includes(metric)
+      )
     );
 
     if (filtered.length === 0) {
-      return `No charts found for metric: ${metricName}`;
+      return `No charts found for metrics: ${metricNames.join(', ')}`;
     }
 
     return filtered;
   }
 
-
   parseReferencesFromApiResponse(apiResponse: any): referenceData[] {
-  // Handle null/undefined response
-  if (!apiResponse || !apiResponse.success || !apiResponse.results) {
-    return [];
-  }
-
-  const referencesData: referenceData[] = [];
-  
-  // Iterate through each result in the API response
-  apiResponse.results.forEach((result: any) => {
-    if (!result.statements || result.statements.length === 0) {
-      return;
+    // Handle null/undefined response
+    if (!apiResponse || !apiResponse.success || !apiResponse.results) {
+      return [];
     }
 
-    const secFilingReferences: references[] = [];
-    const websiteReferences: references[] = [];
-    const companyName = result.company_name || 'Unknown Company';
-    
-    // Extract SEC filing information from statements
-    result.statements.forEach((statement: any) => {
-      if (statement.metadata) {
-        const metadata = statement.metadata;
-        
-        // Create SEC filing reference
-        if (metadata.filing_url && metadata.company_name && metadata.filing_type) {
-          const period = statement.period || 
-                        (metadata.period_end_date ? this.formatPeriod(metadata.period_end_date) : 'N/A');
-          
-          secFilingReferences.push({
-            logo: 'pi pi-book',
-            link: metadata.filing_url,
-            label: `${metadata.company_name} - Form ${metadata.filing_type} ${period}`
-          });
+    const referencesData: referenceData[] = [];
+
+    // Iterate through each result in the API response
+    apiResponse.results.forEach((result: any) => {
+      if (!result.statements || result.statements.length === 0) {
+        return;
+      }
+
+      const secFilingReferences: references[] = [];
+      const websiteReferences: references[] = [];
+      const companyName = result.company_name || 'Unknown Company';
+
+      // Extract SEC filing information from statements
+      result.statements.forEach((statement: any) => {
+        if (statement.metadata) {
+          const metadata = statement.metadata;
+
+          // Create SEC filing reference
+          if (
+            metadata.filing_url &&
+            metadata.company_name &&
+            metadata.filing_type
+          ) {
+            const period =
+              statement.period ||
+              (metadata.period_end_date
+                ? this.formatPeriod(metadata.period_end_date)
+                : 'N/A');
+
+            secFilingReferences.push({
+              logo: 'pi pi-book',
+              link: metadata.filing_url,
+              label: `${metadata.company_name} - Form ${metadata.filing_type} ${period}`,
+            });
+          }
         }
+      });
+
+      // Add SEC EDGAR database reference (always included if we have SEC filings)
+      if (secFilingReferences.length > 0) {
+        websiteReferences.push({
+          logo: 'pi pi-book',
+          link: 'https://www.sec.gov/edgar',
+          label: 'SEC EDGAR Database',
+        });
+      }
+
+      // Build sections array
+      const sections: refSections[] = [];
+
+      if (secFilingReferences.length > 0) {
+        sections.push({
+          sectionName: 'SEC Filings:',
+          references: secFilingReferences,
+        });
+      }
+
+      if (websiteReferences.length > 0) {
+        sections.push({
+          sectionName: 'Reference Websites:',
+          references: websiteReferences,
+        });
+      }
+
+      // Only add to referencesData if we have sections
+      if (sections.length > 0) {
+        referencesData.push({
+          companyName: companyName, // Add company name
+          totalRefCount: secFilingReferences.length + websiteReferences.length,
+          sections: sections,
+        });
       }
     });
 
-    // Add SEC EDGAR database reference (always included if we have SEC filings)
-    if (secFilingReferences.length > 0) {
-      websiteReferences.push({
-        logo: 'pi pi-book',
-        link: 'https://www.sec.gov/edgar',
-        label: 'SEC EDGAR Database'
-      });
-    }
-
-    // Build sections array
-    const sections: refSections[] = [];
-    
-    if (secFilingReferences.length > 0) {
-      sections.push({
-        sectionName: 'SEC Filings:',
-        references: secFilingReferences
-      });
-    }
-    
-    if (websiteReferences.length > 0) {
-      sections.push({
-        sectionName: 'Reference Websites:',
-        references: websiteReferences
-      });
-    }
-
-    // Only add to referencesData if we have sections
-    if (sections.length > 0) {
-      referencesData.push({
-        companyName: companyName,  // Add company name
-        totalRefCount: secFilingReferences.length + websiteReferences.length,
-        sections: sections
-      });
-    }
-  });
-
-  return referencesData;
-}
-
-formatPeriod(dateString: string): string {
-  try {
-    const date = new Date(dateString);
-    const quarter = Math.ceil((date.getMonth() + 1) / 3);
-    return `Q${quarter} ${date.getFullYear()}`;
-  } catch (e) {
-    return 'N/A';
+    return referencesData;
   }
-}
 
+  formatPeriod(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      const quarter = Math.ceil((date.getMonth() + 1) / 3);
+      return `Q${quarter} ${date.getFullYear()}`;
+    } catch (e) {
+      return 'N/A';
+    }
+  }
 }
