@@ -150,6 +150,18 @@ interface QuarterPieChartData {
   data: PieChartDataPoint[];
 }
 
+// Structure for segment-based pie charts
+interface SegmentPieChartData {
+  companyName: string;
+  cik: string;
+  period: string;
+  filingDate: string;
+  metricName: string;
+  segmentCategory: string; // e.g., "Products/Services", "Business Segments"
+  totalValue: number;
+  data: PieChartDataPoint[];
+}
+
 // Output structure for bar chart data
 interface BarChartDataPoint {
   companyName: string;
@@ -219,7 +231,7 @@ export class PFeaturesComponent {
   companies: string[] = [];
   comparisonMetrics: ComparisonMetric[] = [];
 
-  samplePrompts: any = [
+ samplePrompts: any = [
     {
       id: 0,
       prompt:
@@ -823,12 +835,12 @@ export class PFeaturesComponent {
 
   /**
    * Enhanced parser for multi-quarter segment breakdowns
-   * Generates pie chart data for each company, each quarter, and each metric with children
+   * Generates pie chart data for each company, each quarter, each metric, and each segment category
    */
   parseFinancialDataForMultiQuarterPieCharts(
     apiResponse: APIResponse,
     requestedMetrics?: string[]
-  ): QuarterPieChartData[] | string {
+  ): SegmentPieChartData[] | string {
     // Validate API response
     if (!apiResponse || !apiResponse.success) {
       return 'No data available - API request was not successful';
@@ -838,7 +850,7 @@ export class PFeaturesComponent {
       return 'No data available - No company results found';
     }
 
-    const quarterChartsData: QuarterPieChartData[] = [];
+    const segmentChartsData: SegmentPieChartData[] = [];
 
     // Process each company in the results
     for (const company of apiResponse.results) {
@@ -869,37 +881,39 @@ export class PFeaturesComponent {
             metricValue.children &&
             Object.keys(metricValue.children).length > 0
           ) {
-            const pieChartPoints: PieChartDataPoint[] = [];
-
-            // Extract each child segment for the pie chart
-            for (const [childKey, childValue] of Object.entries(
+            // Process each segment category (e.g., "Products/Services", "Business Segments")
+            for (const [segmentCategory, segmentItems] of Object.entries(
               metricValue.children
             )) {
-              pieChartPoints.push({
-                name:
-                  childValue.description?.replace(
-                    `${metricValue.name} - `,
-                    ''
-                  ) || childKey,
-                value: childValue.value,
-                percentage: childValue.percentage_of_parent,
-                formattedValue: this.formatCurrency(childValue.value),
-              });
-            }
+              const pieChartPoints: PieChartDataPoint[] = [];
 
-            // Only add if we have valid data points
-            if (pieChartPoints.length > 0) {
-              quarterChartsData.push({
-                companyName: statement.metadata.company_name,
-                cik: company.cik,
-                period: statement.period,
-                filingDate: statement.metadata.filing_date,
-                metricName: cleanName,
-                totalValue: metricValue.value,
-                data: pieChartPoints.sort(
-                  (a, b) => b.percentage - a.percentage
-                ), // Sort by percentage descending
-              });
+              // Extract each segment item for the pie chart
+              for (const [segmentKey, segmentValue] of Object.entries(
+                segmentItems 
+              )) {
+                pieChartPoints.push({
+                  name: segmentKey.replace(/_/g, ' '), // Clean segment name
+                  value: segmentValue.value,
+                  percentage: segmentValue.percentage_of_parent,
+                  formattedValue: this.formatCurrency(segmentValue.value),
+                });
+              }
+
+              // Only add if we have valid data points
+              if (pieChartPoints.length > 0) {
+                segmentChartsData.push({
+                  companyName: statement.metadata.company_name,
+                  cik: company.cik,
+                  period: statement.period,
+                  filingDate: statement.metadata.filing_date,
+                  metricName: cleanName,
+                  segmentCategory: segmentCategory,
+                  totalValue: metricValue.value,
+                  data: pieChartPoints.sort(
+                    (a, b) => b.percentage - a.percentage
+                  ), // Sort by percentage descending
+                });
+              }
             }
           }
         }
@@ -907,11 +921,11 @@ export class PFeaturesComponent {
     }
 
     // Return appropriate message if no pie chart data was found
-    if (quarterChartsData.length === 0) {
-      return 'No data available - No metrics with breakdown data found';
+    if (segmentChartsData.length === 0) {
+      return 'No data available - No metrics with segment breakdown data found';
     }
 
-    return quarterChartsData;
+    return segmentChartsData;
   }
 
   parseFinancialDataForPieCharts(
@@ -1439,11 +1453,11 @@ export class PFeaturesComponent {
   }
 
   /**
-   * Creates pie chart options for multi-quarter data
-   * Each chart represents one company, one metric, for one quarter
+   * Creates pie chart options for multi-quarter segment data
+   * Each chart represents one company, one metric, one segment category, for one quarter
    */
   createMultiQuarterPieChartOptions(
-    parsedData: QuarterPieChartData[] | string
+    parsedData: SegmentPieChartData[] | string
   ): CompanyChartOption[] | string {
     // Handle error message from parser
     if (typeof parsedData === 'string') {
@@ -1457,18 +1471,18 @@ export class PFeaturesComponent {
 
     const chartOptions: CompanyChartOption[] = [];
 
-    // Process each quarter's data
-    for (const quarterData of parsedData) {
+    // Process each segment's data
+    for (const segmentData of parsedData) {
       // Skip if no data points
-      if (!quarterData.data || quarterData.data.length === 0) {
+      if (!segmentData.data || segmentData.data.length === 0) {
         continue;
       }
 
       // Determine the appropriate unit and formatter
-      const { formatter, divisor } = this.getUnitFormatter(quarterData.data);
+      const { formatter, divisor } = this.getUnitFormatter(segmentData.data);
 
       // Convert data points to ECharts format
-      const chartData = quarterData.data.map((point) => ({
+      const chartData = segmentData.data.map((point) => ({
         value: parseFloat((point.value / divisor).toFixed(2)),
         name: point.name,
       }));
@@ -1478,7 +1492,7 @@ export class PFeaturesComponent {
         ...this.baseDarkChartTheme,
         title: {
           ...this.baseDarkChartTheme.title,
-          text: `${quarterData.period}`, // Show quarter as title
+          text: `${segmentData.segmentCategory} - ${segmentData.period}`, // Show segment category and quarter
           left: 'center',
           textStyle: {
             color: '#e5e5e5',
@@ -1498,7 +1512,7 @@ export class PFeaturesComponent {
         },
         series: [
           {
-            name: `${quarterData.companyName} - ${quarterData.metricName} - ${quarterData.period}`,
+            name: `${segmentData.companyName} - ${segmentData.metricName} - ${segmentData.segmentCategory}`,
             type: 'pie',
             radius: '60%',
             center: ['50%', '50%'],
@@ -1533,12 +1547,12 @@ export class PFeaturesComponent {
         ],
       };
 
-      // Add to results
+      // Add to results with segment category in the metadata
       chartOptions.push({
-        companyName: quarterData.companyName,
-        cik: quarterData.cik,
-        period: quarterData.period,
-        metricName: quarterData.metricName,
+        companyName: segmentData.companyName,
+        cik: segmentData.cik,
+        period: segmentData.period,
+        metricName: `${segmentData.metricName} - ${segmentData.segmentCategory}`,
         chartOption: chartOption,
       });
     }

@@ -6,7 +6,8 @@ import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { MainService } from '../../common/services/main.service';
 
 interface Formula {
   name: string;
@@ -18,115 +19,30 @@ interface Formula {
 @Component({
   selector: 'app-saved-formulas',
   imports: [
-     CommonModule,
+    CommonModule,
     FormsModule,
     InputTextModule,
     IconFieldModule,
     InputIconModule,
     TooltipModule,
-    ToastModule
+    ToastModule,
   ],
   templateUrl: './saved-formulas.component.html',
-  styleUrl: './saved-formulas.component.scss'
+  styleUrl: './saved-formulas.component.scss',
 })
-export class SavedFormulasComponent {
-
+export class SavedFormulasComponent implements OnInit {
   searchQuery: string = '';
+  formulas: Formula[] = [];
+  isLoading: boolean = false;
 
-  constructor(private messageService: MessageService) {}
+  constructor(
+    private messageService: MessageService,
+    private main: MainService
+  ) {}
 
-  formulas: Formula[] = [
-    {
-      name: 'Loss Ratio',
-      formula: '(Incurred Losses + Loss Adjustment Expenses) / Earned Premiums × 100',
-      description: 'Measures the ratio of losses and expenses to earned premiums',
-      id: 1
-    },
-    {
-      name: 'Combined Ratio',
-      formula: 'Loss Ratio + Expense Ratio',
-      description: 'Key profitability metric; below 100% indicates underwriting profit',
-      id: 2
-    },
-    {
-      name: 'Expense Ratio',
-      formula: '(Underwriting Expenses / Written Premiums) × 100',
-      description: 'Percentage of premium used for operating expenses',
-      id: 3
-    },
-    {
-      name: 'Premium to Surplus Ratio',
-      formula: 'Net Written Premium / Policyholder Surplus',
-      description: 'Measures financial leverage and capacity to write new business',
-      id: 4
-    },
-    {
-      name: 'Claims Frequency',
-      formula: 'Number of Claims / Number of Policies (or Exposure Units)',
-      description: 'Measures how often claims occur relative to exposure',
-      id: 5
-    },
-    {
-      name: 'Claims Severity',
-      formula: 'Total Claims Cost / Number of Claims',
-      description: 'Average cost per claim',
-      id: 6
-    },
-    {
-      name: 'Retention Ratio',
-      formula: '(Policies Renewed / Total Policies Up for Renewal) × 100',
-      description: 'Percentage of policies that are renewed',
-      id: 7
-    },
-    {
-      name: 'Customer Lifetime Value (CLV)',
-      formula: '(Average Premium × Retention Rate) / (1 + Discount Rate - Retention Rate)',
-      description: 'Projected revenue from a customer over their lifetime',
-      id: 8
-    },
-    {
-      name: 'Return on Equity (ROE)',
-      formula: '(Net Income / Average Shareholders Equity) × 100',
-      description: 'Measures profitability relative to shareholder equity',
-      id: 9
-    },
-    {
-      name: 'Reserve to Premium Ratio',
-      formula: 'Total Reserves / Net Written Premium',
-      description: 'Indicates reserve adequacy relative to premium volume',
-      id: 10
-    },
-    {
-      name: 'Quick Ratio',
-      formula: '(Current Assets - Inventory) / Current Liabilities',
-      description: 'Measures ability to meet short-term obligations',
-      id: 11
-    },
-    {
-      name: 'Policy Acquisition Cost',
-      formula: 'Total Marketing & Sales Expenses / Number of New Policies',
-      description: 'Average cost to acquire a new policy',
-      id: 12
-    },
-    {
-      name: 'Pure Premium',
-      formula: 'Expected Losses / Exposure Units',
-      description: 'Expected loss cost per unit of exposure',
-      id: 13
-    },
-    {
-      name: 'Underwriting Profit Margin',
-      formula: '((Earned Premium - Incurred Losses - Expenses) / Earned Premium) × 100',
-      description: 'Profit from underwriting operations as percentage of premium',
-      id: 14
-    },
-    {
-      name: 'Investment Yield',
-      formula: '(Investment Income / Average Invested Assets) × 100',
-      description: 'Return generated from investment portfolio',
-      id: 15
-    }
-  ];
+  ngOnInit() {
+    this.getAllFormulas();
+  }
 
   get filteredFormulas(): Formula[] {
     if (!this.searchQuery.trim()) {
@@ -134,30 +50,136 @@ export class SavedFormulasComponent {
     }
 
     const query = this.searchQuery.toLowerCase();
-    return this.formulas.filter(formula =>
-      formula.name.toLowerCase().includes(query) ||
-      formula.formula.toLowerCase().includes(query) ||
-      formula.description.toLowerCase().includes(query)
+    return this.formulas.filter(
+      (formula) =>
+        formula.name.toLowerCase().includes(query) ||
+        formula.formula.toLowerCase().includes(query) ||
+        formula.description.toLowerCase().includes(query)
     );
   }
 
   copyFormula(formula: Formula): void {
-    navigator.clipboard.writeText(formula.formula).then(() => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Copied!',
-        detail: `${formula.name} formula copied to clipboard`,
-        life: 2000
+    navigator.clipboard
+      .writeText(formula.formula)
+      .then(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Copied!',
+          detail: `${formula.name} formula copied to clipboard`,
+          life: 2000,
+        });
+      })
+      .catch((err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to copy formula',
+          life: 3000,
+        });
+        console.error('Failed to copy:', err);
       });
-    }).catch(err => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to copy formula',
-        life: 3000
-      });
-      console.error('Failed to copy:', err);
+  }
+
+  getAllFormulas() {
+    this.isLoading = true;
+    this.main.getAllFormulas().subscribe({
+      next: (res: any) => {
+        console.log('API Response:', res);
+
+        if (res.success && res.formulas && res.formulas.length > 0) {
+          // Map API response to Formula interface
+          this.formulas = res.formulas.map((item: any, index: number) => ({
+            id: index + 1,
+            name: item.display_name || this.formatMetricName(item.metric_name),
+            formula: this.formatFormula(item.formula),
+            description: this.getFormulaDescription(item),
+          }));
+
+          console.log('Formulas loaded successfully:', this.formulas.length);
+          
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: `Loaded ${this.formulas.length} formulas`,
+            life: 2000,
+          });
+        } else {
+          console.warn('No formulas found in API response');
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Warning',
+            detail: 'No formulas available',
+            life: 3000,
+          });
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching formulas:', err);
+        this.isLoading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load formulas from server',
+          life: 3000,
+        });
+      },
     });
   }
 
+  /**
+   * Format metric name from snake_case to Title Case
+   */
+  private formatMetricName(metricName: string): string {
+    return metricName
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  /**
+   * Format formula for better readability
+   */
+  private formatFormula(formula: string): string {
+    // Replace common operators with more readable versions
+    return formula
+      .replace(/\*/g, '×')
+      .replace(/\//g, '÷')
+      .replace(/if\s+/g, 'if ')
+      .replace(/else\s+/g, 'else ')
+      .trim();
+  }
+
+  /**
+   * Generate a meaningful description based on formula metadata
+   */
+  private getFormulaDescription(item: any): string {
+    const formatType = item.format_type || '';
+    const metricName = item.display_name || this.formatMetricName(item.metric_name);
+
+    // Create description based on format type and available metadata
+    let description = '';
+
+    switch (formatType) {
+      case 'percentage':
+        description = `${metricName} expressed as a percentage`;
+        if (item.min_value !== undefined && item.max_value !== undefined) {
+          description += ` (range: ${item.min_value * 100}% - ${item.max_value * 100}%)`;
+        }
+        break;
+      case 'ratio':
+        description = `Ratio metric for ${metricName}`;
+        if (item.min_value !== undefined && item.max_value !== undefined) {
+          description += ` (range: ${item.min_value} - ${item.max_value})`;
+        }
+        break;
+      case 'currency':
+        description = `${metricName} in currency units`;
+        break;
+      default:
+        description = `Calculated metric for ${metricName}`;
+    }
+
+    return description;
+  }
 }

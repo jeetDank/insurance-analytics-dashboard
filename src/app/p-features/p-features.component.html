@@ -244,7 +244,7 @@
                 {{ metric.metricName }}
                 <i
                   class="pi pi-info-circle ms-2 cursor-pointer"
-                  (click)="op.toggle($event); updateFormulaToggleData(metric)"
+                  (click)="op.toggle($event);"
                 ></i>
               </h5>
               @if (metric.subTitle) {
@@ -437,12 +437,12 @@
   <div class="popover-body p-3">
     <!-- Metric -->
     <h6 class="mb-1 fw-semibold text-primary">
-      {{ this.popoverData?.metricName ? this.popoverData?.metricName : "N/A" }}
+      {{ this.popoverData?.name ? this.popoverData?.name : "N/A" }}
     </h6>
 
     <!-- Definition -->
     <p class="text-secondary mb-3">
-      {{ this.popoverData?.formula?.use }}
+      {{ this.popoverData?.formula }}
     </p>
 
     <!-- Formula label + Edit button -->

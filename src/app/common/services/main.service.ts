@@ -44,5 +44,12 @@ export class MainService {
     return this.http.post(`${BASE_URL}${API_ENDPOINTS.AMBIGUITY_RESOLVE}`, payload);
   }
 
+  getAllFormulas(){
+    return this.http.get(`${BASE_URL}${API_ENDPOINTS.GET_ALL_FORMULAS}`);
+  }
+
+  getFormulaByName(name:string){
+    return this.http.get(`${BASE_URL}${API_ENDPOINTS.GET_FORMULA_BY_NAME}${name}`)
+  }
 
 }

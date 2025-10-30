@@ -9,6 +9,8 @@ export const API_ENDPOINTS = {
     COMAPANIES:"/companies/resolve",
     ANALYSE_BATCH:"/analysis/batch",
     AMBIGUITY_RESOLVE:"/ambiguities/resolve",
+    GET_ALL_FORMULAS:"/formulas_list/formulas",
+    GET_FORMULA_BY_NAME:"/formulas_list/formulas/metric/",
 
 } as const;
 
