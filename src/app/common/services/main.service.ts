@@ -5,9 +5,9 @@ import { LoaderService } from './loader.service';
 import '../../contants/API_ENDPOINTS';
 import { BASE_URL, API_ENDPOINTS } from '../../contants/API_ENDPOINTS';
 
-interface company{
-  cik:string,
-  name:string
+interface company {
+  cik: string;
+  name: string;
 }
 
 @Injectable({
@@ -29,9 +29,20 @@ export class MainService {
 
   startAnalysis(payload: {
     companies: company[];
-    time_periods:string[],
+    time_periods: string[];
     filing_type: string;
   }) {
     return this.http.post(`${BASE_URL}${API_ENDPOINTS.ANALYSE_BATCH}`, payload);
   }
+
+  resolveAmbiguity(payload: {
+    metric_name: string;
+    context: string | null;
+    suggestions: string[];
+    resolution_type: string;
+  }) {
+    return this.http.post(`${BASE_URL}${API_ENDPOINTS.AMBIGUITY_RESOLVE}`, payload);
+  }
+
+
 }

@@ -139,25 +139,30 @@ interface CompanyPieChartData {
   metrics: MetricPieChartData[];
 }
 
-interface PieChartDataPoint {
-  name: string;
-  value: number;
-  percentage: number;
-  formattedValue: string;
-}
-
-interface MetricPieChartData {
+// Enhanced structure for multi-quarter pie charts
+interface QuarterPieChartData {
+  companyName: string;
+  cik: string;
+  period: string;
+  filingDate: string;
   metricName: string;
   totalValue: number;
   data: PieChartDataPoint[];
 }
 
-interface CompanyPieChartData {
+// Output structure for bar chart data
+interface BarChartDataPoint {
   companyName: string;
-  cik: string;
-  period: string;
-  filingDate: string;
-  metrics: MetricPieChartData[];
+  quarter?: string; // Optional quarter field
+  value: number;
+  formattedValue: string;
+}
+
+interface MetricBarChartData {
+  metricName: string;
+  quarters: string[]; // List of quarters
+  companies: string[]; // List of companies
+  data: BarChartDataPoint[];
 }
 
 // Output structure for each chart
@@ -224,9 +229,10 @@ export class PFeaturesComponent {
     {
       id: 2,
       prompt:
-        'Give me the breakdown of revenue of Apple and Microsoft by segment',
+        'Give me the breakdown of revenue of Apple and Microsoft by segment for Q1 and Q2 2025',
     },
-    { id: 3, prompt: 'Compare operating margins for Apple and Microsoft' },
+    { id: 3, prompt: 'Compare gross margins for Apple and Microsoft for last quarter' },
+    { id: 3, prompt: 'I need the revenue, net income, gross profit, and combined ratio for Hartford, Travelers, JPMorgan, and Apple for the last two reported quarters (Q1 and Q2).' },
   ];
 
   baseDarkChartTheme = {
@@ -462,8 +468,6 @@ export class PFeaturesComponent {
   // API Interactions
 
   sendQuery(): void {
-    
-
     const payload = { query: this.userQuery };
 
     // Start loading state
@@ -518,7 +522,6 @@ export class PFeaturesComponent {
     this.referencesData = null;
     this.currentMsg = null;
     this.userQuery = '';
-   
   }
   userQueryResponseData: any;
 
@@ -651,15 +654,14 @@ export class PFeaturesComponent {
 
     // Extract time period safely
     const timePeriods = this.userQueryResponseData?.time_periods;
-    
 
     // Build payload safely and cleanly
     const payload = {
       companies: this.foundCompaniesData
         .map((company: any) => company?.payload)
         .filter((p: any) => !!p), // remove invalid ones
-         time_periods: timePeriods,
-          filing_type: '10-Q',
+      time_periods: timePeriods,
+      filing_type: '10-Q',
     };
 
     if (payload.companies.length === 0) {
@@ -725,22 +727,79 @@ export class PFeaturesComponent {
     );
     this.processDataForComparison();
 
-    // plot charts
+    // Determine if we should use bar charts or pie charts
+    const numberOfCompanies = this.allResponses.analysisData?.results?.length || 0;
 
-    this.parsedChartData = this.parseFinancialDataForPieCharts(
-      this.allResponses.analysisData
-    );
-    this.chartOptions = this.getChartsByMetric(
-      this.createPieChartOptions(this.parsedChartData),
-      this.userQueryResponseData.metrics
-    );
-    console.log(this.chartOptions);
+    // Check if segment_filter exists and has data (not null and not empty)
+    const hasSegmentFilter = this.userQueryResponseData?.segment_filter && 
+                             (Array.isArray(this.userQueryResponseData.segment_filter) 
+                               ? this.userQueryResponseData.segment_filter.length > 0 
+                               : Object.keys(this.userQueryResponseData.segment_filter).length > 0);
+
+    if (hasSegmentFilter) {
+      // Segment filter exists - use pie charts for breakdown across all quarters
+      this.parsedChartData = this.parseFinancialDataForMultiQuarterPieCharts(
+        this.allResponses.analysisData,
+        this.userQueryResponseData.metrics
+      );
+      this.chartOptions = this.createMultiQuarterPieChartOptions(this.parsedChartData);
+      console.log('Multi-Quarter Pie Chart Options (Segment Breakdown):', this.chartOptions);
+    } else if (numberOfCompanies > 1) {
+      // Multiple companies without segment filter - use bar charts for comparison
+      const barChartData = this.parseFinancialDataForBarCharts(
+        this.allResponses.analysisData,
+        this.userQueryResponseData.metrics
+      );
+      this.chartOptions = this.createBarChartOptions(barChartData);
+      console.log('Bar Chart Options:', this.chartOptions);
+    } else {
+      // Single company without segment filter - use pie charts for breakdown
+      this.parsedChartData = this.parseFinancialDataForPieCharts(
+        this.allResponses.analysisData
+      );
+      this.chartOptions = this.getChartsByMetric(
+        this.createPieChartOptions(this.parsedChartData),
+        this.userQueryResponseData.metrics
+      );
+      console.log('Pie Chart Options:', this.chartOptions);
+    }
 
     // generate references and links
-
     this.referencesData = this.parseReferencesFromApiResponse(
       this.allResponses.analysisData
     );
+  }
+
+  /**
+   * Determines if the query is requesting a segment/breakdown view
+   */
+  isSegmentBreakdownRequest(query: string, requestedMetrics: string[]): boolean {
+    const breakdownKeywords = [
+      'breakdown',
+      'segment',
+      'segmentation',
+      'by product',
+      'by region',
+      'product wise',
+      'region wise',
+      'distribution',
+      'split',
+      'composition',
+      'mix'
+    ];
+
+    const lowerQuery = query.toLowerCase();
+    const hasBreakdownKeyword = breakdownKeywords.some(keyword => 
+      lowerQuery.includes(keyword)
+    );
+
+    // Also check if requesting metrics that typically have breakdowns (like revenue)
+    const metricsWithBreakdowns = ['revenue', 'sales', 'income'];
+    const hasBreakdownMetric = requestedMetrics?.some(metric =>
+      metricsWithBreakdowns.some(bm => metric.toLowerCase().includes(bm))
+    );
+
+    return hasBreakdownKeyword || hasBreakdownMetric;
   }
 
   formatCurrency(value: number): string {
@@ -760,6 +819,99 @@ export class PFeaturesComponent {
       .split(' ')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
+  }
+
+  /**
+   * Enhanced parser for multi-quarter segment breakdowns
+   * Generates pie chart data for each company, each quarter, and each metric with children
+   */
+  parseFinancialDataForMultiQuarterPieCharts(
+    apiResponse: APIResponse,
+    requestedMetrics?: string[]
+  ): QuarterPieChartData[] | string {
+    // Validate API response
+    if (!apiResponse || !apiResponse.success) {
+      return 'No data available - API request was not successful';
+    }
+
+    if (!apiResponse.results || apiResponse.results.length === 0) {
+      return 'No data available - No company results found';
+    }
+
+    const quarterChartsData: QuarterPieChartData[] = [];
+
+    // Process each company in the results
+    for (const company of apiResponse.results) {
+      if (!company.statements || company.statements.length === 0) {
+        continue; // Skip companies with no statements
+      }
+
+      // Process each statement (quarter/filing period)
+      for (const statement of company.statements) {
+        // Iterate through all metrics in the statement
+        for (const [metricKey, metricValue] of Object.entries(
+          statement.metrics
+        )) {
+          const cleanName = this.cleanMetricName(metricValue.name);
+
+          // Filter by requested metrics if provided
+          if (requestedMetrics && requestedMetrics.length > 0) {
+            const isRequested = requestedMetrics.some(
+              (rm) =>
+                rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+                cleanName.toLowerCase().replace(/[^a-z0-9]/g, '')
+            );
+            if (!isRequested) continue;
+          }
+
+          // Only process metrics that have children (breakdown data)
+          if (
+            metricValue.children &&
+            Object.keys(metricValue.children).length > 0
+          ) {
+            const pieChartPoints: PieChartDataPoint[] = [];
+
+            // Extract each child segment for the pie chart
+            for (const [childKey, childValue] of Object.entries(
+              metricValue.children
+            )) {
+              pieChartPoints.push({
+                name:
+                  childValue.description?.replace(
+                    `${metricValue.name} - `,
+                    ''
+                  ) || childKey,
+                value: childValue.value,
+                percentage: childValue.percentage_of_parent,
+                formattedValue: this.formatCurrency(childValue.value),
+              });
+            }
+
+            // Only add if we have valid data points
+            if (pieChartPoints.length > 0) {
+              quarterChartsData.push({
+                companyName: statement.metadata.company_name,
+                cik: company.cik,
+                period: statement.period,
+                filingDate: statement.metadata.filing_date,
+                metricName: cleanName,
+                totalValue: metricValue.value,
+                data: pieChartPoints.sort(
+                  (a, b) => b.percentage - a.percentage
+                ), // Sort by percentage descending
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Return appropriate message if no pie chart data was found
+    if (quarterChartsData.length === 0) {
+      return 'No data available - No metrics with breakdown data found';
+    }
+
+    return quarterChartsData;
   }
 
   parseFinancialDataForPieCharts(
@@ -845,6 +997,123 @@ export class PFeaturesComponent {
     }
 
     return companiesData;
+  }
+
+  parseFinancialDataForBarCharts(
+    apiResponse: APIResponse,
+    requestedMetrics: string[]
+  ): MetricBarChartData[] | string {
+    // Validate API response
+    if (!apiResponse || !apiResponse.success) {
+      return 'No data available - API request was not successful';
+    }
+
+    if (!apiResponse.results || apiResponse.results.length === 0) {
+      return 'No data available - No company results found';
+    }
+
+    // If only one company, return message to use pie chart instead
+    if (apiResponse.results.length === 1) {
+      return 'Use pie chart for single company analysis';
+    }
+
+    // Structure: Map<metricName, Map<quarter, Map<companyName, value>>>
+    const metricsMap: Map<string, Map<string, Map<string, number>>> = new Map();
+    const allQuarters = new Set<string>();
+    const allCompanies = new Set<string>();
+
+    // Process each company
+    for (const company of apiResponse.results) {
+      if (!company.statements || company.statements.length === 0) {
+        continue;
+      }
+
+      // Process each statement (quarter) for this company
+      for (const statement of company.statements) {
+        const quarter = statement.period; // e.g., "Q1 2024"
+        const companyName = statement.metadata.company_name;
+        
+        allQuarters.add(quarter);
+        allCompanies.add(companyName);
+
+        // Process each metric in the statement
+        for (const [metricKey, metricValue] of Object.entries(
+          statement.metrics
+        )) {
+          const cleanName = this.cleanMetricName(metricValue.name);
+
+          // Filter by requested metrics if provided
+          if (requestedMetrics && requestedMetrics.length > 0) {
+            const isRequested = requestedMetrics.some(
+              (rm) =>
+                rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+                cleanName.toLowerCase().replace(/[^a-z0-9]/g, '')
+            );
+            if (!isRequested) continue;
+          }
+
+          // Initialize nested maps if they don't exist
+          if (!metricsMap.has(cleanName)) {
+            metricsMap.set(cleanName, new Map());
+          }
+
+          const quarterMap = metricsMap.get(cleanName)!;
+          if (!quarterMap.has(quarter)) {
+            quarterMap.set(quarter, new Map());
+          }
+
+          // Add company data for this quarter
+          quarterMap.get(quarter)!.set(companyName, metricValue.value);
+        }
+      }
+    }
+
+    // Convert to output format
+    const barChartData: MetricBarChartData[] = [];
+
+    metricsMap.forEach((quarterMap, metricName) => {
+      // Sort quarters chronologically
+      const sortedQuarters = Array.from(allQuarters).sort((a, b) => {
+        // Extract quarter and year from format "Q1 2024"
+        const [qA, yA] = a.split(' ');
+        const [qB, yB] = b.split(' ');
+        const yearDiff = parseInt(yA) - parseInt(yB);
+        if (yearDiff !== 0) return yearDiff;
+        return parseInt(qA.replace('Q', '')) - parseInt(qB.replace('Q', ''));
+      });
+
+      // Build data points for this metric
+      const data: BarChartDataPoint[] = [];
+
+      sortedQuarters.forEach((quarter) => {
+        if (quarterMap.has(quarter)) {
+          const companyMap = quarterMap.get(quarter)!;
+          companyMap.forEach((value, companyName) => {
+            data.push({
+              companyName,
+              quarter,
+              value,
+              formattedValue: this.formatCurrency(value),
+            });
+          });
+        }
+      });
+
+      if (data.length > 0) {
+        barChartData.push({
+          metricName,
+          quarters: sortedQuarters,
+          companies: Array.from(allCompanies),
+          data,
+        });
+      }
+    });
+
+    if (barChartData.length === 0) {
+      return 'No data available - No metrics found for comparison';
+    }
+
+    return barChartData;
   }
 
   getMetricDataByName(
@@ -1146,7 +1415,7 @@ export class PFeaturesComponent {
     return cardData;
   }
 
-  // dynamic chart function
+  // Pie Chart functions
 
   getUnitFormatter(data: PieChartDataPoint[]): {
     unit: string;
@@ -1167,6 +1436,118 @@ export class PFeaturesComponent {
       return { unit: 'K', formatter: '{b}: ${c}K ({d}%)', divisor: 1_000 };
     }
     return { unit: '', formatter: '{b}: ${c} ({d}%)', divisor: 1 };
+  }
+
+  /**
+   * Creates pie chart options for multi-quarter data
+   * Each chart represents one company, one metric, for one quarter
+   */
+  createMultiQuarterPieChartOptions(
+    parsedData: QuarterPieChartData[] | string
+  ): CompanyChartOption[] | string {
+    // Handle error message from parser
+    if (typeof parsedData === 'string') {
+      return parsedData;
+    }
+
+    // Validate input
+    if (!parsedData || parsedData.length === 0) {
+      return 'No data available to create charts';
+    }
+
+    const chartOptions: CompanyChartOption[] = [];
+
+    // Process each quarter's data
+    for (const quarterData of parsedData) {
+      // Skip if no data points
+      if (!quarterData.data || quarterData.data.length === 0) {
+        continue;
+      }
+
+      // Determine the appropriate unit and formatter
+      const { formatter, divisor } = this.getUnitFormatter(quarterData.data);
+
+      // Convert data points to ECharts format
+      const chartData = quarterData.data.map((point) => ({
+        value: parseFloat((point.value / divisor).toFixed(2)),
+        name: point.name,
+      }));
+
+      // Create the chart option using the base theme
+      const chartOption: EChartsOption = {
+        ...this.baseDarkChartTheme,
+        title: {
+          ...this.baseDarkChartTheme.title,
+          text: `${quarterData.period}`, // Show quarter as title
+          left: 'center',
+          textStyle: {
+            color: '#e5e5e5',
+            fontSize: 14,
+            fontWeight: 600,
+          },
+        },
+        legend: {
+          ...this.baseDarkChartTheme.legend,
+          bottom: 0,
+          show: true,
+          type: 'scroll',
+        },
+        tooltip: {
+          ...this.baseDarkChartTheme.tooltip,
+          formatter: formatter,
+        },
+        series: [
+          {
+            name: `${quarterData.companyName} - ${quarterData.metricName} - ${quarterData.period}`,
+            type: 'pie',
+            radius: '60%',
+            center: ['50%', '50%'],
+            data: chartData,
+            label: {
+              formatter: '{b}\n{d}%',
+              color: '#ccc',
+              fontSize: 11,
+            },
+            labelLine: {
+              lineStyle: {
+                color: '#555',
+              },
+            },
+            itemStyle: {
+              borderColor: '#1e2129',
+              borderWidth: 2,
+            },
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 15,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
+              label: {
+                show: true,
+                fontSize: 13,
+                fontWeight: 'bold',
+              },
+            },
+          },
+        ],
+      };
+
+      // Add to results
+      chartOptions.push({
+        companyName: quarterData.companyName,
+        cik: quarterData.cik,
+        period: quarterData.period,
+        metricName: quarterData.metricName,
+        chartOption: chartOption,
+      });
+    }
+
+    if (chartOptions.length === 0) {
+      return 'No valid charts could be created from the data';
+    }
+
+    return chartOptions;
   }
 
   createPieChartOptions(
@@ -1259,6 +1640,225 @@ export class PFeaturesComponent {
           chartOption: chartOption,
         });
       }
+    }
+
+    if (chartOptions.length === 0) {
+      return 'No valid charts could be created from the data';
+    }
+
+    return chartOptions;
+  }
+
+  // Bar Chart functions
+
+  createBarChartOptions(
+    parsedData: MetricBarChartData[] | string
+  ): CompanyChartOption[] | string {
+    // Handle error message from parser
+    if (typeof parsedData === 'string') {
+      return parsedData;
+    }
+
+    // Validate input
+    if (!parsedData || parsedData.length === 0) {
+      return 'No data available to create charts';
+    }
+
+    const chartOptions: CompanyChartOption[] = [];
+
+    // Define color palette for different companies
+    const companyColors = [
+      {
+        base: ['#4a9eff', '#1e6bb8'],
+        emphasis: ['#5dadff', '#2b7ed8'],
+      },
+      {
+        base: ['#22c55e', '#16a34a'],
+        emphasis: ['#34d369', '#1fb353'],
+      },
+      {
+        base: ['#f59e0b', '#d97706'],
+        emphasis: ['#fbbf24', '#f59e0b'],
+      },
+      {
+        base: ['#ef4444', '#dc2626'],
+        emphasis: ['#f87171', '#ef4444'],
+      },
+      {
+        base: ['#a855f7', '#9333ea'],
+        emphasis: ['#c084fc', '#a855f7'],
+      },
+    ];
+
+    // Process each metric
+    for (const metric of parsedData) {
+      // Skip metrics with no data
+      if (!metric.data || metric.data.length === 0) {
+        continue;
+      }
+
+      // Determine the appropriate unit and divisor
+      const maxValue = Math.max(...metric.data.map((d) => Math.abs(d.value)));
+      let unit = '';
+      let divisor = 1;
+
+      if (maxValue >= 1_000_000_000) {
+        unit = 'B';
+        divisor = 1_000_000_000;
+      } else if (maxValue >= 1_000_000) {
+        unit = 'M';
+        divisor = 1_000_000;
+      } else if (maxValue >= 1_000) {
+        unit = 'K';
+        divisor = 1_000;
+      }
+
+      // Organize data by quarter and company
+      const dataByQuarter: Map<string, Map<string, number>> = new Map();
+
+      metric.data.forEach((point) => {
+        const quarter = point.quarter || 'Unknown';
+        if (!dataByQuarter.has(quarter)) {
+          dataByQuarter.set(quarter, new Map());
+        }
+        dataByQuarter.get(quarter)!.set(point.companyName, point.value / divisor);
+      });
+
+      // Prepare series data - one series per company
+      const series: any[] = [];
+
+      metric.companies.forEach((companyName, index) => {
+        const companyData: number[] = [];
+
+        // For each quarter, get this company's value (or 0 if not available)
+        metric.quarters.forEach((quarter) => {
+          const quarterData = dataByQuarter.get(quarter);
+          const value = quarterData?.get(companyName);
+          companyData.push(value !== undefined ? parseFloat(value.toFixed(2)) : 0);
+        });
+
+        const colorIndex = index % companyColors.length;
+        const colors = companyColors[colorIndex];
+
+        series.push({
+          name: companyName,
+          type: 'bar',
+          data: companyData,
+          itemStyle: {
+            borderRadius: [4, 4, 0, 0],
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: colors.base[0] },
+                { offset: 1, color: colors.base[1] },
+              ],
+            },
+          },
+          emphasis: {
+            itemStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [
+                  { offset: 0, color: colors.emphasis[0] },
+                  { offset: 1, color: colors.emphasis[1] },
+                ],
+              },
+            },
+          },
+          label: {
+            show: false, // Hide individual bar labels for cleaner look
+          },
+        });
+      });
+
+      // Create the chart option using the base theme
+      const chartOption: EChartsOption = {
+        ...this.baseDarkChartTheme,
+        title: {
+          ...this.baseDarkChartTheme.title,
+          text: '', // Set to metric.metricName if you want titles
+        },
+        tooltip: {
+          ...this.baseDarkChartTheme.tooltip,
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
+          formatter: (params: any) => {
+            if (!Array.isArray(params)) params = [params];
+            
+            let result = `<strong>${params[0].name}</strong><br/>`;
+            params.forEach((param: any) => {
+              if (param.value !== 0) {
+                result += `${param.marker} ${param.seriesName}: $${param.value}${unit}<br/>`;
+              }
+            });
+            return result;
+          },
+        },
+        legend: {
+          ...this.baseDarkChartTheme.legend,
+          show: true,
+          top: 0,
+          data: metric.companies,
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          top: '15%',
+          containLabel: true,
+        },
+        xAxis: {
+          type: 'category',
+          data: metric.quarters,
+          axisLabel: {
+            color: '#a0a0a0',
+            rotate: metric.quarters.length > 4 ? 45 : 0,
+            interval: 0,
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#333',
+            },
+          },
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: {
+            color: '#a0a0a0',
+            formatter: `{value}${unit}`,
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#333',
+            },
+          },
+          splitLine: {
+            lineStyle: {
+              color: '#2a2a2a',
+            },
+          },
+        },
+        series: series,
+      };
+
+      // Add to results
+      chartOptions.push({
+        companyName: 'Multiple Companies',
+        cik: 'comparison',
+        period: `${metric.quarters[0]} - ${metric.quarters[metric.quarters.length - 1]}`,
+        metricName: metric.metricName,
+        chartOption: chartOption,
+      });
     }
 
     if (chartOptions.length === 0) {
@@ -1406,6 +2006,6 @@ export class PFeaturesComponent {
   }
 
   scrollToElement(element: HTMLElement) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
