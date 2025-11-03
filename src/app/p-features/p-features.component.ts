@@ -233,8 +233,15 @@ export class PFeaturesComponent {
       prompt:
         'Give me the breakdown of revenue of Apple and Microsoft by segment for Q1 and Q2 2025',
     },
-    { id: 3, prompt: 'Compare gross margins for Apple and Microsoft for last quarter' },
-    { id: 3, prompt: 'I need the revenue, net income, gross profit, and combined ratio for Hartford, Travelers, JPMorgan, and Apple for the last two reported quarters (Q1 and Q2).' },
+    {
+      id: 3,
+      prompt: 'Compare gross margins for Apple and Microsoft for last quarter',
+    },
+    {
+      id: 3,
+      prompt:
+        'I need the revenue, net income, gross profit, and combined ratio for Hartford, Travelers, JPMorgan, and Apple for the last two reported quarters (Q1 and Q2).',
+    },
   ];
 
   baseDarkChartTheme = {
@@ -727,33 +734,43 @@ export class PFeaturesComponent {
         this.userQueryResponseData.metrics
       )
     );
+    console.log("card data \n_______________________",this.cardData);
+    
     this.processDataForComparison();
 
     // Determine if we should use bar charts or pie charts
-    const numberOfCompanies = this.allResponses.analysisData?.results?.length || 0;
+    const numberOfCompanies =
+      this.allResponses.analysisData?.results?.length || 0;
 
     // Check if segment_filter exists and has data (not null and not empty)
-    const hasSegmentFilter = this.userQueryResponseData?.segment_filter && 
-                             (Array.isArray(this.userQueryResponseData.segment_filter) 
-                               ? this.userQueryResponseData.segment_filter.length > 0 
-                               : Object.keys(this.userQueryResponseData.segment_filter).length > 0);
+    const hasSegmentFilter =
+      this.userQueryResponseData?.segment_filter &&
+      (Array.isArray(this.userQueryResponseData.segment_filter)
+        ? this.userQueryResponseData.segment_filter.length > 0
+        : Object.keys(this.userQueryResponseData.segment_filter).length > 0);
 
     if (hasSegmentFilter) {
       // Segment filter exists - use pie charts for breakdown across all quarters and all segment types
-      console.log('Segment filter detected - generating multi-segment pie charts');
-      
+      console.log(
+        'Segment filter detected - generating multi-segment pie charts'
+      );
+
       // NEW: Pass the array of companies directly instead of wrapping in APIResponse format
       this.parsedChartData = this.parseFinancialDataForMultiSegmentPieCharts(
         this.allResponses.analysisData.results, // Pass array directly
         this.userQueryResponseData.metrics
       );
-      console.log("parsed chart data :",this.parsedChartData);
-      
-      this.chartOptions = this.createMultiQuarterPieChartOptions(this.parsedChartData);
+      console.log('parsed chart data :', this.parsedChartData);
+
+      this.chartOptions = this.createMultiQuarterPieChartOptions(
+        this.parsedChartData
+      );
       console.log('Multi-Segment Pie Chart Options:', this.chartOptions);
     } else if (numberOfCompanies > 1) {
       // Multiple companies without segment filter - use bar charts for comparison
-      console.log('Multiple companies without segment filter - generating bar charts');
+      console.log(
+        'Multiple companies without segment filter - generating bar charts'
+      );
       const barChartData = this.parseFinancialDataForBarCharts(
         this.allResponses.analysisData,
         this.userQueryResponseData.metrics
@@ -762,7 +779,9 @@ export class PFeaturesComponent {
       console.log('Bar Chart Options:', this.chartOptions);
     } else {
       // Single company without segment filter - don't show any charts
-      console.log('Single company without segment filter - no charts to display');
+      console.log(
+        'Single company without segment filter - no charts to display'
+      );
       this.chartOptions = null;
       this.parsedChartData = null;
     }
@@ -776,7 +795,10 @@ export class PFeaturesComponent {
   /**
    * Determines if the query is requesting a segment/breakdown view
    */
-  isSegmentBreakdownRequest(query: string, requestedMetrics: string[]): boolean {
+  isSegmentBreakdownRequest(
+    query: string,
+    requestedMetrics: string[]
+  ): boolean {
     const breakdownKeywords = [
       'breakdown',
       'segment',
@@ -788,18 +810,18 @@ export class PFeaturesComponent {
       'distribution',
       'split',
       'composition',
-      'mix'
+      'mix',
     ];
 
     const lowerQuery = query.toLowerCase();
-    const hasBreakdownKeyword = breakdownKeywords.some(keyword => 
+    const hasBreakdownKeyword = breakdownKeywords.some((keyword) =>
       lowerQuery.includes(keyword)
     );
 
     // Also check if requesting metrics that typically have breakdowns (like revenue)
     const metricsWithBreakdowns = ['revenue', 'sales', 'income'];
-    const hasBreakdownMetric = requestedMetrics?.some(metric =>
-      metricsWithBreakdowns.some(bm => metric.toLowerCase().includes(bm))
+    const hasBreakdownMetric = requestedMetrics?.some((metric) =>
+      metricsWithBreakdowns.some((bm) => metric.toLowerCase().includes(bm))
     );
 
     return hasBreakdownKeyword || hasBreakdownMetric;
@@ -845,7 +867,11 @@ export class PFeaturesComponent {
     requestedMetrics?: string[]
   ): QuarterPieChartData[] | string {
     // Validate input - now expecting array directly
-    if (!companiesArray || !Array.isArray(companiesArray) || companiesArray.length === 0) {
+    if (
+      !companiesArray ||
+      !Array.isArray(companiesArray) ||
+      companiesArray.length === 0
+    ) {
       return 'No data available - No companies found in array';
     }
 
@@ -860,13 +886,15 @@ export class PFeaturesComponent {
       // Process each statement (quarter/filing period)
       for (const statement of company.statements) {
         // Iterate through all metrics in the statement
-        for (const [metricKey, metricValue] of Object.entries(statement.metrics)) {
+        for (const [metricKey, metricValue] of Object.entries(
+          statement.metrics
+        )) {
           const cleanName = this.cleanMetricName(metricValue.name);
 
           // Filter by requested metrics if provided
           if (requestedMetrics && requestedMetrics.length > 0) {
-            console.log("requested metrics", requestedMetrics);
-            
+            console.log('requested metrics', requestedMetrics);
+
             const isRequested = requestedMetrics.some(
               (rm) =>
                 rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
@@ -876,15 +904,26 @@ export class PFeaturesComponent {
           }
 
           // Only process metrics that have children (breakdown data)
-          if (metricValue.children && Object.keys(metricValue.children).length > 0) {
+          if (
+            metricValue.children &&
+            Object.keys(metricValue.children).length > 0
+          ) {
             // Iterate through ALL segment types (e.g., "Products/Services", "Business Segments")
-            for (const [segmentType, segmentChildren] of Object.entries(metricValue.children)) {
+            for (const [segmentType, segmentChildren] of Object.entries(
+              metricValue.children
+            )) {
               const pieChartPoints: PieChartDataPoint[] = [];
 
               // Extract each child segment for the pie chart
-              for (const [childKey, childValue] of Object.entries(segmentChildren)) {
+              for (const [childKey, childValue] of Object.entries(
+                segmentChildren
+              )) {
                 pieChartPoints.push({
-                  name: childValue.description?.replace(`${metricValue.name} - `, '') || childKey,
+                  name:
+                    childValue.description?.replace(
+                      `${metricValue.name} - `,
+                      ''
+                    ) || childKey,
                   value: childValue.value,
                   percentage: childValue.percentage_of_parent,
                   formattedValue: this.formatCurrency(childValue.value),
@@ -901,7 +940,9 @@ export class PFeaturesComponent {
                   metricName: cleanName,
                   segmentType: this.cleanSegmentTypeName(segmentType),
                   totalValue: metricValue.value,
-                  data: pieChartPoints.sort((a, b) => b.percentage - a.percentage),
+                  data: pieChartPoints.sort(
+                    (a, b) => b.percentage - a.percentage
+                  ),
                 });
               }
             }
@@ -956,7 +997,10 @@ export class PFeaturesComponent {
     requestedMetrics?: string[]
   ): QuarterPieChartData[] | string {
     // This is now just a wrapper that calls the multi-segment version
-    return this.parseFinancialDataForMultiSegmentPieCharts(apiResponse.results, requestedMetrics);
+    return this.parseFinancialDataForMultiSegmentPieCharts(
+      apiResponse.results,
+      requestedMetrics
+    );
   }
 
   parseFinancialDataForPieCharts(
@@ -995,8 +1039,12 @@ export class PFeaturesComponent {
             const pieChartPoints: PieChartDataPoint[] = [];
 
             // Extract each child segment for the pie chart
-            for (const [segmentType, segmentChildren] of Object.entries(metricValue.children)) {
-              for (const [childKey, childValue] of Object.entries(segmentChildren)) {
+            for (const [segmentType, segmentChildren] of Object.entries(
+              metricValue.children
+            )) {
+              for (const [childKey, childValue] of Object.entries(
+                segmentChildren
+              )) {
                 pieChartPoints.push({
                   name:
                     childValue.description?.replace(
@@ -1077,7 +1125,7 @@ export class PFeaturesComponent {
       for (const statement of company.statements) {
         const quarter = statement.period; // e.g., "Q1 2024"
         const companyName = statement.metadata.company_name;
-        
+
         allQuarters.add(quarter);
         allCompanies.add(companyName);
 
@@ -1185,6 +1233,71 @@ export class PFeaturesComponent {
     return filteredData;
   }
 
+  // processDataForComparison() {
+  //   // Extract unique companies
+  //   this.companies = [
+  //     ...new Set(this.cardData.map((item) => item.companyName)),
+  //   ];
+
+  //   // Limit to 4 companies
+  //   if (this.companies.length > 4) {
+  //     console.warn('More than 4 companies detected. Only showing first 4.');
+  //     this.companies = this.companies.slice(0, 4);
+  //   }
+
+  //   // Extract unique metrics
+  //   const uniqueMetrics = [
+  //     ...new Set(this.cardData.map((item) => item.metricName)),
+  //   ];
+
+  //   // Build comparison structure
+  //   this.comparisonMetrics = uniqueMetrics.map((metricName) => {
+  //     const companiesData: ComparisonMetric['companies'] = {};
+
+  //     // Get subtitle from first occurrence of this metric
+  //     const firstMetric = this.cardData.find(
+  //       (item) => item.metricName === metricName
+  //     );
+  //     const subTitle = firstMetric?.subTitle || null;
+  //     const formula = firstMetric?.formula || null;
+
+  //     // For each company, find if they have this metric
+  //     this.companies.forEach((companyName) => {
+  //       const metricData = this.cardData.find(
+  //         (item) =>
+  //           item.companyName === companyName && item.metricName === metricName
+  //       );
+
+  //       if (metricData) {
+  //         companiesData[companyName] = {
+  //           metric: metricData.metric,
+  //           metricPeriod: metricData.metricPeriod,
+  //           trend: metricData.trend,
+  //           trendIcon: metricData.trendIcon,
+  //           trendPositive: metricData.trendPositive,
+  //           available: true,
+  //         };
+  //       } else {
+  //         companiesData[companyName] = {
+  //           metric: 'N/A',
+  //           metricPeriod: '',
+  //           trend: '',
+  //           trendIcon: '',
+  //           trendPositive: false,
+  //           available: false,
+  //         };
+  //       }
+  //     });
+
+  //     return {
+  //       metricName,
+  //       subTitle,
+  //       formula,
+  //       companies: companiesData,
+  //     };
+  //   });
+  // }
+
   processDataForComparison() {
     // Extract unique companies
     this.companies = [
@@ -1197,27 +1310,32 @@ export class PFeaturesComponent {
       this.companies = this.companies.slice(0, 4);
     }
 
-    // Extract unique metrics
-    const uniqueMetrics = [
-      ...new Set(this.cardData.map((item) => item.metricName)),
+    // Extract unique metric + period combinations
+    const uniqueMetricPeriods = [
+      ...new Set(
+        this.cardData.map((item) => `${item.metricName}|${item.metricPeriod}`)
+      ),
     ];
 
     // Build comparison structure
-    this.comparisonMetrics = uniqueMetrics.map((metricName) => {
+    this.comparisonMetrics = uniqueMetricPeriods.map((metricPeriodKey) => {
+      const [metricName, period] = metricPeriodKey.split('|');
       const companiesData: ComparisonMetric['companies'] = {};
 
-      // Get subtitle from first occurrence of this metric
+      // Get subtitle and formula from first occurrence of this metric
       const firstMetric = this.cardData.find(
-        (item) => item.metricName === metricName
+        (item) => item.metricName === metricName && item.metricPeriod === period
       );
       const subTitle = firstMetric?.subTitle || null;
       const formula = firstMetric?.formula || null;
 
-      // For each company, find if they have this metric
+      // For each company, find if they have this metric for this period
       this.companies.forEach((companyName) => {
         const metricData = this.cardData.find(
           (item) =>
-            item.companyName === companyName && item.metricName === metricName
+            item.companyName === companyName && 
+            item.metricName === metricName && 
+            item.metricPeriod === period
         );
 
         if (metricData) {
@@ -1232,7 +1350,7 @@ export class PFeaturesComponent {
         } else {
           companiesData[companyName] = {
             metric: 'N/A',
-            metricPeriod: '',
+            metricPeriod: period,
             trend: '',
             trendIcon: '',
             trendPositive: false,
@@ -1274,7 +1392,6 @@ export class PFeaturesComponent {
 
   popoverData: any = null;
 
-
   getQuarterDates(
     period: string
   ): { start_date: string; end_date: string } | null {
@@ -1303,19 +1420,175 @@ export class PFeaturesComponent {
     };
   }
 
+  // populateCardData(apiResponse: any, requestedMetrics: string[]): any[] {
+  //   const cardData: any[] = [];
+
+  //   if (!apiResponse?.success || !apiResponse?.results?.length) {
+  //     return cardData;
+  //   }
+
+  //   // Process each company
+  //   apiResponse.results.forEach((company: any) => {
+  //     const latestStatement = company.statements[0];
+  //     const previousStatement = company.statements[1];
+
+  //     if (!latestStatement) return;
+
+  //     // Helper to format currency
+  //     const formatCurrency = (value: number): string => {
+  //       const absValue = Math.abs(value);
+  //       if (absValue >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
+  //       if (absValue >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+  //       return `$${value.toFixed(2)}`;
+  //     };
+
+  //     // Helper to format percentage
+  //     const formatPercentage = (value: number): string =>
+  //       `${value.toFixed(1)}%`;
+
+  //     // Helper to get growth
+  //     const getGrowth = (metricKey: string): number | null => {
+  //       const current = latestStatement.metrics[metricKey];
+  //       if (current?.yoy_growth != null) return current.yoy_growth;
+  //       if (current?.qoq_growth != null) return current.qoq_growth;
+
+  //       // Calculate from previous statement
+  //       if (previousStatement?.metrics[metricKey]) {
+  //         const prev = previousStatement.metrics[metricKey].value;
+  //         if (prev !== 0) {
+  //           return ((current.value - prev) / Math.abs(prev)) * 100;
+  //         }
+  //       }
+  //       return null;
+  //     };
+
+  //     // Metric name mappings
+  //     const metricNames: Record<
+  //       string,
+  //       { name: string; subTitle: string | null }
+  //     > = {
+  //       revenue: { name: 'Revenue', subTitle: null },
+  //       net_income: { name: 'Net Income', subTitle: null },
+  //       gross_profit: { name: 'Gross Profit', subTitle: null },
+  //       operating_income: { name: 'Operating Income', subTitle: null },
+  //       eps_diluted: { name: 'EPS (Diluted)', subTitle: 'Earnings Per Share' },
+  //       cash_equivalents: { name: 'Cash & Cash Equivalents', subTitle: null },
+  //       research_and_development: {
+  //         name: 'R&D Expenses',
+  //         subTitle: 'Research & Development',
+  //       },
+  //       total_assets: { name: 'Total Assets', subTitle: null },
+  //       free_cash_flow: { name: 'Free Cash Flow', subTitle: null },
+  //     };
+
+  //     // Process each metric
+  //     Object.keys(latestStatement.metrics).forEach((metricKey) => {
+  //       const metric = latestStatement.metrics[metricKey];
+  //       const config = metricNames[metricKey];
+
+  //       if (!config) return; // Skip unknown metrics
+
+  //       // Filter by requested metrics if provided
+  //       if (requestedMetrics?.length > 0) {
+  //         const isRequested = requestedMetrics.some(
+  //           (rm) =>
+  //             rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+  //             config.name.toLowerCase().replace(/[^a-z0-9]/g, '')
+  //         );
+  //         if (!isRequested) return;
+  //       }
+
+  //       const growth = getGrowth(metricKey);
+  //       const isPositive = growth !== null ? growth >= 0 : true;
+
+  //       cardData.push({
+  //         companyName: company.company_name,
+  //         metricName: config.name,
+  //         subTitle: config.subTitle,
+  //         metric: formatCurrency(metric.value),
+  //         metricPeriod: latestStatement.period,
+  //         trend:
+  //           growth !== null
+  //             ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% YoY`
+  //             : 'No change',
+  //         trendIcon: isPositive
+  //           ? 'pi pi-arrow-up-right'
+  //           : 'pi pi-arrow-down-right',
+  //         trendPositive: isPositive,
+  //         formula: {
+  //           name: config.name,
+  //           formula: '',
+  //           use: '',
+  //         },
+  //       });
+  //     });
+
+  //     // Add calculated Gross Margin if revenue and gross_profit exist
+  //     if (
+  //       latestStatement.metrics.revenue &&
+  //       latestStatement.metrics.gross_profit
+  //     ) {
+  //       const margin =
+  //         (latestStatement.metrics.gross_profit.value /
+  //           latestStatement.metrics.revenue.value) *
+  //         100;
+
+  //       let marginGrowth: number | null = null;
+  //       if (
+  //         previousStatement?.metrics.revenue &&
+  //         previousStatement?.metrics.gross_profit
+  //       ) {
+  //         const prevMargin =
+  //           (previousStatement.metrics.gross_profit.value /
+  //             previousStatement.metrics.revenue.value) *
+  //           100;
+  //         marginGrowth = margin - prevMargin;
+  //       }
+
+  //       if (
+  //         !requestedMetrics?.length ||
+  //         requestedMetrics.some((m) => m.toLowerCase().includes('margin'))
+  //       ) {
+  //         cardData.push({
+  //           companyName: company.company_name,
+  //           metricName: 'Gross Margin',
+  //           subTitle: null,
+  //           metric: formatPercentage(margin),
+  //           metricPeriod: latestStatement.period,
+  //           trend:
+  //             marginGrowth !== null
+  //               ? `${marginGrowth >= 0 ? '+' : ''}${marginGrowth.toFixed(
+  //                   1
+  //                 )}% vs prior period`
+  //               : 'No change',
+  //           trendIcon:
+  //             marginGrowth !== null && marginGrowth >= 0
+  //               ? 'pi pi-arrow-up-right'
+  //               : 'pi pi-arrow-down-right',
+  //           trendPositive: marginGrowth !== null ? marginGrowth >= 0 : true,
+  //         });
+  //       }
+  //     }
+  //   });
+
+  //   return cardData;
+  // }
+
+
   populateCardData(apiResponse: any, requestedMetrics: string[]): any[] {
-    const cardData: any[] = [];
+  const cardData: any[] = [];
 
-    if (!apiResponse?.success || !apiResponse?.results?.length) {
-      return cardData;
-    }
+  if (!apiResponse?.success || !apiResponse?.results?.length) {
+    return cardData;
+  }
 
-    // Process each company
-    apiResponse.results.forEach((company: any) => {
-      const latestStatement = company.statements[0];
-      const previousStatement = company.statements[1];
+  // Process each company
+  apiResponse.results.forEach((company: any) => {
+    if (!company.statements?.length) return;
 
-      if (!latestStatement) return;
+    // Process each statement (quarter)
+    company.statements.forEach((statement: any, index: number) => {
+      const previousStatement = company.statements[index + 1]; // Next item is previous period
 
       // Helper to format currency
       const formatCurrency = (value: number): string => {
@@ -1331,7 +1604,7 @@ export class PFeaturesComponent {
 
       // Helper to get growth
       const getGrowth = (metricKey: string): number | null => {
-        const current = latestStatement.metrics[metricKey];
+        const current = statement.metrics[metricKey];
         if (current?.yoy_growth != null) return current.yoy_growth;
         if (current?.qoq_growth != null) return current.qoq_growth;
 
@@ -1364,9 +1637,9 @@ export class PFeaturesComponent {
         free_cash_flow: { name: 'Free Cash Flow', subTitle: null },
       };
 
-      // Process each metric
-      Object.keys(latestStatement.metrics).forEach((metricKey) => {
-        const metric = latestStatement.metrics[metricKey];
+      // Process each metric for this quarter
+      Object.keys(statement.metrics).forEach((metricKey) => {
+        const metric = statement.metrics[metricKey];
         const config = metricNames[metricKey];
 
         if (!config) return; // Skip unknown metrics
@@ -1389,7 +1662,7 @@ export class PFeaturesComponent {
           metricName: config.name,
           subTitle: config.subTitle,
           metric: formatCurrency(metric.value),
-          metricPeriod: latestStatement.period,
+          metricPeriod: statement.period,
           trend:
             growth !== null
               ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% YoY`
@@ -1408,12 +1681,12 @@ export class PFeaturesComponent {
 
       // Add calculated Gross Margin if revenue and gross_profit exist
       if (
-        latestStatement.metrics.revenue &&
-        latestStatement.metrics.gross_profit
+        statement.metrics.revenue &&
+        statement.metrics.gross_profit
       ) {
         const margin =
-          (latestStatement.metrics.gross_profit.value /
-            latestStatement.metrics.revenue.value) *
+          (statement.metrics.gross_profit.value /
+            statement.metrics.revenue.value) *
           100;
 
         let marginGrowth: number | null = null;
@@ -1437,7 +1710,7 @@ export class PFeaturesComponent {
             metricName: 'Gross Margin',
             subTitle: null,
             metric: formatPercentage(margin),
-            metricPeriod: latestStatement.period,
+            metricPeriod: statement.period,
             trend:
               marginGrowth !== null
                 ? `${marginGrowth >= 0 ? '+' : ''}${marginGrowth.toFixed(
@@ -1453,9 +1726,33 @@ export class PFeaturesComponent {
         }
       }
     });
+  });
 
-    return cardData;
+  return cardData;
+}
+
+ 
+
+  consumable_response = [
+    {
+    company_name: 'company name',
+    quarterly_data: [
+      {
+        metrics: {
+          revenue: {
+            children: {
+              'Bussiness Segments': {},
+              'Consolidation Segments': {},
+            },
+          },
+        },
+        quarter: 'Q1 2024',
+      },
+    ],
   }
+  ] ;
+
+
 
   // Pie Chart functions
 
@@ -1764,7 +2061,9 @@ export class PFeaturesComponent {
         if (!dataByQuarter.has(quarter)) {
           dataByQuarter.set(quarter, new Map());
         }
-        dataByQuarter.get(quarter)!.set(point.companyName, point.value / divisor);
+        dataByQuarter
+          .get(quarter)!
+          .set(point.companyName, point.value / divisor);
       });
 
       // Prepare series data - one series per company
@@ -1777,7 +2076,9 @@ export class PFeaturesComponent {
         metric.quarters.forEach((quarter) => {
           const quarterData = dataByQuarter.get(quarter);
           const value = quarterData?.get(companyName);
-          companyData.push(value !== undefined ? parseFloat(value.toFixed(2)) : 0);
+          companyData.push(
+            value !== undefined ? parseFloat(value.toFixed(2)) : 0
+          );
         });
 
         const colorIndex = index % companyColors.length;
@@ -1837,7 +2138,7 @@ export class PFeaturesComponent {
           },
           formatter: (params: any) => {
             if (!Array.isArray(params)) params = [params];
-            
+
             let result = `<strong>${params[0].name}</strong><br/>`;
             params.forEach((param: any) => {
               if (param.value !== 0) {
@@ -1898,7 +2199,9 @@ export class PFeaturesComponent {
       chartOptions.push({
         companyName: 'Multiple Companies',
         cik: 'comparison',
-        period: `${metric.quarters[0]} - ${metric.quarters[metric.quarters.length - 1]}`,
+        period: `${metric.quarters[0]} - ${
+          metric.quarters[metric.quarters.length - 1]
+        }`,
         metricName: metric.metricName,
         chartOption: chartOption,
       });
@@ -2052,18 +2355,13 @@ export class PFeaturesComponent {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-
-
-
-  getFormulaByName(name:string){
-    this.main.getFormulaByName(name).subscribe({next:(res:any)=>{
-      const formulaData = res.metric;
-      this.popoverData.name = formulaData?.display_name
-      this.popoverData.formula = formulaData?.formula
-     
-    }})
+  getFormulaByName(name: string) {
+    this.main.getFormulaByName(name).subscribe({
+      next: (res: any) => {
+        const formulaData = res.metric;
+        this.popoverData.name = formulaData?.display_name;
+        this.popoverData.formula = formulaData?.formula;
+      },
+    });
   }
-
-
-
 }
