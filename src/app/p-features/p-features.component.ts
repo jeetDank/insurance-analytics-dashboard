@@ -93,7 +93,7 @@ interface Metric {
   name: string;
   value: number;
   unit: string;
-  children?: Record<string, MetricChild>;
+  children?: Record<string, Record<string, MetricChild>>;
 }
 
 interface Statement {
@@ -139,13 +139,14 @@ interface CompanyPieChartData {
   metrics: MetricPieChartData[];
 }
 
-// Enhanced structure for multi-quarter pie charts
+// Enhanced structure for multi-quarter pie charts with segment type tracking
 interface QuarterPieChartData {
   companyName: string;
   cik: string;
   period: string;
   filingDate: string;
   metricName: string;
+  segmentType: string; // NEW: Track segment type (e.g., "Products/Services", "Business Segments")
   totalValue: number;
   data: PieChartDataPoint[];
 }
@@ -171,6 +172,7 @@ interface CompanyChartOption {
   cik: string;
   period: string;
   metricName: string;
+  segmentType?: string; // NEW: Optional segment type for multi-segment charts
   chartOption: EChartsOption;
 }
 
@@ -737,15 +739,21 @@ export class PFeaturesComponent {
                                : Object.keys(this.userQueryResponseData.segment_filter).length > 0);
 
     if (hasSegmentFilter) {
-      // Segment filter exists - use pie charts for breakdown across all quarters
-      this.parsedChartData = this.parseFinancialDataForMultiQuarterPieCharts(
-        this.allResponses.analysisData,
+      // Segment filter exists - use pie charts for breakdown across all quarters and all segment types
+      console.log('Segment filter detected - generating multi-segment pie charts');
+      
+      // NEW: Pass the array of companies directly instead of wrapping in APIResponse format
+      this.parsedChartData = this.parseFinancialDataForMultiSegmentPieCharts(
+        this.allResponses.analysisData.results, // Pass array directly
         this.userQueryResponseData.metrics
       );
+      console.log("parsed chart data :",this.parsedChartData);
+      
       this.chartOptions = this.createMultiQuarterPieChartOptions(this.parsedChartData);
-      console.log('Multi-Quarter Pie Chart Options (Segment Breakdown):', this.chartOptions);
+      console.log('Multi-Segment Pie Chart Options:', this.chartOptions);
     } else if (numberOfCompanies > 1) {
       // Multiple companies without segment filter - use bar charts for comparison
+      console.log('Multiple companies without segment filter - generating bar charts');
       const barChartData = this.parseFinancialDataForBarCharts(
         this.allResponses.analysisData,
         this.userQueryResponseData.metrics
@@ -753,15 +761,10 @@ export class PFeaturesComponent {
       this.chartOptions = this.createBarChartOptions(barChartData);
       console.log('Bar Chart Options:', this.chartOptions);
     } else {
-      // Single company without segment filter - use pie charts for breakdown
-      this.parsedChartData = this.parseFinancialDataForPieCharts(
-        this.allResponses.analysisData
-      );
-      this.chartOptions = this.getChartsByMetric(
-        this.createPieChartOptions(this.parsedChartData),
-        this.userQueryResponseData.metrics
-      );
-      console.log('Pie Chart Options:', this.chartOptions);
+      // Single company without segment filter - don't show any charts
+      console.log('Single company without segment filter - no charts to display');
+      this.chartOptions = null;
+      this.parsedChartData = null;
     }
 
     // generate references and links
@@ -822,26 +825,34 @@ export class PFeaturesComponent {
   }
 
   /**
-   * Enhanced parser for multi-quarter segment breakdowns
-   * Generates pie chart data for each company, each quarter, and each metric with children
+   * Helper function to clean segment type names for better display
    */
-  parseFinancialDataForMultiQuarterPieCharts(
-    apiResponse: APIResponse,
+  cleanSegmentTypeName(segmentType: string): string {
+    return segmentType
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  /**
+   * UPDATED: Enhanced parser that accepts array of companies directly
+   * Each company object has statements array with quarter-wise data
+   * Returns pie charts organized by: Company → Quarter → Segment Type → Metric
+   */
+  parseFinancialDataForMultiSegmentPieCharts(
+    companiesArray: CompanyResult[],
     requestedMetrics?: string[]
   ): QuarterPieChartData[] | string {
-    // Validate API response
-    if (!apiResponse || !apiResponse.success) {
-      return 'No data available - API request was not successful';
-    }
-
-    if (!apiResponse.results || apiResponse.results.length === 0) {
-      return 'No data available - No company results found';
+    // Validate input - now expecting array directly
+    if (!companiesArray || !Array.isArray(companiesArray) || companiesArray.length === 0) {
+      return 'No data available - No companies found in array';
     }
 
     const quarterChartsData: QuarterPieChartData[] = [];
 
-    // Process each company in the results
-    for (const company of apiResponse.results) {
+    // Process each company in the array
+    for (const company of companiesArray) {
       if (!company.statements || company.statements.length === 0) {
         continue; // Skip companies with no statements
       }
@@ -849,13 +860,13 @@ export class PFeaturesComponent {
       // Process each statement (quarter/filing period)
       for (const statement of company.statements) {
         // Iterate through all metrics in the statement
-        for (const [metricKey, metricValue] of Object.entries(
-          statement.metrics
-        )) {
+        for (const [metricKey, metricValue] of Object.entries(statement.metrics)) {
           const cleanName = this.cleanMetricName(metricValue.name);
 
           // Filter by requested metrics if provided
           if (requestedMetrics && requestedMetrics.length > 0) {
+            console.log("requested metrics", requestedMetrics);
+            
             const isRequested = requestedMetrics.some(
               (rm) =>
                 rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
@@ -865,41 +876,34 @@ export class PFeaturesComponent {
           }
 
           // Only process metrics that have children (breakdown data)
-          if (
-            metricValue.children &&
-            Object.keys(metricValue.children).length > 0
-          ) {
-            const pieChartPoints: PieChartDataPoint[] = [];
+          if (metricValue.children && Object.keys(metricValue.children).length > 0) {
+            // Iterate through ALL segment types (e.g., "Products/Services", "Business Segments")
+            for (const [segmentType, segmentChildren] of Object.entries(metricValue.children)) {
+              const pieChartPoints: PieChartDataPoint[] = [];
 
-            // Extract each child segment for the pie chart
-            for (const [childKey, childValue] of Object.entries(
-              metricValue.children
-            )) {
-              pieChartPoints.push({
-                name:
-                  childValue.description?.replace(
-                    `${metricValue.name} - `,
-                    ''
-                  ) || childKey,
-                value: childValue.value,
-                percentage: childValue.percentage_of_parent,
-                formattedValue: this.formatCurrency(childValue.value),
-              });
-            }
+              // Extract each child segment for the pie chart
+              for (const [childKey, childValue] of Object.entries(segmentChildren)) {
+                pieChartPoints.push({
+                  name: childValue.description?.replace(`${metricValue.name} - `, '') || childKey,
+                  value: childValue.value,
+                  percentage: childValue.percentage_of_parent,
+                  formattedValue: this.formatCurrency(childValue.value),
+                });
+              }
 
-            // Only add if we have valid data points
-            if (pieChartPoints.length > 0) {
-              quarterChartsData.push({
-                companyName: statement.metadata.company_name,
-                cik: company.cik,
-                period: statement.period,
-                filingDate: statement.metadata.filing_date,
-                metricName: cleanName,
-                totalValue: metricValue.value,
-                data: pieChartPoints.sort(
-                  (a, b) => b.percentage - a.percentage
-                ), // Sort by percentage descending
-              });
+              // Only add if we have valid data points
+              if (pieChartPoints.length > 0) {
+                quarterChartsData.push({
+                  companyName: statement.metadata.company_name,
+                  cik: company.cik,
+                  period: statement.period,
+                  filingDate: statement.metadata.filing_date,
+                  metricName: cleanName,
+                  segmentType: this.cleanSegmentTypeName(segmentType),
+                  totalValue: metricValue.value,
+                  data: pieChartPoints.sort((a, b) => b.percentage - a.percentage),
+                });
+              }
             }
           }
         }
@@ -911,7 +915,48 @@ export class PFeaturesComponent {
       return 'No data available - No metrics with breakdown data found';
     }
 
+    // Sort the results to ensure proper ordering:
+    // 1. By company name
+    // 2. By period (chronologically)
+    // 3. By segment type (alphabetically)
+    quarterChartsData.sort((a, b) => {
+      // First, sort by company name
+      const companyCompare = a.companyName.localeCompare(b.companyName);
+      if (companyCompare !== 0) return companyCompare;
+
+      // Then, sort by period (extract year and quarter)
+      const periodA = this.parsePeriodForSorting(a.period);
+      const periodB = this.parsePeriodForSorting(b.period);
+      if (periodA !== periodB) return periodA - periodB;
+
+      // Finally, sort by segment type alphabetically
+      return a.segmentType.localeCompare(b.segmentType);
+    });
+
     return quarterChartsData;
+  }
+
+  /**
+   * Helper function to parse period string for sorting
+   * Converts "Q1 2025" to a sortable number like 20251
+   */
+  parsePeriodForSorting(period: string): number {
+    const match = period.match(/Q(\d)\s*(\d{4})/);
+    if (!match) return 0;
+    const quarter = parseInt(match[1], 10);
+    const year = parseInt(match[2], 10);
+    return year * 10 + quarter; // e.g., 2025 Q1 → 20251
+  }
+
+  /**
+   * LEGACY: Original parser for single-segment pie charts (kept for backwards compatibility)
+   */
+  parseFinancialDataForMultiQuarterPieCharts(
+    apiResponse: APIResponse,
+    requestedMetrics?: string[]
+  ): QuarterPieChartData[] | string {
+    // This is now just a wrapper that calls the multi-segment version
+    return this.parseFinancialDataForMultiSegmentPieCharts(apiResponse.results, requestedMetrics);
   }
 
   parseFinancialDataForPieCharts(
@@ -950,19 +995,19 @@ export class PFeaturesComponent {
             const pieChartPoints: PieChartDataPoint[] = [];
 
             // Extract each child segment for the pie chart
-            for (const [childKey, childValue] of Object.entries(
-              metricValue.children
-            )) {
-              pieChartPoints.push({
-                name:
-                  childValue.description?.replace(
-                    `${metricValue.name} - `,
-                    ''
-                  ) || childKey,
-                value: childValue.value,
-                percentage: childValue.percentage_of_parent,
-                formattedValue: this.formatCurrency(childValue.value),
-              });
+            for (const [segmentType, segmentChildren] of Object.entries(metricValue.children)) {
+              for (const [childKey, childValue] of Object.entries(segmentChildren)) {
+                pieChartPoints.push({
+                  name:
+                    childValue.description?.replace(
+                      `${metricValue.name} - `,
+                      ''
+                    ) || childKey,
+                  value: childValue.value,
+                  percentage: childValue.percentage_of_parent,
+                  formattedValue: this.formatCurrency(childValue.value),
+                });
+              }
             }
 
             // Only add if we have valid data points
@@ -1436,8 +1481,8 @@ export class PFeaturesComponent {
   }
 
   /**
-   * Creates pie chart options for multi-quarter data
-   * Each chart represents one company, one metric, for one quarter
+   * Creates pie chart options for multi-quarter, multi-segment data
+   * Each chart represents one company, one metric, one quarter, and one segment type
    */
   createMultiQuarterPieChartOptions(
     parsedData: QuarterPieChartData[] | string
@@ -1475,7 +1520,7 @@ export class PFeaturesComponent {
         ...this.baseDarkChartTheme,
         title: {
           ...this.baseDarkChartTheme.title,
-          text: `${quarterData.period}`, // Show quarter as title
+          text: `${quarterData.period} - ${quarterData.segmentType}`, // Show quarter and segment type as title
           left: 'center',
           textStyle: {
             color: '#e5e5e5',
@@ -1495,7 +1540,7 @@ export class PFeaturesComponent {
         },
         series: [
           {
-            name: `${quarterData.companyName} - ${quarterData.metricName} - ${quarterData.period}`,
+            name: `${quarterData.companyName} - ${quarterData.metricName} - ${quarterData.period} - ${quarterData.segmentType}`,
             type: 'pie',
             radius: '60%',
             center: ['50%', '50%'],
@@ -1536,6 +1581,7 @@ export class PFeaturesComponent {
         cik: quarterData.cik,
         period: quarterData.period,
         metricName: quarterData.metricName,
+        segmentType: quarterData.segmentType, // NEW: Include segment type
         chartOption: chartOption,
       });
     }
