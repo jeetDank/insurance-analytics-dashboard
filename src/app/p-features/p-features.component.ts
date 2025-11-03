@@ -225,22 +225,22 @@ export class PFeaturesComponent {
     {
       id: 0,
       prompt:
-        'Show me the revenue data for Apple and Microsoft for the last two quarters',
+        'Compare revenue and net income for Hartford and Travelers for last 2 quarters',
     },
 
     {
       id: 2,
       prompt:
-        'Give me the breakdown of revenue of Apple and Microsoft by segment for Q1 and Q2 2025',
+        'Give me segment wise revenue breakdown for hartford and travelers for Q1 and Q2 2025',
     },
     {
       id: 3,
-      prompt: 'Compare gross margins for Apple and Microsoft for last quarter',
+      prompt: 'Compare gross margins for JPM and PGR for last quarter',
     },
     {
       id: 3,
       prompt:
-        'I need the revenue, net income, gross profit, and combined ratio for Hartford, Travelers, JPMorgan, and Apple for the last two reported quarters (Q1 and Q2).',
+        'I need the revenue, net income, gross profit, and combined ratio for Hartford, Travelers, JPMorgan, and allstate for the last two reported quarters (Q1 and Q2).',
     },
   ];
 
@@ -725,17 +725,31 @@ export class PFeaturesComponent {
   parsedChartData: any;
   chartOptions: any;
 
+  checkIfSegmentKeywordPresent(): boolean {
+  const keyword_check = this.userQueryResponseData?.raw_query?.toLowerCase() || "";
+
+  const keywords = ["segment", "segment-wise", "segments", "segment breakdown"];
+
+  return keywords.some(keyword => keyword_check.includes(keyword));
+}
+
+
+
   handleAnalysisResponse(res: any) {
-    console.log(res);
+    
+
+
     this.allResponses.analysisData = res;
+
+
     this.cardData = this.groupByMetricName(
       this.populateCardData(
         this.allResponses.analysisData,
         this.userQueryResponseData.metrics
       )
     );
-    console.log("card data \n_______________________",this.cardData);
     
+
     this.processDataForComparison();
 
     // Determine if we should use bar charts or pie charts
@@ -743,13 +757,13 @@ export class PFeaturesComponent {
       this.allResponses.analysisData?.results?.length || 0;
 
     // Check if segment_filter exists and has data (not null and not empty)
-    const hasSegmentFilter =
-      this.userQueryResponseData?.segment_filter &&
-      (Array.isArray(this.userQueryResponseData.segment_filter)
-        ? this.userQueryResponseData.segment_filter.length > 0
-        : Object.keys(this.userQueryResponseData.segment_filter).length > 0);
+    // const hasSegmentFilter =  this.userQueryResponseData?.segment_filter;
+    const keyword_check = this.checkIfSegmentKeywordPresent();
+    console.log(keyword_check);
+    
+    
 
-    if (hasSegmentFilter) {
+    if (keyword_check) {
       // Segment filter exists - use pie charts for breakdown across all quarters and all segment types
       console.log(
         'Segment filter detected - generating multi-segment pie charts'
@@ -760,6 +774,7 @@ export class PFeaturesComponent {
         this.allResponses.analysisData.results, // Pass array directly
         this.userQueryResponseData.metrics
       );
+
       console.log('parsed chart data :', this.parsedChartData);
 
       this.chartOptions = this.createMultiQuarterPieChartOptions(
@@ -1333,8 +1348,8 @@ export class PFeaturesComponent {
       this.companies.forEach((companyName) => {
         const metricData = this.cardData.find(
           (item) =>
-            item.companyName === companyName && 
-            item.metricName === metricName && 
+            item.companyName === companyName &&
+            item.metricName === metricName &&
             item.metricPeriod === period
         );
 
@@ -1384,13 +1399,16 @@ export class PFeaturesComponent {
   }
 
   getFirstAvailablePeriod(metric: ComparisonMetric): string {
-  for (const company of this.companies) {
-    if (metric.companies[company]?.available && metric.companies[company]?.metricPeriod) {
-      return metric.companies[company].metricPeriod;
+    for (const company of this.companies) {
+      if (
+        metric.companies[company]?.available &&
+        metric.companies[company]?.metricPeriod
+      ) {
+        return metric.companies[company].metricPeriod;
+      }
     }
+    return '';
   }
-  return '';
-}
   /**
    * Get company keys for iteration
    */
@@ -1582,262 +1600,468 @@ export class PFeaturesComponent {
   //   return cardData;
   // }
 
-
   populateCardData(apiResponse: any, requestedMetrics: string[]): any[] {
-  const cardData: any[] = [];
+    const cardData: any[] = [];
 
-  if (!apiResponse?.success || !apiResponse?.results?.length) {
+    if (!apiResponse?.success || !apiResponse?.results?.length) {
+      return cardData;
+    }
+
+    // Process each company
+    apiResponse.results.forEach((company: any) => {
+      if (!company.statements?.length) return;
+
+      // Process each statement (quarter)
+      company.statements.forEach((statement: any, index: number) => {
+        const previousStatement = company.statements[index + 1]; // Next item is previous period
+
+        // Helper to format currency
+        const formatCurrency = (value: number): string => {
+          const absValue = Math.abs(value);
+          if (absValue >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
+          if (absValue >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
+          return `$${value.toFixed(2)}`;
+        };
+
+        // Helper to format percentage
+        const formatPercentage = (value: number): string =>
+          `${(value * 100).toFixed(1)}%`;
+
+        // Helper to format ratio
+        const formatRatio = (value: number): string => `${value.toFixed(2)}`;
+
+        // Helper to get growth
+        const getGrowth = (metricKey: string): number | null => {
+          const current = statement.metrics[metricKey];
+          if (current?.yoy_growth != null) return current.yoy_growth;
+          if (current?.qoq_growth != null) return current.qoq_growth;
+
+          // Calculate from previous statement
+          if (previousStatement?.metrics[metricKey]) {
+            const prev = previousStatement.metrics[metricKey].value;
+            if (prev !== 0) {
+              return ((current.value - prev) / Math.abs(prev)) * 100;
+            }
+          }
+          return null;
+        };
+
+        // Comprehensive metric name mappings
+        const metricNames: Record<
+          string,
+          {
+            name: string;
+            subTitle: string | null;
+            formatType: 'currency' | 'percentage' | 'ratio';
+          }
+        > = {
+          // Income Statement Metrics
+          revenue: { name: 'Revenue', subTitle: null, formatType: 'currency' },
+          net_income: {
+            name: 'Net Income',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          gross_profit: {
+            name: 'Gross Profit',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          operating_income: {
+            name: 'Operating Income',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          ebitda: {
+            name: 'EBITDA',
+            subTitle:
+              'Earnings Before Interest, Taxes, Depreciation & Amortization',
+            formatType: 'currency',
+          },
+          interest_expense: {
+            name: 'Interest Expense',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          tax_expense: {
+            name: 'Tax Expense',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          operating_expenses: {
+            name: 'Operating Expenses',
+            subTitle: null,
+            formatType: 'currency',
+          },
+
+          // Balance Sheet Metrics
+          total_assets: {
+            name: 'Total Assets',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          cash_equivalents: {
+            name: 'Cash & Cash Equivalents',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          ppe: {
+            name: 'Property, Plant & Equipment',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          goodwill: {
+            name: 'Goodwill',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          total_liabilities: {
+            name: 'Total Liabilities',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          long_term_debt: {
+            name: 'Long-term Debt',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          shareholders_equity: {
+            name: 'Shareholders Equity',
+            subTitle: null,
+            formatType: 'currency',
+          },
+
+          // Cash Flow Metrics
+          operating_cash_flow: {
+            name: 'Operating Cash Flow',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          capex: {
+            name: 'Capital Expenditures',
+            subTitle: 'CapEx',
+            formatType: 'currency',
+          },
+          investing_cash_flow: {
+            name: 'Investing Cash Flow',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          financing_cash_flow: {
+            name: 'Financing Cash Flow',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          free_cash_flow: {
+            name: 'Free Cash Flow',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          total_dividends: {
+            name: 'Total Dividends',
+            subTitle: null,
+            formatType: 'currency',
+          },
+
+          // Per Share Metrics
+          earnings_per_share: {
+            name: 'EPS',
+            subTitle: 'Earnings Per Share',
+            formatType: 'ratio',
+          },
+          basic_earnings_per_share: {
+            name: 'Basic EPS',
+            subTitle: 'Basic Earnings Per Share',
+            formatType: 'ratio',
+          },
+          eps_diluted: {
+            name: 'Diluted EPS',
+            subTitle: 'Diluted Earnings Per Share',
+            formatType: 'ratio',
+          },
+
+          // Insurance-Specific Metrics
+          premiums_earned: {
+            name: 'Premiums Earned',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          losses_and_lae: {
+            name: 'Losses & LAE',
+            subTitle: 'Losses and Loss Adjustment Expenses',
+            formatType: 'currency',
+          },
+          benefits_losses_loss_adjustment: {
+            name: 'Benefits, Losses & Loss Adjustment',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          policyholder_dividends: {
+            name: 'Policyholder Dividends',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          amortization_dac: {
+            name: 'Amortization of DAC',
+            subTitle: 'Deferred Acquisition Costs',
+            formatType: 'currency',
+          },
+          general_admin_expenses: {
+            name: 'General & Admin Expenses',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          net_investment_income: {
+            name: 'Net Investment Income',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          realized_investment_gains: {
+            name: 'Realized Investment Gains',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          invested_assets: {
+            name: 'Invested Assets',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          losses_and_lae_reserves: {
+            name: 'Loss & LAE Reserves',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          unearned_premiums: {
+            name: 'Unearned Premiums',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          underwriting_income: {
+            name: 'Underwriting Income',
+            subTitle: null,
+            formatType: 'currency',
+          },
+
+          // Other Revenue/Expense
+          other_revenues: {
+            name: 'Other Revenues',
+            subTitle: null,
+            formatType: 'currency',
+          },
+          research_and_development: {
+            name: 'R&D Expenses',
+            subTitle: 'Research & Development',
+            formatType: 'currency',
+          },
+
+          // Financial Ratios
+          operating_margin: {
+            name: 'Operating Margin',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          net_profit_margin: {
+            name: 'Net Profit Margin',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          ebitda_margin: {
+            name: 'EBITDA Margin',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          return_on_equity: {
+            name: 'Return on Equity',
+            subTitle: 'ROE',
+            formatType: 'percentage',
+          },
+          return_on_assets: {
+            name: 'Return on Assets',
+            subTitle: 'ROA',
+            formatType: 'percentage',
+          },
+          return_on_invested_capital: {
+            name: 'Return on Invested Capital',
+            subTitle: 'ROIC',
+            formatType: 'percentage',
+          },
+          asset_turnover: {
+            name: 'Asset Turnover',
+            subTitle: null,
+            formatType: 'ratio',
+          },
+          times_interest_earned: {
+            name: 'Times Interest Earned',
+            subTitle: null,
+            formatType: 'ratio',
+          },
+          dividend_payout_ratio: {
+            name: 'Dividend Payout Ratio',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+
+          // Insurance-Specific Ratios
+          loss_ratio: {
+            name: 'Loss Ratio',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          expense_ratio: {
+            name: 'Expense Ratio',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          combined_ratio: {
+            name: 'Combined Ratio',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          dividend_ratio: {
+            name: 'Dividend Ratio',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          underwriting_margin: {
+            name: 'Underwriting Margin',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+          investment_yield: {
+            name: 'Investment Yield',
+            subTitle: null,
+            formatType: 'percentage',
+          },
+        };
+
+        // Process each metric for this quarter
+        Object.keys(statement.metrics).forEach((metricKey) => {
+          const metric = statement.metrics[metricKey];
+          const config = metricNames[metricKey];
+
+          if (!config) return; // Skip unknown metrics
+
+          // Filter by requested metrics if provided
+          if (requestedMetrics?.length > 0) {
+            const isRequested = requestedMetrics.some(
+              (rm) =>
+                rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
+                config.name.toLowerCase().replace(/[^a-z0-9]/g, '')
+            );
+            if (!isRequested) return;
+          }
+
+          const growth = getGrowth(metricKey);
+          const isPositive = growth !== null ? growth >= 0 : true;
+
+          // Format value based on type
+          let formattedValue: string;
+          if (config.formatType === 'currency') {
+            formattedValue = formatCurrency(metric.value);
+          } else if (config.formatType === 'percentage') {
+            formattedValue = formatPercentage(metric.value);
+          } else {
+            formattedValue = formatRatio(metric.value);
+          }
+
+          cardData.push({
+            companyName: company.company_name,
+            metricName: config.name,
+            subTitle: config.subTitle,
+            metric: formattedValue,
+            metricPeriod: statement.period,
+            trend:
+              growth !== null
+                ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% YoY`
+                : 'No change',
+            trendIcon: isPositive
+              ? 'pi pi-arrow-up-right'
+              : 'pi pi-arrow-down-right',
+            trendPositive: isPositive,
+            formula: {
+              name: config.name,
+              formula: '',
+              use: '',
+            },
+          });
+        });
+
+        // Add calculated Gross Margin if revenue and gross_profit exist
+        if (statement.metrics.revenue && statement.metrics.gross_profit) {
+          const margin =
+            (statement.metrics.gross_profit.value /
+              statement.metrics.revenue.value) *
+            100;
+
+          let marginGrowth: number | null = null;
+          if (
+            previousStatement?.metrics.revenue &&
+            previousStatement?.metrics.gross_profit
+          ) {
+            const prevMargin =
+              (previousStatement.metrics.gross_profit.value /
+                previousStatement.metrics.revenue.value) *
+              100;
+            marginGrowth = margin - prevMargin;
+          }
+
+          if (
+            !requestedMetrics?.length ||
+            requestedMetrics.some(
+              (m) =>
+                m.toLowerCase().includes('margin') ||
+                m.toLowerCase().includes('gross')
+            )
+          ) {
+            cardData.push({
+              companyName: company.company_name,
+              metricName: 'Gross Margin',
+              subTitle: null,
+              metric: formatPercentage(margin / 100),
+              metricPeriod: statement.period,
+              trend:
+                marginGrowth !== null
+                  ? `${marginGrowth >= 0 ? '+' : ''}${marginGrowth.toFixed(
+                      1
+                    )}% vs prior period`
+                  : 'No change',
+              trendIcon:
+                marginGrowth !== null && marginGrowth >= 0
+                  ? 'pi pi-arrow-up-right'
+                  : 'pi pi-arrow-down-right',
+              trendPositive: marginGrowth !== null ? marginGrowth >= 0 : true,
+              formula: {
+                name: 'Gross Margin',
+                formula: '(Gross Profit / Revenue) × 100',
+                use: 'Measures profitability after cost of goods sold',
+              },
+            });
+          }
+        }
+      });
+    });
+
     return cardData;
   }
 
-  // Process each company
-  apiResponse.results.forEach((company: any) => {
-    if (!company.statements?.length) return;
-
-    // Process each statement (quarter)
-    company.statements.forEach((statement: any, index: number) => {
-      const previousStatement = company.statements[index + 1]; // Next item is previous period
-
-      // Helper to format currency
-      const formatCurrency = (value: number): string => {
-        const absValue = Math.abs(value);
-        if (absValue >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-        if (absValue >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-        return `$${value.toFixed(2)}`;
-      };
-
-      // Helper to format percentage
-      const formatPercentage = (value: number): string =>
-        `${(value * 100).toFixed(1)}%`;
-
-      // Helper to format ratio
-      const formatRatio = (value: number): string =>
-        `${value.toFixed(2)}`;
-
-      // Helper to get growth
-      const getGrowth = (metricKey: string): number | null => {
-        const current = statement.metrics[metricKey];
-        if (current?.yoy_growth != null) return current.yoy_growth;
-        if (current?.qoq_growth != null) return current.qoq_growth;
-
-        // Calculate from previous statement
-        if (previousStatement?.metrics[metricKey]) {
-          const prev = previousStatement.metrics[metricKey].value;
-          if (prev !== 0) {
-            return ((current.value - prev) / Math.abs(prev)) * 100;
-          }
-        }
-        return null;
-      };
-
-      // Comprehensive metric name mappings
-      const metricNames: Record<
-        string,
-        { name: string; subTitle: string | null; formatType: 'currency' | 'percentage' | 'ratio' }
-      > = {
-        // Income Statement Metrics
-        revenue: { name: 'Revenue', subTitle: null, formatType: 'currency' },
-        net_income: { name: 'Net Income', subTitle: null, formatType: 'currency' },
-        gross_profit: { name: 'Gross Profit', subTitle: null, formatType: 'currency' },
-        operating_income: { name: 'Operating Income', subTitle: null, formatType: 'currency' },
-        ebitda: { name: 'EBITDA', subTitle: 'Earnings Before Interest, Taxes, Depreciation & Amortization', formatType: 'currency' },
-        interest_expense: { name: 'Interest Expense', subTitle: null, formatType: 'currency' },
-        tax_expense: { name: 'Tax Expense', subTitle: null, formatType: 'currency' },
-        operating_expenses: { name: 'Operating Expenses', subTitle: null, formatType: 'currency' },
-        
-        // Balance Sheet Metrics
-        total_assets: { name: 'Total Assets', subTitle: null, formatType: 'currency' },
-        cash_equivalents: { name: 'Cash & Cash Equivalents', subTitle: null, formatType: 'currency' },
-        ppe: { name: 'Property, Plant & Equipment', subTitle: null, formatType: 'currency' },
-        goodwill: { name: 'Goodwill', subTitle: null, formatType: 'currency' },
-        total_liabilities: { name: 'Total Liabilities', subTitle: null, formatType: 'currency' },
-        long_term_debt: { name: 'Long-term Debt', subTitle: null, formatType: 'currency' },
-        shareholders_equity: { name: 'Shareholders Equity', subTitle: null, formatType: 'currency' },
-        
-        // Cash Flow Metrics
-        operating_cash_flow: { name: 'Operating Cash Flow', subTitle: null, formatType: 'currency' },
-        capex: { name: 'Capital Expenditures', subTitle: 'CapEx', formatType: 'currency' },
-        investing_cash_flow: { name: 'Investing Cash Flow', subTitle: null, formatType: 'currency' },
-        financing_cash_flow: { name: 'Financing Cash Flow', subTitle: null, formatType: 'currency' },
-        free_cash_flow: { name: 'Free Cash Flow', subTitle: null, formatType: 'currency' },
-        total_dividends: { name: 'Total Dividends', subTitle: null, formatType: 'currency' },
-        
-        // Per Share Metrics
-        earnings_per_share: { name: 'EPS', subTitle: 'Earnings Per Share', formatType: 'ratio' },
-        basic_earnings_per_share: { name: 'Basic EPS', subTitle: 'Basic Earnings Per Share', formatType: 'ratio' },
-        eps_diluted: { name: 'Diluted EPS', subTitle: 'Diluted Earnings Per Share', formatType: 'ratio' },
-        
-        // Insurance-Specific Metrics
-        premiums_earned: { name: 'Premiums Earned', subTitle: null, formatType: 'currency' },
-        losses_and_lae: { name: 'Losses & LAE', subTitle: 'Losses and Loss Adjustment Expenses', formatType: 'currency' },
-        benefits_losses_loss_adjustment: { name: 'Benefits, Losses & Loss Adjustment', subTitle: null, formatType: 'currency' },
-        policyholder_dividends: { name: 'Policyholder Dividends', subTitle: null, formatType: 'currency' },
-        amortization_dac: { name: 'Amortization of DAC', subTitle: 'Deferred Acquisition Costs', formatType: 'currency' },
-        general_admin_expenses: { name: 'General & Admin Expenses', subTitle: null, formatType: 'currency' },
-        net_investment_income: { name: 'Net Investment Income', subTitle: null, formatType: 'currency' },
-        realized_investment_gains: { name: 'Realized Investment Gains', subTitle: null, formatType: 'currency' },
-        invested_assets: { name: 'Invested Assets', subTitle: null, formatType: 'currency' },
-        losses_and_lae_reserves: { name: 'Loss & LAE Reserves', subTitle: null, formatType: 'currency' },
-        unearned_premiums: { name: 'Unearned Premiums', subTitle: null, formatType: 'currency' },
-        underwriting_income: { name: 'Underwriting Income', subTitle: null, formatType: 'currency' },
-        
-        // Other Revenue/Expense
-        other_revenues: { name: 'Other Revenues', subTitle: null, formatType: 'currency' },
-        research_and_development: { name: 'R&D Expenses', subTitle: 'Research & Development', formatType: 'currency' },
-        
-        // Financial Ratios
-        operating_margin: { name: 'Operating Margin', subTitle: null, formatType: 'percentage' },
-        net_profit_margin: { name: 'Net Profit Margin', subTitle: null, formatType: 'percentage' },
-        ebitda_margin: { name: 'EBITDA Margin', subTitle: null, formatType: 'percentage' },
-        return_on_equity: { name: 'Return on Equity', subTitle: 'ROE', formatType: 'percentage' },
-        return_on_assets: { name: 'Return on Assets', subTitle: 'ROA', formatType: 'percentage' },
-        return_on_invested_capital: { name: 'Return on Invested Capital', subTitle: 'ROIC', formatType: 'percentage' },
-        asset_turnover: { name: 'Asset Turnover', subTitle: null, formatType: 'ratio' },
-        times_interest_earned: { name: 'Times Interest Earned', subTitle: null, formatType: 'ratio' },
-        dividend_payout_ratio: { name: 'Dividend Payout Ratio', subTitle: null, formatType: 'percentage' },
-        
-        // Insurance-Specific Ratios
-        loss_ratio: { name: 'Loss Ratio', subTitle: null, formatType: 'percentage' },
-        expense_ratio: { name: 'Expense Ratio', subTitle: null, formatType: 'percentage' },
-        combined_ratio: { name: 'Combined Ratio', subTitle: null, formatType: 'percentage' },
-        dividend_ratio: { name: 'Dividend Ratio', subTitle: null, formatType: 'percentage' },
-        underwriting_margin: { name: 'Underwriting Margin', subTitle: null, formatType: 'percentage' },
-        investment_yield: { name: 'Investment Yield', subTitle: null, formatType: 'percentage' },
-      };
-
-      // Process each metric for this quarter
-      Object.keys(statement.metrics).forEach((metricKey) => {
-        const metric = statement.metrics[metricKey];
-        const config = metricNames[metricKey];
-
-        if (!config) return; // Skip unknown metrics
-
-        // Filter by requested metrics if provided
-        if (requestedMetrics?.length > 0) {
-          const isRequested = requestedMetrics.some(
-            (rm) =>
-              rm.toLowerCase().replace(/[^a-z0-9]/g, '') ===
-              config.name.toLowerCase().replace(/[^a-z0-9]/g, '')
-          );
-          if (!isRequested) return;
-        }
-
-        const growth = getGrowth(metricKey);
-        const isPositive = growth !== null ? growth >= 0 : true;
-
-        // Format value based on type
-        let formattedValue: string;
-        if (config.formatType === 'currency') {
-          formattedValue = formatCurrency(metric.value);
-        } else if (config.formatType === 'percentage') {
-          formattedValue = formatPercentage(metric.value);
-        } else {
-          formattedValue = formatRatio(metric.value);
-        }
-
-        cardData.push({
-          companyName: company.company_name,
-          metricName: config.name,
-          subTitle: config.subTitle,
-          metric: formattedValue,
-          metricPeriod: statement.period,
-          trend:
-            growth !== null
-              ? `${growth >= 0 ? '+' : ''}${growth.toFixed(1)}% YoY`
-              : 'No change',
-          trendIcon: isPositive
-            ? 'pi pi-arrow-up-right'
-            : 'pi pi-arrow-down-right',
-          trendPositive: isPositive,
-          formula: {
-            name: config.name,
-            formula: '',
-            use: '',
-          },
-        });
-      });
-
-      // Add calculated Gross Margin if revenue and gross_profit exist
-      if (
-        statement.metrics.revenue &&
-        statement.metrics.gross_profit
-      ) {
-        const margin =
-          (statement.metrics.gross_profit.value /
-            statement.metrics.revenue.value) *
-          100;
-
-        let marginGrowth: number | null = null;
-        if (
-          previousStatement?.metrics.revenue &&
-          previousStatement?.metrics.gross_profit
-        ) {
-          const prevMargin =
-            (previousStatement.metrics.gross_profit.value /
-              previousStatement.metrics.revenue.value) *
-            100;
-          marginGrowth = margin - prevMargin;
-        }
-
-        if (
-          !requestedMetrics?.length ||
-          requestedMetrics.some((m) => m.toLowerCase().includes('margin') || m.toLowerCase().includes('gross'))
-        ) {
-          cardData.push({
-            companyName: company.company_name,
-            metricName: 'Gross Margin',
-            subTitle: null,
-            metric: formatPercentage(margin / 100),
-            metricPeriod: statement.period,
-            trend:
-              marginGrowth !== null
-                ? `${marginGrowth >= 0 ? '+' : ''}${marginGrowth.toFixed(
-                    1
-                  )}% vs prior period`
-                : 'No change',
-            trendIcon:
-              marginGrowth !== null && marginGrowth >= 0
-                ? 'pi pi-arrow-up-right'
-                : 'pi pi-arrow-down-right',
-            trendPositive: marginGrowth !== null ? marginGrowth >= 0 : true,
-            formula: {
-              name: 'Gross Margin',
-              formula: '(Gross Profit / Revenue) × 100',
-              use: 'Measures profitability after cost of goods sold',
-            },
-          });
-        }
-      }
-    });
-  });
-
-  return cardData;
-}
-
-
-  
- 
-
   consumable_response = [
     {
-    company_name: 'company name',
-    quarterly_data: [
-      {
-        metrics: {
-          revenue: {
-            children: {
-              'Bussiness Segments': {},
-              'Consolidation Segments': {},
+      company_name: 'company name',
+      quarterly_data: [
+        {
+          metrics: {
+            revenue: {
+              children: {
+                'Bussiness Segments': {},
+                'Consolidation Segments': {},
+              },
             },
           },
+          quarter: 'Q1 2024',
         },
-        quarter: 'Q1 2024',
-      },
-    ],
-  }
-  ] ;
-
-
+      ],
+    },
+  ];
 
   // Pie Chart functions
 
@@ -2447,6 +2671,9 @@ export class PFeaturesComponent {
         this.popoverData.name = formulaData?.display_name;
         this.popoverData.formula = formulaData?.formula;
       },
+      error:(err)=>{
+        console.log(err)
+      }
     });
   }
 }
