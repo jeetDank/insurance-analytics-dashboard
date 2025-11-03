@@ -1383,6 +1383,14 @@ export class PFeaturesComponent {
     }
   }
 
+  getFirstAvailablePeriod(metric: ComparisonMetric): string {
+  for (const company of this.companies) {
+    if (metric.companies[company]?.available && metric.companies[company]?.metricPeriod) {
+      return metric.companies[company].metricPeriod;
+    }
+  }
+  return '';
+}
   /**
    * Get company keys for iteration
    */

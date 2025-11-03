@@ -236,15 +236,15 @@
 
         <!-- Comparison Metrics Grid -->
         <div class="metrics-comparison">
-          @for (metric of comparisonMetrics; track metric.metricName) {
+          @for (metric of comparisonMetrics; track metric.metricName + '-' + getFirstAvailablePeriod(metric)) {
           <div class="comparison-metric-card mb-4">
             <!-- Metric Header -->
             <div class="metric-header">
               <h5 class="metric-title mb-0">
-                {{ metric.metricName }}
+                {{ metric.metricName }} - {{ getFirstAvailablePeriod(metric) }}
                 <i
                   class="pi pi-info-circle ms-2 cursor-pointer"
-                  (click)="op.toggle($event);"
+                  (click)="op.toggle($event); getFormulaByName(metric.metricName)"
                 ></i>
               </h5>
               @if (metric.subTitle) {
