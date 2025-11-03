@@ -1608,7 +1608,11 @@ export class PFeaturesComponent {
 
       // Helper to format percentage
       const formatPercentage = (value: number): string =>
-        `${value.toFixed(1)}%`;
+        `${(value * 100).toFixed(1)}%`;
+
+      // Helper to format ratio
+      const formatRatio = (value: number): string =>
+        `${value.toFixed(2)}`;
 
       // Helper to get growth
       const getGrowth = (metricKey: string): number | null => {
@@ -1626,23 +1630,79 @@ export class PFeaturesComponent {
         return null;
       };
 
-      // Metric name mappings
+      // Comprehensive metric name mappings
       const metricNames: Record<
         string,
-        { name: string; subTitle: string | null }
+        { name: string; subTitle: string | null; formatType: 'currency' | 'percentage' | 'ratio' }
       > = {
-        revenue: { name: 'Revenue', subTitle: null },
-        net_income: { name: 'Net Income', subTitle: null },
-        gross_profit: { name: 'Gross Profit', subTitle: null },
-        operating_income: { name: 'Operating Income', subTitle: null },
-        eps_diluted: { name: 'EPS (Diluted)', subTitle: 'Earnings Per Share' },
-        cash_equivalents: { name: 'Cash & Cash Equivalents', subTitle: null },
-        research_and_development: {
-          name: 'R&D Expenses',
-          subTitle: 'Research & Development',
-        },
-        total_assets: { name: 'Total Assets', subTitle: null },
-        free_cash_flow: { name: 'Free Cash Flow', subTitle: null },
+        // Income Statement Metrics
+        revenue: { name: 'Revenue', subTitle: null, formatType: 'currency' },
+        net_income: { name: 'Net Income', subTitle: null, formatType: 'currency' },
+        gross_profit: { name: 'Gross Profit', subTitle: null, formatType: 'currency' },
+        operating_income: { name: 'Operating Income', subTitle: null, formatType: 'currency' },
+        ebitda: { name: 'EBITDA', subTitle: 'Earnings Before Interest, Taxes, Depreciation & Amortization', formatType: 'currency' },
+        interest_expense: { name: 'Interest Expense', subTitle: null, formatType: 'currency' },
+        tax_expense: { name: 'Tax Expense', subTitle: null, formatType: 'currency' },
+        operating_expenses: { name: 'Operating Expenses', subTitle: null, formatType: 'currency' },
+        
+        // Balance Sheet Metrics
+        total_assets: { name: 'Total Assets', subTitle: null, formatType: 'currency' },
+        cash_equivalents: { name: 'Cash & Cash Equivalents', subTitle: null, formatType: 'currency' },
+        ppe: { name: 'Property, Plant & Equipment', subTitle: null, formatType: 'currency' },
+        goodwill: { name: 'Goodwill', subTitle: null, formatType: 'currency' },
+        total_liabilities: { name: 'Total Liabilities', subTitle: null, formatType: 'currency' },
+        long_term_debt: { name: 'Long-term Debt', subTitle: null, formatType: 'currency' },
+        shareholders_equity: { name: 'Shareholders Equity', subTitle: null, formatType: 'currency' },
+        
+        // Cash Flow Metrics
+        operating_cash_flow: { name: 'Operating Cash Flow', subTitle: null, formatType: 'currency' },
+        capex: { name: 'Capital Expenditures', subTitle: 'CapEx', formatType: 'currency' },
+        investing_cash_flow: { name: 'Investing Cash Flow', subTitle: null, formatType: 'currency' },
+        financing_cash_flow: { name: 'Financing Cash Flow', subTitle: null, formatType: 'currency' },
+        free_cash_flow: { name: 'Free Cash Flow', subTitle: null, formatType: 'currency' },
+        total_dividends: { name: 'Total Dividends', subTitle: null, formatType: 'currency' },
+        
+        // Per Share Metrics
+        earnings_per_share: { name: 'EPS', subTitle: 'Earnings Per Share', formatType: 'ratio' },
+        basic_earnings_per_share: { name: 'Basic EPS', subTitle: 'Basic Earnings Per Share', formatType: 'ratio' },
+        eps_diluted: { name: 'Diluted EPS', subTitle: 'Diluted Earnings Per Share', formatType: 'ratio' },
+        
+        // Insurance-Specific Metrics
+        premiums_earned: { name: 'Premiums Earned', subTitle: null, formatType: 'currency' },
+        losses_and_lae: { name: 'Losses & LAE', subTitle: 'Losses and Loss Adjustment Expenses', formatType: 'currency' },
+        benefits_losses_loss_adjustment: { name: 'Benefits, Losses & Loss Adjustment', subTitle: null, formatType: 'currency' },
+        policyholder_dividends: { name: 'Policyholder Dividends', subTitle: null, formatType: 'currency' },
+        amortization_dac: { name: 'Amortization of DAC', subTitle: 'Deferred Acquisition Costs', formatType: 'currency' },
+        general_admin_expenses: { name: 'General & Admin Expenses', subTitle: null, formatType: 'currency' },
+        net_investment_income: { name: 'Net Investment Income', subTitle: null, formatType: 'currency' },
+        realized_investment_gains: { name: 'Realized Investment Gains', subTitle: null, formatType: 'currency' },
+        invested_assets: { name: 'Invested Assets', subTitle: null, formatType: 'currency' },
+        losses_and_lae_reserves: { name: 'Loss & LAE Reserves', subTitle: null, formatType: 'currency' },
+        unearned_premiums: { name: 'Unearned Premiums', subTitle: null, formatType: 'currency' },
+        underwriting_income: { name: 'Underwriting Income', subTitle: null, formatType: 'currency' },
+        
+        // Other Revenue/Expense
+        other_revenues: { name: 'Other Revenues', subTitle: null, formatType: 'currency' },
+        research_and_development: { name: 'R&D Expenses', subTitle: 'Research & Development', formatType: 'currency' },
+        
+        // Financial Ratios
+        operating_margin: { name: 'Operating Margin', subTitle: null, formatType: 'percentage' },
+        net_profit_margin: { name: 'Net Profit Margin', subTitle: null, formatType: 'percentage' },
+        ebitda_margin: { name: 'EBITDA Margin', subTitle: null, formatType: 'percentage' },
+        return_on_equity: { name: 'Return on Equity', subTitle: 'ROE', formatType: 'percentage' },
+        return_on_assets: { name: 'Return on Assets', subTitle: 'ROA', formatType: 'percentage' },
+        return_on_invested_capital: { name: 'Return on Invested Capital', subTitle: 'ROIC', formatType: 'percentage' },
+        asset_turnover: { name: 'Asset Turnover', subTitle: null, formatType: 'ratio' },
+        times_interest_earned: { name: 'Times Interest Earned', subTitle: null, formatType: 'ratio' },
+        dividend_payout_ratio: { name: 'Dividend Payout Ratio', subTitle: null, formatType: 'percentage' },
+        
+        // Insurance-Specific Ratios
+        loss_ratio: { name: 'Loss Ratio', subTitle: null, formatType: 'percentage' },
+        expense_ratio: { name: 'Expense Ratio', subTitle: null, formatType: 'percentage' },
+        combined_ratio: { name: 'Combined Ratio', subTitle: null, formatType: 'percentage' },
+        dividend_ratio: { name: 'Dividend Ratio', subTitle: null, formatType: 'percentage' },
+        underwriting_margin: { name: 'Underwriting Margin', subTitle: null, formatType: 'percentage' },
+        investment_yield: { name: 'Investment Yield', subTitle: null, formatType: 'percentage' },
       };
 
       // Process each metric for this quarter
@@ -1665,11 +1725,21 @@ export class PFeaturesComponent {
         const growth = getGrowth(metricKey);
         const isPositive = growth !== null ? growth >= 0 : true;
 
+        // Format value based on type
+        let formattedValue: string;
+        if (config.formatType === 'currency') {
+          formattedValue = formatCurrency(metric.value);
+        } else if (config.formatType === 'percentage') {
+          formattedValue = formatPercentage(metric.value);
+        } else {
+          formattedValue = formatRatio(metric.value);
+        }
+
         cardData.push({
           companyName: company.company_name,
           metricName: config.name,
           subTitle: config.subTitle,
-          metric: formatCurrency(metric.value),
+          metric: formattedValue,
           metricPeriod: statement.period,
           trend:
             growth !== null
@@ -1711,13 +1781,13 @@ export class PFeaturesComponent {
 
         if (
           !requestedMetrics?.length ||
-          requestedMetrics.some((m) => m.toLowerCase().includes('margin'))
+          requestedMetrics.some((m) => m.toLowerCase().includes('margin') || m.toLowerCase().includes('gross'))
         ) {
           cardData.push({
             companyName: company.company_name,
             metricName: 'Gross Margin',
             subTitle: null,
-            metric: formatPercentage(margin),
+            metric: formatPercentage(margin / 100),
             metricPeriod: statement.period,
             trend:
               marginGrowth !== null
@@ -1730,6 +1800,11 @@ export class PFeaturesComponent {
                 ? 'pi pi-arrow-up-right'
                 : 'pi pi-arrow-down-right',
             trendPositive: marginGrowth !== null ? marginGrowth >= 0 : true,
+            formula: {
+              name: 'Gross Margin',
+              formula: '(Gross Profit / Revenue) × 100',
+              use: 'Measures profitability after cost of goods sold',
+            },
           });
         }
       }
@@ -1739,6 +1814,8 @@ export class PFeaturesComponent {
   return cardData;
 }
 
+
+  
  
 
   consumable_response = [
