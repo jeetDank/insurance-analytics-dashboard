@@ -424,3 +424,19 @@
 ::ng-deep .dark-popover .p-popover-arrow::before {
   border-bottom-color: var(--dark-border);
 }
+
+
+::ng-deep .p-dropdown.bg-dark {
+  background-color: #1e1e1e !important; /* dark background */
+  color: #f5f5f5 !important;            /* light text */
+  border: 1px solid #444 !important;
+}
+
+::ng-deep .p-dropdown.bg-dark .p-dropdown-label {
+  color: #f5f5f5 !important;
+}
+
+::ng-deep .p-dropdown.bg-dark .p-dropdown-panel {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5 !important;
+}

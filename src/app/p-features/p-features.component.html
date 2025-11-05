@@ -87,18 +87,17 @@
         </div>
 
         <!-- Button: bottom-right -->
-        
-        <div class="position-absolute end-0 mb-3 me-3" style="bottom:40px">
+
+        <div class="position-absolute end-0 mb-3 me-3" style="bottom: 40px">
           <p-button
             [disabled]="isLoaderShowing"
             severity="contrast"
             icon="pi pi-send"
             (click)="sendQuery()"
             type="submit"
-            
           ></p-button>
         </div>
-        <div class="position-absolute bottom-0 end-0 mb-3 me-3 " >
+        <div class="position-absolute bottom-0 end-0 mb-3 me-3">
           <p-button
             type="button"
             [disabled]="isLoaderShowing"
@@ -125,7 +124,8 @@
 
       <!-- Ambiguity correction section  -->
 
-      <!-- <div class="mt-5 mb-5" >
+      @if(ambiguityResolution.length > 0){
+      <div class="mt-5 mb-5">
         <div
           class="mt-5 d-flex justify-content-between align-items-center mb-4"
         >
@@ -137,25 +137,54 @@
                 title="We couldn’t understand a few words in your query. Try rewording it for more accurate results."
               ></i>
             </span>
+            <div class="mt-2 mb-2">
+              Go ahead and pick one of the suggestions!
+            </div>
           </h4>
         </div>
+        <div class="row">
+          @for ( ambiguityData of ambiguityResolution; track $index) {
 
-        <div class="mt-2 mb-2">
-          We have an ambiguity issue
-          <span class="text-warning"> " some word "</span>
-        </div>
-        <div class="mt-2 mb-2">Go ahead and pick one of the suggestions!</div>
+          <div class="col-sm-12 col-md-3">
+            <div class="mt-2 mb-2">
+              Ambiguity issue found for
+              <span class="text-warning fw-bold">
+                " {{ ambiguityData.unresolved_word }} "</span
+              >
+              <div class="mt-2">Did you mean?</div>
+            </div>
 
-        <div class="mb-2 mt-2">
-          <p-select
-            [options]="allResponses.ambiguity[0]?.options"
-            [(ngModel)]="allResponses.ambiguity[0].selectedOption"
-            optionLabel="name"
-            placeholder="Select"
-            styleClass="bg-dark w-25"
-          />
+            <div class="mb-2 mt-2">
+              <select
+                placeholder="Select"
+                class="form-select bg-dark text-light"
+                [(ngModel)]="ambiguityData.metric_name"
+                name=""
+                id=""
+              >
+                <option value="" select>select</option>
+                @for (data of ambiguityData.suggestions; track $index) {
+
+                <option [value]="data">{{ data }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          }
         </div>
-      </div> -->
+
+        <p-button
+          variant="outlined"
+          icon="pi pi-wrench"
+          severity="secondary"
+          label="Resolve"
+          styleClass="mt-2"
+          type="submit"
+          (click)="postAmbiguities()"
+        ></p-button>
+      </div>
+      }
 
       <!-- loader and msg  -->
 
@@ -236,7 +265,8 @@
 
         <!-- Comparison Metrics Grid -->
         <div class="metrics-comparison">
-          @for (metric of comparisonMetrics; track metric.metricName + '-' + getFirstAvailablePeriod(metric)) {
+          @for (metric of comparisonMetrics; track metric.metricName + '-' +
+          getFirstAvailablePeriod(metric)) {
           <div class="comparison-metric-card mb-4">
             <!-- Metric Header -->
             <div class="metric-header">
@@ -244,7 +274,9 @@
                 {{ metric.metricName }} - {{ getFirstAvailablePeriod(metric) }}
                 <i
                   class="pi pi-info-circle ms-2 cursor-pointer"
-                  (click)="op.toggle($event); getFormulaByName(metric.metricName)"
+                  (click)="
+                    op.toggle($event); getFormulaByName(metric.metricName)
+                  "
                 ></i>
               </h5>
               @if (metric.subTitle) {
@@ -336,7 +368,8 @@
       </div>
       } -->
 
-      @if (chartOptions && chartOptions.length > 0 && typeof chartOptions != 'string') {
+      @if (chartOptions && chartOptions.length > 0 && typeof chartOptions !=
+      'string') {
       <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Charts</h3>
       </div>
@@ -395,7 +428,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                         class="text-primary"
-                        style="text-decoration: underline; "
+                        style="text-decoration: underline"
                       >
                         {{ reference.label }}
                       </a>
@@ -409,19 +442,16 @@
           </div>
         </div>
       </div>
-      } }
-
-       @if(isLoaderShowing){
-         <div class="d-flex align-items-center">
-           <p-progress-spinner
-            strokeWidth="5"
-            ariaLabel="loading"
-            [style]="{ width: '30px', height: '30px' }"
-          ></p-progress-spinner> <div class="ms-3">
-            Just a moment — we’re loading your data for you 
-          </div>
-         </div>
-          }
+      } } @if(isLoaderShowing){
+      <div class="d-flex align-items-center">
+        <p-progress-spinner
+          strokeWidth="5"
+          ariaLabel="loading"
+          [style]="{ width: '30px', height: '30px' }"
+        ></p-progress-spinner>
+        <div class="ms-3">Just a moment — we’re loading your data for you</div>
+      </div>
+      }
 
       <div style="height: 50px"></div>
     </div>
@@ -453,9 +483,9 @@
     </h6>
 
     <!-- Definition -->
-    
+
     @if(this.popoverData?.error){
-       <p class="text-secondary mb-3 text-danger">
+    <p class="text-secondary mb-3 text-danger">
       {{ this.popoverData?.error }}
     </p>
     }
@@ -466,12 +496,13 @@
     </div>
 
     <!-- Input box -->
-   
 
     <div class="border border-1 p-3 rounded-1">
-{{this.popoverData?.formula
+      {{
+        this.popoverData?.formula
           ? this.popoverData?.formula
-          : 'Base/Direct metric'}}
+          : "Base/Direct metric"
+      }}
     </div>
   </div>
 </p-popover>

@@ -199,7 +199,7 @@ interface CompanyChartOption {
     FormsModule,
     PopoverModule,
     ProgressSpinnerModule,
-    
+
     SelectModule,
   ],
   templateUrl: './p-features.component.html',
@@ -530,6 +530,7 @@ export class PFeaturesComponent {
     this.referencesData = null;
     this.currentMsg = null;
     this.userQuery = '';
+    this.ambiguityResolution = [];
   }
   userQueryResponseData: any;
 
@@ -540,13 +541,17 @@ export class PFeaturesComponent {
 
     // check for ambiguities
 
-    if (
-      this.userQueryResponseData?.ambiguities &&
-      this.userQueryResponseData.ambiguities.length == 0
-    ) {
-      // this.handleAmbiguity(this.userQueryResponseData?.ambiguities);
+    if (this.userQueryResponseData?.ambiguities) {
+      this.handleAmbiguity(this.userQueryResponseData?.ambiguities);
+    }
+    else{
+      this.handleResponsesAfterAmbiguityResolution()
     }
 
+    
+  }
+
+  handleResponsesAfterAmbiguityResolution(){
     // Validate companies array safely
     const companies: string[] = Array.isArray(
       this.userQueryResponseData?.companies
@@ -638,7 +643,67 @@ export class PFeaturesComponent {
       });
   }
 
-  handleAmbiguity(data: any) {}
+  ambiguityResolution: any = [
+    // {
+    //   metric_name: 'string',
+    //   context: 'string',
+    //   suggestions: ['string'],
+    //   resolution_type: 'select',
+    //   unresolved_word: 'string',
+    // },
+  ];
+
+  handleAmbiguity(data: any) {
+    console.log(data);
+
+    data.forEach((suggestion: any, index: number) => {
+      this.ambiguityResolution.push({
+        index: index, // add index here
+        metric_name: null,
+        context: 'string',
+        suggestions: suggestion.suggestions,
+        resolution_type: 'select',
+        unresolved_word: suggestion.name,
+      });
+    });
+  }
+
+  
+
+  postAmbiguities() {
+    const data = this.ambiguityResolution;
+    let parseData = data.map((item: any) => {
+      return {
+        metric_name: item.metric_name,
+        context: 'string',
+        suggestions: item.suggestions,
+        resolution_type: 'select',
+      };
+    });
+
+    // Create an array of observables
+    const requests = parseData.map((payload: any) => 
+      this.main.resolveAmbiguity(payload)
+    );
+
+    // Execute all requests in parallel and wait for all to complete
+    forkJoin(requests).subscribe({
+      next: (responses:any) => {
+        // All responses collected in array
+        console.log('All responses:', responses);
+
+        let metric_list = responses.map((response:any) => response.selected_metric)
+    .filter((metric:any) => metric !== null && metric !== undefined)
+
+        this.userQueryResponseData.metrics = [...metric_list]
+        this.ambiguityResolution = []
+        this.handleResponsesAfterAmbiguityResolution();
+      },
+      error: (err) => {
+        console.error('Error in one or more requests:', err);
+      }
+    });
+  }
 
   foundCompaniesData: any = [];
 
@@ -725,21 +790,21 @@ export class PFeaturesComponent {
   chartOptions: any;
 
   checkIfSegmentKeywordPresent(): boolean {
-  const keyword_check = this.userQueryResponseData?.analysis_intent?.toLowerCase() || "";
+    const keyword_check =
+      this.userQueryResponseData?.analysis_intent?.toLowerCase() || '';
 
-  const keywords = ["segment", "segment-wise", "segments", "segment breakdown"];
+    const keywords = [
+      'segment',
+      'segment-wise',
+      'segments',
+      'segment breakdown',
+    ];
 
-  return keywords.some(keyword => keyword_check.includes(keyword));
-}
-
-
+    return keywords.some((keyword) => keyword_check.includes(keyword));
+  }
 
   handleAnalysisResponse(res: any) {
-    
-
-
     this.allResponses.analysisData = res;
-
 
     this.cardData = this.groupByMetricName(
       this.populateCardData(
@@ -747,7 +812,6 @@ export class PFeaturesComponent {
         this.userQueryResponseData.metrics
       )
     );
-    
 
     this.processDataForComparison();
 
@@ -759,8 +823,6 @@ export class PFeaturesComponent {
     // const hasSegmentFilter =  this.userQueryResponseData?.segment_filter;
     const keyword_check = this.checkIfSegmentKeywordPresent();
     console.log(keyword_check);
-    
-    
 
     if (keyword_check) {
       // Segment filter exists - use pie charts for breakdown across all quarters and all segment types
@@ -1416,9 +1478,9 @@ export class PFeaturesComponent {
   }
 
   popoverData: any = {
-    name:"NA",
-    formula:"NA",
-    error:""
+    name: 'NA',
+    formula: 'NA',
+    error: '',
   };
 
   getQuarterDates(
@@ -2667,41 +2729,34 @@ export class PFeaturesComponent {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-checkAndLowercase(input: string): string {
-  const trimmed = input.trim();
-  const hasMiddleSpace = trimmed.slice(1, -1).includes(' ');
+  checkAndLowercase(input: string): string {
+    const trimmed = input.trim();
+    const hasMiddleSpace = trimmed.slice(1, -1).includes(' ');
 
-  if (hasMiddleSpace) {
-    console.log('Space detected in the middle of the string.');
-  } else {
-    console.log('No space in the middle of the string.');
+    if (hasMiddleSpace) {
+      console.log('Space detected in the middle of the string.');
+    } else {
+      console.log('No space in the middle of the string.');
+    }
+
+    // Make lowercase and replace spaces with underscores
+    return input.toLowerCase().replace(/ /g, '_');
   }
 
-  // Make lowercase and replace spaces with underscores
-  return input.toLowerCase().replace(/ /g, '_');
-}
-
-    
-   
-
   getFormulaByName(name: string) {
-
-    const metric  = this.checkAndLowercase(name);
+    const metric = this.checkAndLowercase(name);
     this.popoverData = {};
-
 
     this.main.getFormulaByName(metric).subscribe({
       next: (res: any) => {
         const formulaData = res.metric;
         this.popoverData.name = formulaData?.display_name;
         this.popoverData.formula = formulaData?.formula;
-        
       },
-      error:(err)=>{
+      error: (err) => {
         this.popoverData.error = err?.error?.detail;
         console.log(err, this.popoverData);
-        
-      }
+      },
     });
   }
 }
