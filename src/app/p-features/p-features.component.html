@@ -379,7 +379,7 @@
               <ng-template>
                 @for (section of refData.sections; track section.sectionName) {
                 <div class="mb-3">
-                  <h6 class="text-primary">{{ section.sectionName }}</h6>
+                  <h6 class="">{{ section.sectionName }}</h6>
                   <ul class="list-unstyled">
                     @for (reference of section.references; track reference.link)
                     {
@@ -395,6 +395,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                         class="text-primary"
+                        style="text-decoration: underline; "
                       >
                         {{ reference.label }}
                       </a>
@@ -410,7 +411,18 @@
       </div>
       } }
 
-      <app-card-skeleton></app-card-skeleton>
+       @if(isLoaderShowing){
+         <div class="d-flex align-items-center">
+           <p-progress-spinner
+            strokeWidth="5"
+            ariaLabel="loading"
+            [style]="{ width: '30px', height: '30px' }"
+          ></p-progress-spinner> <div class="ms-3">
+            Just a moment — we’re loading your data for you 
+          </div>
+         </div>
+          }
+
       <div style="height: 50px"></div>
     </div>
   </div>
@@ -441,26 +453,25 @@
     </h6>
 
     <!-- Definition -->
-    <p class="text-secondary mb-3">
-      {{ this.popoverData?.formula }}
+    
+    @if(this.popoverData?.error){
+       <p class="text-secondary mb-3 text-danger">
+      {{ this.popoverData?.error }}
     </p>
+    }
 
     <!-- Formula label + Edit button -->
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <label class="fw-medium mb-0 text-primary">Formula</label>
+      <label class="fw-medium mb-0">Formula</label>
     </div>
 
     <!-- Input box -->
-    <input
-      disabled
-      type="text"
-      class="form-control dark-input mb-3"
-      placeholder="Enter formula here..."
-      [value]="
-        this.popoverData?.formula?.formula
-          ? this.popoverData?.formula?.formula
-          : 'N/A'
-      "
-    />
+   
+
+    <div class="border border-1 p-3 rounded-1">
+{{this.popoverData?.formula
+          ? this.popoverData?.formula
+          : 'Formula not available or This is a base metric'}}
+    </div>
   </div>
 </p-popover>

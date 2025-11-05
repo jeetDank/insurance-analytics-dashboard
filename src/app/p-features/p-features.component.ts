@@ -29,7 +29,6 @@ import { LoaderService } from '../common/services/loader.service';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from '../common/services/message.service';
 import { catchError, EMPTY, finalize, forkJoin, of, tap } from 'rxjs';
-import { CardSkeletonComponent } from '../common/components/card-skeleton/card-skeleton.component';
 import { SelectModule } from 'primeng/select';
 
 interface message {
@@ -200,7 +199,7 @@ interface CompanyChartOption {
     FormsModule,
     PopoverModule,
     ProgressSpinnerModule,
-    CardSkeletonComponent,
+    
     SelectModule,
   ],
   templateUrl: './p-features.component.html',
@@ -231,7 +230,7 @@ export class PFeaturesComponent {
     {
       id: 2,
       prompt:
-        'Give me segment wise revenue breakdown for hartford and travelers for Q1 and Q2 2025',
+        'Give me segment wise revenue breakdown for Hartford and Allstate for Q1 and Q2 2025',
     },
     {
       id: 3,
@@ -726,7 +725,7 @@ export class PFeaturesComponent {
   chartOptions: any;
 
   checkIfSegmentKeywordPresent(): boolean {
-  const keyword_check = this.userQueryResponseData?.raw_query?.toLowerCase() || "";
+  const keyword_check = this.userQueryResponseData?.analysis_intent?.toLowerCase() || "";
 
   const keywords = ["segment", "segment-wise", "segments", "segment breakdown"];
 
@@ -1416,7 +1415,11 @@ export class PFeaturesComponent {
     return Object.keys(companies);
   }
 
-  popoverData: any = null;
+  popoverData: any = {
+    name:"NA",
+    formula:"NA",
+    error:""
+  };
 
   getQuarterDates(
     period: string
@@ -2664,15 +2667,40 @@ export class PFeaturesComponent {
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+checkAndLowercase(input: string): string {
+  const trimmed = input.trim();
+  const hasMiddleSpace = trimmed.slice(1, -1).includes(' ');
+
+  if (hasMiddleSpace) {
+    console.log('Space detected in the middle of the string.');
+  } else {
+    console.log('No space in the middle of the string.');
+  }
+
+  // Make lowercase and replace spaces with underscores
+  return input.toLowerCase().replace(/ /g, '_');
+}
+
+    
+   
+
   getFormulaByName(name: string) {
-    this.main.getFormulaByName(name).subscribe({
+
+    const metric  = this.checkAndLowercase(name);
+    this.popoverData = {};
+
+
+    this.main.getFormulaByName(metric).subscribe({
       next: (res: any) => {
         const formulaData = res.metric;
         this.popoverData.name = formulaData?.display_name;
         this.popoverData.formula = formulaData?.formula;
+        
       },
       error:(err)=>{
-        console.log(err)
+        this.popoverData.error = err?.error?.detail;
+        console.log(err, this.popoverData);
+        
       }
     });
   }

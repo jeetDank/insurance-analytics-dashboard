@@ -37,7 +37,7 @@ export class MainService {
 
   resolveAmbiguity(payload: {
     metric_name: string;
-    context: string | null;
+    context: string;
     suggestions: string[];
     resolution_type: string;
   }) {
@@ -51,5 +51,7 @@ export class MainService {
   getFormulaByName(name:string){
     return this.http.get(`${BASE_URL}${API_ENDPOINTS.GET_FORMULA_BY_NAME}${name}`)
   }
+
+  
 
 }
