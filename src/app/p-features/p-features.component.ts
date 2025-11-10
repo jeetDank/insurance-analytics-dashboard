@@ -30,6 +30,10 @@ import { MessageModule } from 'primeng/message';
 import { MessageService } from '../common/services/message.service';
 import { catchError, EMPTY, finalize, forkJoin, of, tap } from 'rxjs';
 import { SelectModule } from 'primeng/select';
+import { ExcelExportService } from '../common/services/excel-export.service';
+import { ExcelDataDebugService } from '../common/services/data-debug.service';
+
+import introJs from 'intro.js';
 
 interface message {
   text: string;
@@ -417,6 +421,8 @@ export class PFeaturesComponent {
   currentMsg: message | null = null;
 
   constructor(
+    private excelExportService: ExcelExportService,
+    private excelDebugService: ExcelDataDebugService,
     private msg: MessageService,
     private main: MainService,
     private loader: LoaderService
@@ -434,7 +440,54 @@ export class PFeaturesComponent {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    // this.startIntro();
+  }
+
+  startIntro() {
+    introJs().setOptions({
+      steps: [
+  {
+    element: '#step1',
+    intro: 'Type your query here to get started.',
+    position: 'right'
+  },
+  {
+    element: '#step2',
+    intro: 'Choose from these sample prompts for quick examples.',
+    position: 'bottom'
+  },
+  {
+    element: '#step3',
+    intro: 'Click here to submit your query.',
+    position: 'bottom'
+  },
+  {
+    element: '#step4',
+    intro: 'Click here to reset the page.',
+    position: 'bottom'
+  },
+  {
+    element: '#step5',
+    intro: 'View all your past queries here.',
+    position: 'bottom'
+  },
+  {
+    element: '#step6',
+    intro: 'Browse available metrics and their formulas here.',
+    position: 'bottom'
+  },
+],
+      showProgress: true,
+      exitOnOverlayClick: false,
+    showBullets: false,
+    showStepNumbers: false,
+    overlayOpacity: 0.1, // Higher opacity for better contrast
+    scrollToElement: true,
+    disableInteraction: false
+  
+    }).start();
+  }
 
   pushPromptToQueryBox(query: any) {
     this.userQuery = query.prompt;
@@ -541,17 +594,17 @@ export class PFeaturesComponent {
 
     // check for ambiguities
 
-    if (this.userQueryResponseData?.ambiguities) {
+    if (
+      this.userQueryResponseData?.ambiguities &&
+      this.userQueryResponseData?.ambiguities.length > 0
+    ) {
       this.handleAmbiguity(this.userQueryResponseData?.ambiguities);
+    } else {
+      this.handleResponsesAfterAmbiguityResolution();
     }
-    else{
-      this.handleResponsesAfterAmbiguityResolution()
-    }
-
-    
   }
 
-  handleResponsesAfterAmbiguityResolution(){
+  handleResponsesAfterAmbiguityResolution() {
     // Validate companies array safely
     const companies: string[] = Array.isArray(
       this.userQueryResponseData?.companies
@@ -668,8 +721,6 @@ export class PFeaturesComponent {
     });
   }
 
-  
-
   postAmbiguities() {
     const data = this.ambiguityResolution;
     let parseData = data.map((item: any) => {
@@ -682,26 +733,27 @@ export class PFeaturesComponent {
     });
 
     // Create an array of observables
-    const requests = parseData.map((payload: any) => 
+    const requests = parseData.map((payload: any) =>
       this.main.resolveAmbiguity(payload)
     );
 
     // Execute all requests in parallel and wait for all to complete
     forkJoin(requests).subscribe({
-      next: (responses:any) => {
+      next: (responses: any) => {
         // All responses collected in array
         console.log('All responses:', responses);
 
-        let metric_list = responses.map((response:any) => response.selected_metric)
-    .filter((metric:any) => metric !== null && metric !== undefined)
+        let metric_list = responses
+          .map((response: any) => response.selected_metric)
+          .filter((metric: any) => metric !== null && metric !== undefined);
 
-        this.userQueryResponseData.metrics = [...metric_list]
-        this.ambiguityResolution = []
+        this.userQueryResponseData.metrics = [...metric_list];
+        this.ambiguityResolution = [];
         this.handleResponsesAfterAmbiguityResolution();
       },
       error: (err) => {
         console.error('Error in one or more requests:', err);
-      }
+      },
     });
   }
 
@@ -2758,5 +2810,28 @@ export class PFeaturesComponent {
         console.log(err, this.popoverData);
       },
     });
+  }
+
+  exportToExcel() {
+    if (!this.allResponses?.analysisData) {
+      this.msg.setMessage('No data available', 'warning');
+      return;
+    }
+
+    try {
+      this.loader.show();
+
+      
+
+     
+      this.excelExportService.exportToExcel(this.allResponses.analysisData.results,'Financial_Data_Export');
+
+      this.msg.setMessage('Excel generated!', 'success');
+    } catch (error: any) {
+      console.error('Export error:', error);
+      this.msg.setMessage(`Export failed:  ${error.message}`, 'error');
+    } finally {
+      this.loader.hide();
+    }
   }
 }

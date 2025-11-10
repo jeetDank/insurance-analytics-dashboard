@@ -23,6 +23,8 @@
         </span>
 
         <p-button
+  id="step5"
+
           (click)="previousDashboards = true"
           class="ms-auto me-3"
           variant="outlined"
@@ -31,12 +33,22 @@
           label="Previous Dashboards"
         />
         <p-button
+         id="step6"
           (click)="formulas = true"
           class=""
           variant="outlined"
           icon="pi pi-calculator"
           severity="secondary"
           label="Saved Formulas"
+        />
+        <p-button
+         
+          (click)="startIntro()"
+          class="ms-2"
+          variant="outlined"
+          icon="pi pi-directions"
+          severity="secondary"
+          label="Quick Tour"
         />
       </div>
     </nav>
@@ -61,6 +73,7 @@
       </div>
 
       <div
+      id="step1"
         class="query-container position-relative border rounded shadow-sm p-3 bg-dark text-light"
       >
         <!-- Spinner: top-right -->
@@ -75,9 +88,10 @@
         </div>
 
         <!-- Textarea -->
-        <div class="mb-5 w-100">
+        <div   class="mb-5 w-100">
           <!-- gives space for bottom button -->
           <textarea
+           
             [(ngModel)]="userQuery"
             placeholder="Enter your analysis prompt here..."
             class="query-text-area form-control bg-dark text-light border-0 shadow-none"
@@ -90,6 +104,7 @@
 
         <div class="position-absolute end-0 mb-3 me-3" style="bottom: 40px">
           <p-button
+            id="step3"
             [disabled]="isLoaderShowing"
             severity="contrast"
             icon="pi pi-send"
@@ -99,6 +114,7 @@
         </div>
         <div class="position-absolute bottom-0 end-0 mb-3 me-3">
           <p-button
+          id="step4"
             type="button"
             [disabled]="isLoaderShowing"
             severity="contrast"
@@ -189,10 +205,10 @@
       <!-- loader and msg  -->
 
       @if(userQuery == "" ){
-      <div class="sample-prompt-container mt-3">
-        <div class="mb-2 w-100">Sample Prompts:</div>
+      <div id="step2"   class="sample-prompt-container mt-3">
+        <div    class="mb-2 w-100">Sample Prompts:</div>
         @for (item of samplePrompts; track $index) {
-        <p-button
+        <p-button 
           (click)="pushPromptToQueryBox(item)"
           class="mt-2 mb-2 me-2"
           variant="outlined"
@@ -242,6 +258,16 @@
       @if (comparisonMetrics.length > 0) {
       <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
         <h3 class="mb-0">Financial Metrics</h3>
+        <div>
+           <p-button
+          (click)="exportToExcel()"
+          class=""
+          variant="outlined"
+          icon="pi pi-file-excel"
+          severity="secondary"
+          label="Export to Excel"
+        />
+        </div>
       </div>
       }
 

@@ -408,3 +408,193 @@ strong {
     padding: 1rem !important;
   }
 }
+
+
+
+/* Minimalist Dark Theme - Clean and Clear */
+
+/* Tooltip/Step box */
+.introjs-tooltip {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #404040 !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  padding: 16px !important;
+}
+
+/* Tooltip header */
+.introjs-tooltip-header {
+  background-color: transparent !important;
+  border-bottom: 1px solid #404040 !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Tooltip title */
+.introjs-tooltip-title {
+  color: #ffffff !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+}
+
+/* Tooltip content text */
+.introjs-tooltiptext {
+  color: #cccccc !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  font-weight: normal !important;
+}
+
+/* Arrow pointing to element */
+.introjs-arrow.top {
+  border-bottom-color: #1a1a1a !important;
+}
+
+.introjs-arrow.bottom {
+  border-top-color: #1a1a1a !important;
+}
+
+.introjs-arrow.left {
+  border-right-color: #1a1a1a !important;
+}
+
+.introjs-arrow.right {
+  border-left-color: #1a1a1a !important;
+}
+
+/* Buttons */
+.introjs-button {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  border: 1px solid #404040 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  font-weight: normal !important;
+  font-size: 14px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.introjs-button:hover {
+  background-color: #333333 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.introjs-button:focus {
+  outline: 1px solid #666666 !important;
+  outline-offset: 2px !important;
+}
+
+/* Next/Done button - slightly highlighted */
+.introjs-nextbutton {
+  background-color: #0066cc !important;
+  border-color: #0066cc !important;
+}
+
+.introjs-nextbutton:hover {
+  background-color: #0052a3 !important;
+}
+
+/* Skip button */
+.introjs-skipbutton {
+  color: #999999 !important;
+  font-weight: normal !important;
+  text-decoration: none !important;
+}
+
+.introjs-skipbutton:hover {
+  color: #cccccc !important;
+  text-decoration: none !important;
+}
+
+/* Disabled button */
+.introjs-disabled,
+.introjs-disabled:hover,
+.introjs-disabled:focus {
+  background-color: #1a1a1a !important;
+  color: #555555 !important;
+  cursor: not-allowed !important;
+  border-color: #2a2a2a !important;
+}
+
+/* Progress bar */
+.introjs-progress {
+  background-color: #2a2a2a !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+  height: 4px !important;
+}
+
+.introjs-progressbar {
+  background-color: #0066cc !important;
+}
+
+/* Bullets (navigation dots) */
+.introjs-bullets ul li a {
+  background: #3a3a3a !important;
+  border: 1px solid #4a4a4a !important;
+  width: 8px !important;
+  height: 8px !important;
+  box-shadow: none !important;
+}
+
+.introjs-bullets ul li a:hover {
+  background: #4a4a4a !important;
+  border-color: #5a5a5a !important;
+}
+
+.introjs-bullets ul li a.active {
+  background: #0066cc !important;
+  border-color: #0066cc !important;
+  box-shadow: none !important;
+}
+
+/* Overlay - dark and clear */
+.introjs-overlay {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Highlighted element - THIS IS KEY FOR VISIBILITY */
+.introjs-helperLayer {
+  background-color: transparent !important;
+  border: 2px solid #0066cc !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 0 5000px rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Step number badge - clean and simple */
+.introjs-helperNumberLayer {
+  background: #0066cc !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: normal !important;
+  font-size: 16px !important;
+  padding: 4px 8px !important;
+}
+
+/* Floating element styling */
+.introjs-floating {
+  box-shadow: none !important;
+}
+
+/* Remove all animations and transitions for cleaner look */
+.introjs-hint-pulse {
+  animation: none !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Hint dots (if using hints) */
+.introjs-hint {
+  background-color: #0066cc !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.introjs-hint:hover {
+  background-color: #0052a3 !important;
+}
