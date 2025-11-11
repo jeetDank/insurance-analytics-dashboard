@@ -1,0 +1,375 @@
+.formula-editor-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #1f2937;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  color: #f9fafb;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f9fafb;
+  margin: 0;
+}
+
+/* Variables Section */
+.variables-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #111827;
+  border-radius: 8px;
+  border: 1px solid #374151;
+}
+
+.variables-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.variables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.75rem;
+}
+
+.variable-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.variable-item:hover {
+  background: #2d3748;
+  border-color: #4b5563;
+}
+
+.variable-name {
+  font-family: 'Courier New', monospace;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.variable-value {
+  color: #9ca3af;
+}
+
+/* Formula Input Section */
+.formula-input-section {
+  margin-bottom: 1.5rem;
+}
+
+.formula-input-section label {
+  display: block;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.formula-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+  background: #111827;
+  color: #f9fafb;
+  border: 2px solid #374151;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.formula-input:focus {
+  border-color: #3b82f6;
+}
+
+.formula-input::placeholder {
+  color: #6b7280;
+}
+
+/* Suggestions Dropdown */
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* Custom Scrollbar for Suggestions */
+.suggestions-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-track {
+  background: #111827;
+  border-radius: 8px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 8px;
+}
+
+.suggestions-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.suggestion-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  border-bottom: 1px solid #374151;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.selected {
+  background-color: #374151;
+}
+
+.suggestion-name {
+  font-family: 'Courier New', monospace;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.suggestion-value {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.hint-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* Result Section */
+.result-section {
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.result-section.success {
+  background-color: #064e3b;
+  border: 2px solid #10b981;
+}
+
+.result-section.error {
+  background-color: #7f1d1d;
+  border: 2px solid #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.result-label {
+  font-weight: 600;
+  color: #6ee7b7;
+  margin-bottom: 0.5rem;
+}
+
+.result-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #34d399;
+  font-family: 'Courier New', monospace;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+  color: #fca5a5;
+}
+
+.error-message {
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+/* Examples Section */
+.examples-section {
+  padding: 1.5rem;
+  background: #111827;
+  border-radius: 8px;
+  border: 1px solid #374151;
+}
+
+.examples-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.examples-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.examples-section li {
+  margin-bottom: 0.5rem;
+}
+
+.examples-section code {
+  background: #1f2937;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #60a5fa;
+  display: inline-block;
+  border: 1px solid #374151;
+  transition: background-color 0.2s;
+}
+
+.examples-section code:hover {
+  background: #2d3748;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .formula-editor-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .variables-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .result-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.suggestions-dropdown {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.result-section {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Focus States for Accessibility */
+.btn:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.formula-input:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+.suggestion-item:focus {
+  outline: 2px solid #60a5fa;
+  outline-offset: -2px;
+}

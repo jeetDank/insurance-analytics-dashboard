@@ -488,7 +488,14 @@
 
       <div>
 
-        <app-metric-tree-table [requestedMetrics]="userQueryResponseData?.metrics" [companies]="allResponses.analysisData?.results" ></app-metric-tree-table>
+        @if (isSegmentWiseTableVisible) {
+      <div class="mt-5 d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">Segment Analysis</h3>
+        
+      </div>
+      <app-metric-tree-table [requestedMetrics]="userQueryResponseData?.metrics" [companies]="allResponses.analysisData?.results" ></app-metric-tree-table>
+      }
+
       </div>
 
       
@@ -513,14 +520,17 @@
 </p-drawer>
 
 <p-popover #op styleClass="dark-popover">
-  <!-- popover.component.html -->
+ <app-formula-editor  ></app-formula-editor>
+</p-popover>
+<!-- <p-popover #op styleClass="dark-popover">
+ 
   <div class="popover-body p-3">
-    <!-- Metric -->
+    
     <h6 class="mb-1 fw-semibold text-primary">
       {{ this.popoverData?.name ? this.popoverData?.name : "N/A" }}
     </h6>
 
-    <!-- Definition -->
+   
 
     @if(this.popoverData?.error){
     <p class="text-secondary mb-3 text-danger">
@@ -528,12 +538,10 @@
     </p>
     }
 
-    <!-- Formula label + Edit button -->
     <div class="d-flex justify-content-between align-items-center mb-2">
       <label class="fw-medium mb-0">Formula</label>
     </div>
 
-    <!-- Input box -->
 
     <div class="border border-1 p-3 rounded-1">
       {{
@@ -543,4 +551,6 @@
       }}
     </div>
   </div>
-</p-popover>
+</p-popover> -->
+
+

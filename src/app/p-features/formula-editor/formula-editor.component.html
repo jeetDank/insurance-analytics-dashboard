@@ -1,0 +1,96 @@
+<div class="formula-editor-container">
+  <div class="header">
+    <h2>Formula Calculator</h2>
+  </div>
+
+  <!-- Variables Reference Section -->
+  <!-- <div class="variables-section">
+    <h3>Available Variables:</h3>
+    <div class="variables-grid">
+      @for (variable of variables(); track variable.name) {
+        <div class="variable-item">
+          <span class="variable-name">{{ variable.name }}</span>
+          <span class="variable-value">{{ variable.value | number }}</span>
+        </div>
+      }
+    </div>
+  </div> -->
+
+  <!-- Formula Input Section -->
+  <div class="formula-input-section">
+    <label for="formulaInput">Enter Formula:</label>
+    <div class="input-wrapper">
+      <input
+        #formulaInput
+        type="text"
+        id="formulaInput"
+        [ngModel]="formula()"
+        (ngModelChange)="formula.set($event)"
+        (input)="onFormulaChange($event)"
+        (keydown)="onKeyDown($event)"
+        placeholder="e.g., revenue - expenses or net_income / revenue * 100"
+        class="formula-input"
+      />
+      
+      <!-- Suggestions Dropdown -->
+      @if (showSuggestions()) {
+        <div class="suggestions-dropdown">
+          @for (suggestion of suggestions(); track suggestion; let i = $index) {
+            <div
+              class="suggestion-item"
+              [class.selected]="i === selectedSuggestionIndex()"
+              (click)="selectSuggestion(suggestion)"
+            >
+              <span class="suggestion-name">{{ suggestion }}</span>
+              <span class="suggestion-value">
+                {{ getVariableValue(suggestion) | number }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="hint-text">
+      Start typing a variable name to see suggestions. Use operators: +, -, *, /, ()
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button class="btn btn-primary" (click)="calculateFormula()">
+      Calculate & Add
+    </button>
+    <button class="btn btn-secondary" (click)="clearFormula()">
+      Clear
+    </button>
+  </div>
+
+  <!-- Result Section -->
+  @if (result() !== null) {
+    <div class="result-section success">
+      <div class="result-label">Result:</div>
+      <div class="result-value">{{ result() | number:'1.2-2' }}</div>
+    </div>
+  }
+
+  <!-- Error Section -->
+  @if (error()) {
+    <div class="result-section error">
+      <div class="error-icon">⚠</div>
+      <div class="error-message">{{ error() }}</div>
+    </div>
+  }
+
+  <!-- Examples Section -->
+  <!-- <div class="examples-section">
+    <h3>Example Formulas:</h3>
+    <ul>
+      <li><code>revenue - expenses</code></li>
+      <li><code>net_income / revenue * 100</code></li>
+      <li><code>(revenue - expenses) / revenue</code></li>
+      <li><code>total_assets - total_liabilities</code></li>
+      <li><code>gross_profit / revenue * 100</code></li>
+    </ul>
+  </div> -->
+</div>

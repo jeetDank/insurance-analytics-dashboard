@@ -36,6 +36,7 @@ import { ExcelDataDebugService } from '../common/services/data-debug.service';
 import introJs from 'intro.js';
 import { TransformDataStructureService } from '../common/services/transform-data-structure-service';
 import { MetricTreeTableComponent } from '../common/components/segement-table/metric-tree-table.component';
+import { FormulaEditorComponent } from './formula-editor/formula-editor.component';
 
 interface message {
   text: string;
@@ -207,7 +208,8 @@ interface CompanyChartOption {
     ProgressSpinnerModule,
     MatTableModule,
     SelectModule,
-    MetricTreeTableComponent
+    MetricTreeTableComponent,
+    FormulaEditorComponent
   ],
   templateUrl: './p-features.component.html',
   styleUrl: './p-features.component.scss',
@@ -859,6 +861,8 @@ export class PFeaturesComponent {
     return keywords.some((keyword) => keyword_check.includes(keyword));
   }
 
+  isSegmentWiseTableVisible:boolean = false
+
   handleAnalysisResponse(res: any) {
     this.allResponses.analysisData = res;
 
@@ -883,6 +887,7 @@ export class PFeaturesComponent {
     // const hasSegmentFilter =  this.userQueryResponseData?.segment_filter;
     const keyword_check = this.checkIfSegmentKeywordPresent();
     console.log(keyword_check);
+    this.isSegmentWiseTableVisible = keyword_check;
 
     if (keyword_check) {
       // Segment filter exists - use pie charts for breakdown across all quarters and all segment types
