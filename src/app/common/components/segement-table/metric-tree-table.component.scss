@@ -6,391 +6,6 @@
   
   .toolbar {
     display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #333;
-    
-    button {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background-color: #2d2d2d;
-      color: #e0e0e0;
-      border: 1px solid #404040;
-      transition: all 0.3s ease;
-      
-      &:hover {
-        background-color: #3d3d3d;
-        border-color: #505050;
-      }
-      
-      mat-icon {
-        color: #90caf9;
-      }
-    }
-  }
-  
-  .mat-tree {
-    background: transparent;
-    
-    .mat-tree-node-content {
-      display: flex;
-      align-items: center;
-      min-height: 48px;
-      padding: 4px 0;
-      border-bottom: 1px solid #333;
-      transition: background-color 0.2s ease;
-      
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-      }
-      
-      &.company-node {
-        background-color: #1a237e;
-        font-weight: 600;
-        font-size: 16px;
-        color: #90caf9;
-        border-bottom: 2px solid #283593;
-        
-        &:hover {
-          background-color: #283593;
-        }
-        
-        .node-value,
-        .node-percentage,
-        .node-unit {
-          color: #bbdefb;
-        }
-      }
-      
-      &.quarter-node {
-        background-color: #212121;
-        font-weight: 500;
-        font-size: 14px;
-        color: #81c784;
-        border-bottom: 1px solid #424242;
-        
-        &:hover {
-          background-color: #2c2c2c;
-        }
-        
-        .node-value,
-        .node-percentage,
-        .node-unit {
-          color: #a5d6a7;
-        }
-      }
-      
-      &.metric-node {
-        font-weight: 500;
-        background-color: #263238;
-        color: #e0e0e0;
-        
-        &:hover {
-          background-color: #2f3c43;
-        }
-        
-        .node-value {
-          color: #fff59d;
-          font-weight: 500;
-        }
-        
-        .node-percentage {
-          color: #80deea;
-        }
-      }
-      
-      &.segment-group {
-        background-color: #3e2723;
-        font-weight: 500;
-        font-style: italic;
-        color: #ffb74d;
-        border-left: 3px solid #ff9800;
-        
-        &:hover {
-          background-color: #4e342e;
-        }
-        
-        .node-value,
-        .node-percentage,
-        .node-unit {
-          color: #ffcc80;
-        }
-      }
-      
-      &.segment-node {
-        font-weight: 400;
-        background-color: #1e1e1e;
-        color: #b0bec5;
-        
-        &:hover {
-          background-color: #2a2a2a;
-        }
-        
-        .node-value {
-          color: #e0e0e0;
-        }
-        
-        .node-percentage {
-          color: #4dd0e1;
-        }
-      }
-      
-      button {
-        margin-right: 8px;
-        color: #90caf9;
-        
-        &:disabled {
-          color: #616161;
-        }
-        
-        mat-icon {
-          color: inherit;
-        }
-      }
-      
-      .node-name {
-        flex: 2;
-        padding-right: 16px;
-        font-weight: inherit;
-      }
-      
-      .node-value {
-        flex: 1;
-        text-align: right;
-        padding-right: 16px;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 14px;
-        font-weight: 500;
-      }
-      
-      .node-percentage {
-        flex: 0.5;
-        text-align: right;
-        padding-right: 16px;
-        font-size: 13px;
-        font-weight: 400;
-      }
-      
-      .node-unit {
-        flex: 0.5;
-        text-align: center;
-        color: #78909c;
-        font-size: 12px;
-        text-transform: uppercase;
-      }
-    }
-  }
-  
-  .tree-invisible {
-    display: none;
-  }
-  
-  // Scrollbar styling for dark theme
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #1e1e1e;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: #424242;
-    border-radius: 4px;
-    
-    &:hover {
-      background: #616161;
-    }
-  }
-}
-
-// Material tooltip dark theme override
-::ng-deep {
-  .mat-mdc-tooltip {
-    &.mdc-tooltip {
-      background-color: #424242 !important;
-      color: #e0e0e0 !important;
-      border: 1px solid #616161;
-      
-      .mdc-tooltip__surface {
-        background-color: #424242 !important;
-        color: #e0e0e0 !important;
-      }
-    }
-  }
-  
-  // Material button dark theme
-  .metric-tree-table-container {
-    .mat-mdc-raised-button {
-      &:not(:disabled) {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-        
-        &:hover {
-          background-color: #3d3d3d;
-        }
-      }
-    }
-    
-    // Icon button in tree
-    .mat-mdc-icon-button {
-      color: #90caf9;
-      
-      &:disabled {
-        color: #616161;
-      }
-    }
-  }
-}
-
-// Alternative: Even darker variant
-.metric-tree-table-container.ultra-dark {
-  background-color: #121212;
-  
-  .toolbar {
-    border-bottom: 1px solid #272727;
-    
-    button {
-      background-color: #1e1e1e;
-      border: 1px solid #2d2d2d;
-      
-      &:hover {
-        background-color: #2d2d2d;
-        border-color: #3d3d3d;
-      }
-    }
-  }
-  
-  .mat-tree {
-    .mat-tree-node-content {
-      border-bottom: 1px solid #272727;
-      
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.03);
-      }
-      
-      &.company-node {
-        background-color: #0d1b3e;
-        border-bottom: 2px solid #1a2948;
-        
-        &:hover {
-          background-color: #1a2948;
-        }
-      }
-      
-      &.quarter-node {
-        background-color: #151515;
-        border-bottom: 1px solid #2d2d2d;
-        
-        &:hover {
-          background-color: #1f1f1f;
-        }
-      }
-      
-      &.metric-node {
-        background-color: #1a2128;
-        
-        &:hover {
-          background-color: #212b33;
-        }
-      }
-      
-      &.segment-group {
-        background-color: #2d1f1a;
-        
-        &:hover {
-          background-color: #3d2b24;
-        }
-      }
-      
-      &.segment-node {
-        background-color: #121212;
-        
-        &:hover {
-          background-color: #1d1d1d;
-        }
-      }
-    }
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #121212;
-  }
-}
-
-// Accessibility: High contrast dark mode
-.metric-tree-table-container.high-contrast-dark {
-  background-color: #000000;
-  border: 2px solid #ffffff;
-  
-  .toolbar {
-    border-bottom: 2px solid #ffffff;
-    
-    button {
-      background-color: #1a1a1a;
-      border: 2px solid #ffffff;
-      color: #ffffff;
-      
-      &:hover {
-        background-color: #333333;
-      }
-    }
-  }
-  
-  .mat-tree {
-    .mat-tree-node-content {
-      border-bottom: 1px solid #ffffff;
-      color: #ffffff;
-      
-      &.company-node {
-        background-color: #0a0080;
-        color: #ffffff;
-        border: 1px solid #00ffff;
-      }
-      
-      &.quarter-node {
-        background-color: #004d00;
-        color: #ffffff;
-        border: 1px solid #00ff00;
-      }
-      
-      &.metric-node {
-        background-color: #1a1a1a;
-        color: #ffff00;
-      }
-      
-      &.segment-group {
-        background-color: #4d2600;
-        color: #ffaa00;
-        border: 1px solid #ff6600;
-      }
-      
-      &.segment-node {
-        background-color: #000000;
-        color: #cccccc;
-      }
-      
-      .node-value,
-      .node-percentage,
-      .node-unit {
-        color: #ffffff;
-      }
-    }
-  }
-}
-
-
-.metric-tree-table-container {
-  padding: 16px;
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-  border-radius: 8px;
-  
-  .toolbar {
-    display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
@@ -447,5 +62,262 @@
     }
   }
   
-  // ... rest of the styles remain the same
+  .mat-tree {
+    background: transparent;
+    
+    // Base styles for all tree nodes
+    .mat-tree-node {
+      min-height: 48px;
+      border-bottom: 1px solid #333;
+      
+      // Reset default Material styles
+      &:hover {
+        background-color: transparent;
+      }
+    }
+    
+    .mat-tree-node-content {
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      padding: 4px 0;
+      width: 100%;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      
+      // Company level styling
+      &.company-node {
+        background-color: #1a237e;
+        font-weight: 600;
+        font-size: 16px;
+        color: #90caf9;
+        border-bottom: 2px solid #283593;
+        
+        &:hover {
+          background-color: #283593;
+        }
+        
+        .node-name {
+          color: #90caf9;
+        }
+        
+        .node-value,
+        .node-percentage,
+        .node-unit {
+          color: #bbdefb;
+        }
+      }
+      
+      // Quarter level styling
+      &.quarter-node {
+        background-color: #212121;
+        font-weight: 500;
+        font-size: 14px;
+        color: #81c784;
+        border-bottom: 1px solid #424242;
+        
+        &:hover {
+          background-color: #2c2c2c;
+        }
+        
+        .node-name {
+          color: #81c784;
+        }
+        
+        .node-value,
+        .node-percentage,
+        .node-unit {
+          color: #a5d6a7;
+        }
+      }
+      
+      // Metric level styling
+      &.metric-node {
+        background-color: #263238;
+        font-weight: 500;
+        color: #e0e0e0;
+        
+        &:hover {
+          background-color: #2f3c43;
+        }
+        
+        .node-name {
+          color: #e0e0e0;
+        }
+        
+        .node-value {
+          color: #fff59d;
+          font-weight: 500;
+        }
+        
+        .node-percentage {
+          color: #80deea;
+        }
+      }
+      
+      // Segment group styling
+      &.segment-group {
+        background-color: #3e2723;
+        font-weight: 500;
+        font-style: italic;
+        color: #ffb74d;
+        border-left: 3px solid #ff9800;
+        
+        &:hover {
+          background-color: #4e342e;
+        }
+        
+        .node-name {
+          color: #ffb74d;
+        }
+        
+        .node-value,
+        .node-percentage,
+        .node-unit {
+          color: #ffcc80;
+        }
+      }
+      
+      // Individual segment styling
+      &.segment-node {
+        background-color: #1e1e1e;
+        font-weight: 400;
+        color: #b0bec5;
+        
+        &:hover {
+          background-color: #2a2a2a;
+        }
+        
+        .node-name {
+          color: #b0bec5;
+        }
+        
+        .node-value {
+          color: #e0e0e0;
+        }
+        
+        .node-percentage {
+          color: #4dd0e1;
+        }
+      }
+      
+      // Toggle button styling
+      button {
+        margin-right: 8px;
+        flex-shrink: 0;
+        color: #90caf9;
+        
+        &:disabled {
+          color: #616161;
+        }
+        
+        mat-icon {
+          color: inherit;
+        }
+      }
+      
+      // Column styling
+      .node-name {
+        flex: 2;
+        padding-right: 16px;
+        font-weight: inherit;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .node-value {
+        flex: 1;
+        text-align: right;
+        padding-right: 16px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      
+      .node-percentage {
+        flex: 0.5;
+        text-align: right;
+        padding-right: 16px;
+        font-size: 13px;
+        font-weight: 400;
+      }
+      
+      .node-unit {
+        flex: 0.5;
+        text-align: center;
+        color: #78909c;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+    }
+  }
+  
+  // Scrollbar styling for dark theme
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #1e1e1e;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #616161;
+    }
+  }
+}
+
+// Material overrides
+::ng-deep {
+  // Tooltip dark theme
+  .mat-mdc-tooltip {
+    &.mdc-tooltip {
+      background-color: #424242 !important;
+      color: #e0e0e0 !important;
+      border: 1px solid #616161;
+      
+      .mdc-tooltip__surface {
+        background-color: #424242 !important;
+        color: #e0e0e0 !important;
+      }
+    }
+  }
+  
+  // Material button dark theme
+  .metric-tree-table-container {
+    .mat-mdc-raised-button {
+      &:not(:disabled) {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+        
+        &:hover {
+          background-color: #3d3d3d;
+        }
+      }
+    }
+    
+    // Icon button in tree
+    .mat-mdc-icon-button {
+      color: #90caf9;
+      
+      &:disabled {
+        color: #616161;
+      }
+    }
+    
+    // Ensure mat-tree-node takes full width
+    .mat-tree-node {
+      display: block !important;
+      width: 100%;
+    }
+  }
 }

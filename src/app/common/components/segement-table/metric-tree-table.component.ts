@@ -1,4 +1,4 @@
-import { Component, input, effect, signal, computed } from '@angular/core';
+import { Component, input, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener, MatTreeModule } from '@angular/material/tree';
@@ -24,6 +24,7 @@ export interface MetricNode {
   parent_value?: number;
   format_type: string;
   children?: { [key: string]: MetricNode | SegmentGroup };
+  nodeType?:any
 }
 
 // Interface for segment groups (like "Business Segments", "Consolidation Items")
@@ -33,8 +34,9 @@ export interface SegmentGroup {
 
 // Interface for quarter data
 export interface QuarterData {
-  quarter: string;
-  year: number;
+  period?: string;
+  quarter?: string;
+  year?: number;
   metrics: { [key: string]: MetricNode };
 }
 
@@ -43,6 +45,19 @@ export interface CompanyData {
   company_name: string;
   ticker?: string;
   statements: QuarterData[];
+}
+
+// Internal tree node structure
+interface TreeNode {
+  name: string;
+  value?: number;
+  percentage_of_parent?: number;
+  format_type?: string;
+  unit?: string;
+  description?: string | null;
+  nodeType: 'company' | 'quarter' | 'metric' | 'segment-group' | 'segment';
+  isSegmentGroup?: boolean;
+  children?: TreeNode[];
 }
 
 // Flattened node interface for the tree
@@ -87,8 +102,8 @@ export class MetricTreeTableComponent {
 
   // Tree control and data source
   treeControl: FlatTreeControl<FlatMetricNode>;
-  treeFlattener: MatTreeFlattener<any, FlatMetricNode>;
-  dataSource: MatTreeFlatDataSource<any, FlatMetricNode>;
+  treeFlattener: MatTreeFlattener<TreeNode, FlatMetricNode>;
+  dataSource: MatTreeFlatDataSource<TreeNode, FlatMetricNode>;
 
   constructor() {
     // Initialize tree flattener
@@ -123,43 +138,9 @@ export class MetricTreeTableComponent {
   }
 
   // Transform nested node to flat node
-  private transformer = (node: any, level: number): FlatMetricNode => {
-    // Handle company node
-    if (node.nodeType === 'company') {
-      return {
-        expandable: node.statements && node.statements.length > 0,
-        name: node.company_name + (node.ticker ? ` (${node.ticker})` : ''),
-        level: level,
-        nodeType: 'company',
-        isSegmentGroup: false
-      };
-    }
-
-    // Handle quarter node
-    if (node.nodeType === 'quarter') {
-      return {
-        expandable: node.metrics && Object.keys(node.metrics).length > 0,
-        name: `${node.quarter} ${node.year}`,
-        level: level,
-        nodeType: 'quarter',
-        isSegmentGroup: false
-      };
-    }
-
-    // Handle segment group node (like "Business Segments")
-    if (node.nodeType === 'segment-group') {
-      return {
-        expandable: true,
-        name: node.name,
-        level: level,
-        nodeType: 'segment-group',
-        isSegmentGroup: true
-      };
-    }
-
-    // Handle metric node
+  private transformer = (node: TreeNode, level: number): FlatMetricNode => {
     return {
-      expandable: !!node.children && Object.keys(node.children).length > 0,
+      expandable: !!node.children && node.children.length > 0,
       name: node.name,
       value: node.value,
       percentage_of_parent: node.percentage_of_parent,
@@ -167,8 +148,8 @@ export class MetricTreeTableComponent {
       level: level,
       unit: node.unit,
       description: node.description,
-      nodeType: node.children ? 'metric' : 'segment',
-      isSegmentGroup: false
+      nodeType: node.nodeType,
+      isSegmentGroup: node.isSegmentGroup || false
     };
   };
 
@@ -178,114 +159,106 @@ export class MetricTreeTableComponent {
   // Check if node is expandable
   private isExpandable = (node: FlatMetricNode): boolean => node.expandable;
 
-  // Get children of the node - handles all nested structures
-  private getChildren = (node: any): any[] => {
-    // Company node - return statements as quarters
-    if (node.nodeType === 'company') {
-      return node.statements.map((statement: QuarterData) => ({
-        ...statement,
-        nodeType: 'quarter'
-      }));
-    }
-
-    // Quarter node - return metrics (filtered if requested metrics exist)
-    if (node.nodeType === 'quarter') {
-      const metricsArray: any[] = [];
-      Object.keys(node.metrics).forEach(key => {
-        const metric = node.metrics[key];
-        metricsArray.push({
-          ...metric,
-          nodeType: 'metric'
-        });
-      });
-      return metricsArray;
-    }
-
-    // Segment group node - return segments
-    if (node.nodeType === 'segment-group') {
-      const segmentsArray: any[] = [];
-      Object.keys(node.segments).forEach(key => {
-        const segment = node.segments[key];
-        segmentsArray.push({
-          ...segment,
-          nodeType: 'segment'
-        });
-      });
-      return segmentsArray;
-    }
-
-    // Metric or segment node with children
-    if (node.children) {
-      const childrenArray: any[] = [];
-      
-      Object.keys(node.children).forEach(key => {
-        const child = node.children[key];
-        
-        // Check if this is a segment group (contains multiple segments)
-        // A segment group is identified by having children that are all MetricNodes
-        if (this.isSegmentGroup(child)) {
-          // This is a segment group (like "Business Segments", "Consolidation Items")
-          childrenArray.push({
-            name: key,
-            nodeType: 'segment-group',
-            segments: child
-          });
-        } else {
-          // This is a regular segment/metric
-          childrenArray.push({
-            ...child,
-            nodeType: 'segment'
-          });
-        }
-      });
-      
-      return childrenArray;
-    }
-
-    return [];
+  // Get children of the node
+  private getChildren = (node: TreeNode): TreeNode[] => {
+    return node.children || [];
   };
+
+  // Check if node has children
+  hasChild = (_: number, node: FlatMetricNode): boolean => node.expandable;
+
+  // Get quarter display name
+  private getQuarterDisplayName(statement: QuarterData): string {
+    if (statement.period) {
+      return statement.period;
+    }
+    if (statement.quarter && statement.year) {
+      return `${statement.quarter} ${statement.year}`;
+    }
+    return 'Period';
+  }
 
   // Helper method to check if an object is a segment group
   private isSegmentGroup(obj: any): boolean {
     if (!obj || typeof obj !== 'object') return false;
     
-    // Check if all properties are objects with metric-like properties
     const keys = Object.keys(obj);
     if (keys.length === 0) return false;
     
-    // If it has a 'value' property, it's a metric node, not a group
     if ('value' in obj) return false;
     
-    // Check if all children have 'value' property (indicating they are metrics)
     return keys.every(key => {
       const child = obj[key];
       return child && typeof child === 'object' && 'value' in child;
     });
   }
 
-  // Check if node has children
-  hasChild = (_: number, node: FlatMetricNode): boolean => node.expandable;
+  // Convert metric node to tree node
+  private convertMetricToTreeNode(metric: MetricNode): TreeNode {
+    const treeNode: TreeNode = {
+      name: metric.name,
+      value: metric.value,
+      percentage_of_parent: metric.percentage_of_parent,
+      format_type: metric.format_type,
+      unit: metric.unit,
+      description: metric.description,
+      nodeType: 'metric',
+      isSegmentGroup: false,
+      children: []
+    };
 
-  // Helper method to check if a metric should be included based on requested metrics
+    // Process children if they exist
+    if (metric.children && Object.keys(metric.children).length > 0) {
+      Object.keys(metric.children).forEach(key => {
+        const child:any = metric.children![key];
+        
+        if (this.isSegmentGroup(child)) {
+          // This is a segment group
+          const segmentGroupNode: TreeNode = {
+            name: key,
+            nodeType: 'segment-group',
+            isSegmentGroup: true,
+            children: []
+          };
+          
+          // Add segments to the group
+          Object.keys(child).forEach(segmentKey => {
+            const segment = child[segmentKey] as MetricNode;
+            segmentGroupNode.children!.push(this.convertMetricToTreeNode({
+              ...segment,
+              nodeType: 'segment' as any
+            }));
+          });
+          
+          treeNode.children!.push(segmentGroupNode);
+        } else {
+          // This is a regular child metric
+          const childMetric = child as MetricNode;
+          treeNode.children!.push(this.convertMetricToTreeNode({
+            ...childMetric,
+            nodeType: 'segment' as any
+          }));
+        }
+      });
+    }
+
+    return treeNode;
+  }
+
+  // Helper method to check if a metric should be included
   private shouldIncludeMetric(metricKey: string, requestedMetrics: string[]): boolean {
-    // If no filter is provided, include all metrics
     if (!requestedMetrics || requestedMetrics.length === 0) {
       return true;
     }
     
-    // Check if the metric key matches any of the requested metrics
-    // Handle both exact matches and variations (e.g., "revenue" matches "revenue_Operatings")
     return requestedMetrics.some(requestedMetric => {
       const normalizedMetricKey = metricKey.toLowerCase();
       const normalizedRequestedMetric = requestedMetric.toLowerCase();
       
-      // Exact match
       if (normalizedMetricKey === normalizedRequestedMetric) {
         return true;
       }
       
-      // Check if the metric key starts with the requested metric followed by underscore
-      // This handles cases like "revenue_Operatings" when filtering for "revenue"
       if (normalizedMetricKey.startsWith(normalizedRequestedMetric + '_')) {
         return true;
       }
@@ -294,53 +267,47 @@ export class MetricTreeTableComponent {
     });
   }
 
-  // Filter metrics based on requested metrics list
-  private filterMetrics(metrics: { [key: string]: MetricNode }, requestedMetrics: string[]): { [key: string]: MetricNode } {
-    // If no filter is provided, return all metrics
-    if (!requestedMetrics || requestedMetrics.length === 0) {
-      return metrics;
-    }
-    
-    const filteredMetrics: { [key: string]: MetricNode } = {};
-    
-    Object.keys(metrics).forEach(key => {
-      if (this.shouldIncludeMetric(key, requestedMetrics)) {
-        filteredMetrics[key] = metrics[key];
-      }
-    });
-    
-    return filteredMetrics;
-  }
-
-  // Filter companies data based on requested metrics
-  private filterCompaniesData(companies: CompanyData[], requestedMetrics: string[]): CompanyData[] {
-    // If no filter is provided, return all companies as-is
-    if (!requestedMetrics || requestedMetrics.length === 0) {
-      return companies;
-    }
-    
-    return companies.map(company => ({
-      ...company,
-      statements: company.statements.map(statement => ({
-        ...statement,
-        metrics: this.filterMetrics(statement.metrics, requestedMetrics)
-      })).filter(statement => Object.keys(statement.metrics).length > 0) // Remove quarters with no matching metrics
-    })).filter(company => company.statements.length > 0); // Remove companies with no matching quarters
-  }
-
   // Load data from input companies
   private loadData(companies: CompanyData[], requestedMetrics: string[]): void {
-    // Filter the companies data based on requested metrics
-    const filteredCompanies = this.filterCompaniesData(companies, requestedMetrics);
-    
-    const companiesArray = filteredCompanies.map(company => ({
-      ...company,
-      nodeType: 'company'
-    }));
-    
-    this.dataSource.data = companiesArray;
-    console.log(companiesArray);
-    
+    const treeData: TreeNode[] = [];
+
+    companies.forEach(company => {
+      const companyNode: TreeNode = {
+        name: company.company_name + (company.ticker ? ` (${company.ticker})` : ''),
+        nodeType: 'company',
+        children: []
+      };
+
+      company.statements.forEach(statement => {
+        const quarterNode: TreeNode = {
+          name: this.getQuarterDisplayName(statement),
+          nodeType: 'quarter',
+          children: []
+        };
+
+        // Process metrics for this quarter
+        Object.keys(statement.metrics).forEach(metricKey => {
+          // Apply filter
+          if (this.shouldIncludeMetric(metricKey, requestedMetrics)) {
+            const metric = statement.metrics[metricKey];
+            const metricTreeNode = this.convertMetricToTreeNode(metric);
+            quarterNode.children!.push(metricTreeNode);
+          }
+        });
+
+        // Only add quarter if it has metrics
+        if (quarterNode.children!.length > 0) {
+          companyNode.children!.push(quarterNode);
+        }
+      });
+
+      // Only add company if it has quarters with metrics
+      if (companyNode.children!.length > 0) {
+        treeData.push(companyNode);
+      }
+    });
+
+    this.dataSource.data = treeData;
   }
 
   // Format currency values
@@ -356,7 +323,6 @@ export class MetricTreeTableComponent {
       }).format(value);
     }
     
-    // Handle other format types
     return value.toLocaleString('en-US');
   }
 
@@ -384,7 +350,7 @@ export class MetricTreeTableComponent {
     this.treeControl.collapseAll();
   }
   
-  // Get count of displayed metrics (useful for showing in UI)
+  // Get count of displayed metrics
   getDisplayedMetricsCount(): number {
     const requestedMetrics = this.requestedMetrics();
     return requestedMetrics && requestedMetrics.length > 0 ? requestedMetrics.length : 0;
