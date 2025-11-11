@@ -23,7 +23,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { MainService } from '../common/services/main.service';
 import { FormsModule } from '@angular/forms';
 import { PopoverModule } from 'primeng/popover';
-
+import {MatTableModule} from '@angular/material/table';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { LoaderService } from '../common/services/loader.service';
 import { MessageModule } from 'primeng/message';
@@ -34,6 +34,8 @@ import { ExcelExportService } from '../common/services/excel-export.service';
 import { ExcelDataDebugService } from '../common/services/data-debug.service';
 
 import introJs from 'intro.js';
+import { TransformDataStructureService } from '../common/services/transform-data-structure-service';
+import { MetricTreeTableComponent } from '../common/components/segement-table/metric-tree-table.component';
 
 interface message {
   text: string;
@@ -203,8 +205,9 @@ interface CompanyChartOption {
     FormsModule,
     PopoverModule,
     ProgressSpinnerModule,
-
+    MatTableModule,
     SelectModule,
+    MetricTreeTableComponent
   ],
   templateUrl: './p-features.component.html',
   styleUrl: './p-features.component.scss',
@@ -225,6 +228,10 @@ export class PFeaturesComponent {
   comparisonMetrics: ComparisonMetric[] = [];
 
   samplePrompts: any = [
+     {
+      id: 3,
+      prompt: 'Compare gross margins for JPM and PGR for last quarter',
+    },
     {
       id: 0,
       prompt:
@@ -236,10 +243,7 @@ export class PFeaturesComponent {
       prompt:
         'Give me segment wise revenue breakdown for Hartford and Allstate for Q1 and Q2 2025',
     },
-    {
-      id: 3,
-      prompt: 'Compare gross margins for JPM and PGR for last quarter',
-    },
+   
     {
       id: 3,
       prompt:
@@ -422,7 +426,7 @@ export class PFeaturesComponent {
 
   constructor(
     private excelExportService: ExcelExportService,
-    private excelDebugService: ExcelDataDebugService,
+    private transformData:TransformDataStructureService,
     private msg: MessageService,
     private main: MainService,
     private loader: LoaderService
@@ -450,7 +454,7 @@ export class PFeaturesComponent {
   {
     element: '#step1',
     intro: 'Type your query here to get started.',
-    position: 'right'
+    position: 'bottom'
   },
   {
     element: '#step2',
@@ -483,7 +487,7 @@ export class PFeaturesComponent {
     showBullets: false,
     showStepNumbers: false,
     overlayOpacity: 0.1, // Higher opacity for better contrast
-    scrollToElement: true,
+    scrollToElement: false,
     disableInteraction: false
   
     }).start();
@@ -857,6 +861,10 @@ export class PFeaturesComponent {
 
   handleAnalysisResponse(res: any) {
     this.allResponses.analysisData = res;
+
+    
+    
+    
 
     this.cardData = this.groupByMetricName(
       this.populateCardData(

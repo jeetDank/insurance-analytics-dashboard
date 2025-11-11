@@ -218,6 +218,10 @@
         }
       </div>
 
+      <div class="mt-5 mb-5 fs-3 text-center text-secondary" >
+        Enter a prompt or select a sample prompt to get started with your financial analysis.
+      </div>
+
       }
       <!-- <div class="mb-2 mt-2">
         <p-progressbar mode="indeterminate" [style]="{ height: '3px' }" />
@@ -480,6 +484,14 @@
       }
 
       <div style="height: 50px"></div>
+
+
+      <div>
+
+        <app-metric-tree-table [requestedMetrics]="userQueryResponseData?.metrics" [companies]="allResponses.analysisData?.results" ></app-metric-tree-table>
+      </div>
+
+      
     </div>
   </div>
 </mat-drawer-container>
